@@ -1,1 +1,1 @@
-# Ride-eos
+# RideEos
