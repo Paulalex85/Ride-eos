@@ -27,7 +27,7 @@ namespace rideEOS {
         });
     }
 
-    void Users::get_user(const account_name account) {
+    void Users::getuser(const account_name account) {
         userIndex users(_self, _self);
 
         auto iterator = users.find(account);
@@ -35,6 +35,5 @@ namespace rideEOS {
 
         auto currentUser = users.get(account);
         print("Username: ", currentUser.username.c_str());
-
     }
 }

@@ -21,9 +21,8 @@ namespace rideEOS {
         void update(account_name account, string& username);
 
         //@abi action
-        void get_user(const account_name account);
+        void getuser(const account_name account);
 
-    private:
         //@abi table user i64
         struct user {
             uint64_t account_name;
@@ -34,8 +33,8 @@ namespace rideEOS {
             EOSLIB_SERIALIZE(user, (account_name)(username))
         };
 
-        typedef multi_index<N(user), user> userIndex;
+        typedef multi_index<N(userIndex), user> userIndex;
     };
 
-    EOSIO_ABI(Users, (add)(update)(get_user));
+    EOSIO_ABI(Users, (add)(update)(getuser));
 }
