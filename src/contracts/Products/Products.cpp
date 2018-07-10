@@ -2,6 +2,8 @@
 
 namespace rideEOS {
 
+    EOSIO_ABI(Products, (add)(update)(getprodbyid)(getprodbyusr));
+
     void Products::add(account_name account, string& title, string& description, uint64_t price, bool available){
         require_auth(account);
         productIndex products(_self, _self);
@@ -30,7 +32,24 @@ namespace rideEOS {
         });
     }
 
-    void Products::getproduct(const uint64_t productKey) {
+    void Products::getprodbyusr(const account_name account){
+        productIndex products(_self, _self);
+
+        auto productsUser =products.get_index<N(byuserkey)>();
+
+        print("=== Product === ");
+
+        for (const auto& product : productsUser ) {
+            print("- Product Key : ", product.productKey);
+            print("- Title : ", product.title.c_str());
+            print("- Descri : ", product.description.c_str());
+            print("- Price : ", product.price);
+            print("- Available : ", product.available);
+            print("- Owner Key : ", product.userKey);
+        }
+    }
+
+    void Products::getprodbyid(const uint64_t productKey) {
         productIndex products(_self, _self);
 
         auto iterator = products.find(productKey);
@@ -41,8 +60,8 @@ namespace rideEOS {
         print("- Product Key : ", currentProduct.productKey);
         print("- Title : ", currentProduct.title.c_str());
         print("- Descri : ", currentProduct.description.c_str());
+        print("- Price : ", currentProduct.price);
         print("- Available : ", currentProduct.available);
         print("- Owner Key : ", currentProduct.userKey);
-
     }
 }

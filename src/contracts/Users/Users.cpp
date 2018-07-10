@@ -2,6 +2,8 @@
 
 namespace rideEOS {
 
+    EOSIO_ABI(Users, (add)(update)(getuser));
+
     void Users::add(account_name account, string& username) {
         require_auth(account);
         userIndex users(_self, _self);

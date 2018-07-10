@@ -35,6 +35,4 @@ namespace rideEOS {
 
         typedef multi_index<N(userIndex), user> userIndex;
     };
-
-    EOSIO_ABI(Users, (add)(update)(getuser));
 }
