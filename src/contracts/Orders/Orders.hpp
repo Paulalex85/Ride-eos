@@ -29,7 +29,7 @@ namespace rideEOS {
         void initialize(account_name buyer, account_name seller, account_name deliver);
 
         //@abi action
-        void addinkart(uint64_t orderKey,account_name buyer, uint64_t productKey, uint64_t quantity);
+        void addinkart(uint64_t orderKey,account_name buyer,account_name seller, uint64_t productKey, uint64_t quantity);
 
         //@abi action
         void deleteinkart(uint64_t orderKey, account_name buyer, uint64_t productKey);

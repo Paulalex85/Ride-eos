@@ -68,14 +68,14 @@ namespace rideEOS {
         }
     }
 
-    void Orders::addinkart(uint64_t orderKey, account_name buyer, uint64_t productKey, uint64_t quantity) {
+    void Orders::addinkart(uint64_t orderKey, account_name buyer,account_name seller,uint64_t productKey, uint64_t quantity) {
         require_auth(buyer);
 
-        orderIndex orders(_self, _self);
+        orderIndex orders(_self,_self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
 
-        Products::productIndex products(N(Products), N(Products));
+        Products::productIndex products(seller, seller);
         auto iteratorProduct = products.find(productKey);
         eosio_assert(iteratorProduct != products.end(), "Address for product not found");
 

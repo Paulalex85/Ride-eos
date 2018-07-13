@@ -10,49 +10,37 @@ cleos set contract buyer ../build ../build/Users.wast ../build/Users.abi
 
 #User test
 cleos push action tester add '["tester","usertest1"]' -p tester@active
-sleep 1
 cleos push action rider add '["rider","rider"]' -p rider@active
-sleep 1
 cleos push action buyer add '["buyer","buyer"]' -p buyer@active
-sleep 1
 
 cleos push action tester getuser '["tester"]' -p tester@active
-sleep 1
 
 cleos push action tester update '["tester","usertest2"]' -p tester@active
-sleep 1
 
 cleos push action tester getuser '["tester"]' -p tester@active
-sleep 1
 
 #Product test
 
 cleos set contract tester ../build ../build/Products.wast ../build/Products.abi
 
 cleos push action tester add '["tester","product1","test product",12,true]' -p tester@active
-sleep 1
 
 cleos push action tester getprodbyusr '["tester"]' -p tester@active
-sleep 1
 
-cleos push action tester update '["tester",0,"product cool",10,false]' -p tester@active
-sleep 1
+cleos push action tester update '["tester",0,"product cool",10,true]' -p tester@active
 
 cleos push action tester getprodbyid '[0]' -p tester@active
-sleep 1
 
 #Order test
 
 cleos set contract buyer ../build ../build/Orders.wast ../build/Orders.abi
 
 cleos push action buyer initialize '["buyer","tester","rider"]' -p buyer@active
+
+cleos push action buyer getorderbybu '["buyer"]' -p buyer@active
+
+cleos push action buyer addinkart '[0,"buyer","tester",0,10]' -p buyer@active
+
 sleep 1
 
 cleos push action buyer getorderbybu '["buyer"]' -p buyer@active
-sleep 1
-
-cleos push action buyer addinkart '[0,"buyer",0,10]' -p buyer@active
-sleep 1
-
-cleos push action buyer getorderbybu '["buyer"]' -p buyer@active
-sleep 1
