@@ -44,3 +44,6 @@ cleos push action buyer addinkart '[0,"buyer","tester",0,10]' -p buyer@active
 sleep 1
 
 cleos push action buyer getorderbybu '["buyer"]' -p buyer@active
+
+cleos push action buyer deleteinkart '[0,"buyer","tester",0,10]' -p buyer@active
+

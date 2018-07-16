@@ -14,6 +14,8 @@ namespace rideEOS {
     public:
         Orders(account_name self):contract(self) {}
 
+        //bool isinkart(order current, uint64_t productKey);
+
         /*enum OrderStatut {
             Initialization,
             WaitBiker,
@@ -29,7 +31,7 @@ namespace rideEOS {
         void initialize(account_name buyer, account_name seller, account_name deliver);
 
         //@abi action
-        void addinkart(uint64_t orderKey,account_name buyer,account_name seller, uint64_t productKey, uint64_t quantity);
+        void addinkart(uint64_t orderKey,account_name buyer, uint64_t productKey, uint64_t quantity);
 
         //@abi action
         void deleteinkart(uint64_t orderKey, account_name buyer, uint64_t productKey);
