@@ -1,6 +1,6 @@
+import node
 import sess
 import eosf
-import node
 
 node.reset()
 sess.init()
@@ -16,7 +16,9 @@ contract.deploy()
 assert(not contract.error), "Contract deploy problem"
 
 #test add
-assert(not contract.push_action("add", '{"account":"'+str(buyer) + '", "username":"' + str(buyer) + '"}', buyer).error), "Failed to deploy Users contract"
+assert(not contract.push_action("add", '{"account":"'+str(buyer) + '", "username":"' + str(buyer) + '"}', buyer,output=True).error), "Failed to deploy Users contract"
 
+#test getuser
+getuser = contract.push_action("getuser", '{"account":"'+str(buyer) + '"}', buyer,output=True)
 
 exit()
