@@ -3,15 +3,19 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu));
+    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)(validateinit));
 
-    /*bool Orders::isinkart(order current, uint64_t productKey) {
+    bool Orders::isinkart(const vector<rideEOS::Orders::kart> current, const uint64_t &productKey) {
         bool isin = false;
 
-        for (int i = 0; i < current.karts.size(); ++i) {
-            if()
+        for (int i = 0; i < current.size(); ++i) {
+            if(current.at(i).productKey == productKey){
+                isin = true;
+                break;
+            }
         }
-    }*/
+        return isin;
+    }
 
     void Orders::initialize(account_name buyer, account_name seller, account_name deliver) {
         require_auth(buyer);
@@ -22,7 +26,7 @@ namespace rideEOS {
             order.buyer = buyer;
             order.seller = seller;
             order.deliver = deliver;
-            order.statut = 1;
+            order.state = 0;
             order.date = 0; //TODO set current date
         });
     }
@@ -39,7 +43,7 @@ namespace rideEOS {
             print("- Buyer Key : ", order.buyer);
             print("- Seller Key : ", order.seller);
             print("- Deliver Key : ", order.deliver);
-            print("- Statut : ", order.statut);
+            print("- Statut : ", order.state);
             print("- Date : ", order.date);
             print("- Kart : ");
 
@@ -64,7 +68,7 @@ namespace rideEOS {
         print("- Buyer Key : ", currentOrder.buyer);
         print("- Seller Key : ", currentOrder.seller);
         print("- Deliver Key : ", currentOrder.deliver);
-        print("- Statut : ", currentOrder.statut);
+        print("- Statut : ", currentOrder.state);
         print("- Date : ", currentOrder.date);
         print("- Kart : ");
 
@@ -92,6 +96,12 @@ namespace rideEOS {
 
         eosio_assert(iteratorProduct->available == true, "The product is not available");
 
+        eosio_assert(quantity > 0, "The quantity should be more than 0");
+
+        eosio_assert(isinkart(iteratorOrder->karts, iteratorProduct->productKey), "The product is already in the kart");
+
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+
         orders.modify(iteratorOrder, buyer, [&](auto& order) {
             order.karts.push_back(kart{
                 productKey,
@@ -110,6 +120,8 @@ namespace rideEOS {
 
         eosio_assert(!iteratorOrder->karts.empty(), "No element in kart");
 
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+
         auto iteratorKart = iteratorOrder->karts.begin();
 
         while(iteratorKart != iteratorOrder->karts.end()){
@@ -123,6 +135,22 @@ namespace rideEOS {
 
         orders.modify(iteratorOrder, buyer, [&](auto& order) {
             order.karts.erase(iteratorKart);
+        });
+    }
+
+    void Orders::validateinit(uint64_t orderKey, account_name buyer) {
+        require_auth(buyer);
+
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        eosio_assert(!iteratorOrder->karts.empty(), "No element in kart");
+
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+
+        orders.modify(iteratorOrder, buyer, [&](auto& order) {
+            order.state = 1;
         });
     }
 }
