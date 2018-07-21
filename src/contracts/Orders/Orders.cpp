@@ -3,7 +3,8 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)(validateinit));
+    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)
+    (validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive));
 
     bool Orders::isinkart(const vector<rideEOS::Orders::kart> current, const uint64_t &productKey) {
         bool isin = false;
@@ -80,12 +81,12 @@ namespace rideEOS {
         }
     }
 
-    void Orders::addinkart(uint64_t orderKey, account_name buyer,uint64_t productKey, uint64_t quantity) {
-        require_auth(buyer);
-
+    void Orders::addinkart(uint64_t orderKey, uint64_t productKey, uint64_t quantity) {
         orderIndex orders(_self,_self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
 
         Products::productIndex products(iteratorOrder->seller, iteratorOrder->seller);
         auto iteratorProduct = products.find(productKey);
@@ -102,7 +103,7 @@ namespace rideEOS {
 
         eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
-        orders.modify(iteratorOrder, buyer, [&](auto& order) {
+        orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto& order) {
             order.karts.push_back(kart{
                 productKey,
                 quantity,
@@ -111,12 +112,14 @@ namespace rideEOS {
         });
     }
 
-    void Orders::deleteinkart(uint64_t orderKey, account_name buyer, uint64_t productKey) {
-        require_auth(buyer);
+    void Orders::deleteinkart(uint64_t orderKey, uint64_t productKey) {
+        
 
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
 
         eosio_assert(!iteratorOrder->karts.empty(), "No element in kart");
 
@@ -133,24 +136,105 @@ namespace rideEOS {
 
         eosio_assert(iteratorKart != iteratorOrder->karts.end(), "Product not found in kart");
 
-        orders.modify(iteratorOrder, buyer, [&](auto& order) {
+        orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto& order) {
             order.karts.erase(iteratorKart);
         });
     }
 
-    void Orders::validateinit(uint64_t orderKey, account_name buyer) {
-        require_auth(buyer);
-
+    void Orders::validateinit(uint64_t orderKey, const checksum256& commitment) {
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
 
         eosio_assert(!iteratorOrder->karts.empty(), "No element in kart");
 
         eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
-        orders.modify(iteratorOrder, buyer, [&](auto& order) {
+        orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto& order) {
             order.state = 1;
+            order.deliveryverification = commitment;
         });
     }
+
+    void Orders::validatedeli(uint64_t orderKey){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->deliver);
+
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of waiting deliver");
+
+        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
+            order.state = 2;
+        });
+    }
+
+    void Orders::validatesell(uint64_t orderKey, const checksum256& commitment){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->seller);
+
+        eosio_assert(iteratorOrder->state == 2, "The order is not in the state of waiting seller");
+
+        orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto& order) {
+            order.state = 3;
+            order.takeverification = commitment;
+        });
+    }
+
+    void Orders::productready(uint64_t orderKey){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->seller);
+
+        eosio_assert(iteratorOrder->state == 3, "The order is not in the state of product ready");
+
+        orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto& order) {
+            order.state = 4;
+        });
+    }
+
+    void Orders::ordertaken(uint64_t ,const checksum256& source){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->deliver);
+
+        eosio_assert(
+            assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification),
+            "The source key is invalid");
+
+        eosio_assert(iteratorOrder->state == 4, "The order is not in the state of waiting deliver");
+
+        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
+            order.state = 5;
+        });
+    }
+
+    void Orders::orderdelive(uint64_t ,const checksum256& source){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->deliver);
+
+        eosio_assert(
+            assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification),
+            "The source key is invalid");
+
+        eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
+
+        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
+            order.state = 6;
+        });
+    }
+
 }

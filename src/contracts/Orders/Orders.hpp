@@ -1,5 +1,7 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/print.hpp>
+#include <eosiolib/time.hpp>
+#include <eosiolib/crypto.h>
 #include <string>
 
 using namespace eosio;
@@ -7,6 +9,7 @@ namespace rideEOS {
 
     using namespace eosio;
     using std::string;
+    using eosio::key256;
 
     class Orders : public contract{
         using contract::contract;
@@ -28,7 +31,8 @@ namespace rideEOS {
             OrderReady = 4
             OrderTaken = 5
             OrderDelivered = 6
-            OrderCancel = 7
+            OrderEnd
+            OrderCancel = 8
         */
 
         bool isinkart(const vector<kart> current, const uint64_t& productKey);
@@ -37,13 +41,28 @@ namespace rideEOS {
         void initialize(account_name buyer, account_name seller, account_name deliver);
 
         //@abi action
-        void addinkart(uint64_t orderKey,account_name buyer, uint64_t productKey, uint64_t quantity);
+        void addinkart(uint64_t orderKey, uint64_t productKey, uint64_t quantity);
 
         //@abi action
-        void deleteinkart(uint64_t orderKey, account_name buyer, uint64_t productKey);
+        void deleteinkart(uint64_t orderKey, uint64_t productKey);
 
         //@abi action
-        void validateinit(uint64_t orderKey,account_name buyer);
+        void validateinit(uint64_t orderKey, const checksum256& commitment);
+
+        //@abi action
+        void validatedeli(uint64_t orderKey);
+
+        //@abi action
+        void validatesell(uint64_t orderKey, const checksum256& commitment);
+
+        //@abi action
+        void productready(uint64_t orderKey);
+
+        //@abi action
+        void ordertaken(uint64_t orderKey, const checksum256& source);
+
+        //@abi action
+        void orderdelive(uint64_t orderKey, const checksum256& source);
 
         //@abi action
         void getorder(const uint64_t orderKey);
@@ -66,13 +85,15 @@ namespace rideEOS {
             uint64_t state;
             uint64_t date;//TODO change type
             vector<kart> karts;
+            checksum256 takeverification;
+            checksum256 deliveryverification;
 
             uint64_t primary_key() const { return orderKey; }
             account_name get_buyer_key() const { return buyer; }
             account_name get_seller_key() const { return seller; }
             account_name get_deliver_key() const { return deliver; }
 
-            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(karts))
+            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(karts)(takeverification)(deliveryverification))
         };
 
         typedef multi_index<N(orders), order,
