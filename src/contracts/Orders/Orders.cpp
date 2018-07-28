@@ -4,7 +4,7 @@
 namespace rideEOS {
 
     EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)
-    (validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive));
+    (validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
 
     bool Orders::isinkart(const vector<rideEOS::Orders::kart> current, const uint64_t &productKey) {
         bool isin = false;
@@ -28,7 +28,7 @@ namespace rideEOS {
             order.seller = seller;
             order.deliver = deliver;
             order.state = 0;
-            order.date = 0; //TODO set current date
+            order.date = eosio::time_point_sec(now());
         });
     }
 
@@ -45,7 +45,7 @@ namespace rideEOS {
             print("- Seller Key : ", order.seller);
             print("- Deliver Key : ", order.deliver);
             print("- Statut : ", order.state);
-            print("- Date : ", order.date);
+            print("- Date : ", order.date.utc_seconds);
             print("- Kart : ");
 
             for (const auto& kart : order.karts ) {
@@ -70,7 +70,7 @@ namespace rideEOS {
         print("- Seller Key : ", currentOrder.seller);
         print("- Deliver Key : ", currentOrder.deliver);
         print("- Statut : ", currentOrder.state);
-        print("- Date : ", currentOrder.date);
+        print("- Date : ", currentOrder.date.utc_seconds);
         print("- Kart : ");
 
         for (const auto& kart : currentOrder.karts ) {
@@ -201,16 +201,14 @@ namespace rideEOS {
         });
     }
 
-    void Orders::ordertaken(uint64_t ,const checksum256& source){
+    void Orders::ordertaken(uint64_t orderKey,const checksum256& source){
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
 
         require_auth(iteratorOrder->deliver);
 
-        eosio_assert(
-            assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification),
-            "The source key is invalid");
+        assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification);
 
         eosio_assert(iteratorOrder->state == 4, "The order is not in the state of waiting deliver");
 
@@ -219,22 +217,49 @@ namespace rideEOS {
         });
     }
 
-    void Orders::orderdelive(uint64_t ,const checksum256& source){
+    void Orders::orderdelive(uint64_t orderKey,const checksum256& source){
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
 
         require_auth(iteratorOrder->deliver);
 
-        eosio_assert(
-            assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification),
-            "The source key is invalid");
+        assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification);
 
         eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
 
         orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
             order.state = 6;
         });
+    }
+
+    void Orders::ordercancel(uint64_t orderKey,const checksum256& source){
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
+
+        assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification);
+
+        eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
+
+        if(iteratorOrder->state <= 4){
+            orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
+                order.state = 8;
+                //TODO asset handle
+            });
+            //TODO 100% asset
+        }
+        else if(iteratorOrder->state == 5)
+        {
+            //TODO 0% deliver
+        }
+        else {
+            abort();
+        }
+
+
     }
 
 }

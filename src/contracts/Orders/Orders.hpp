@@ -2,6 +2,8 @@
 #include <eosiolib/print.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/crypto.h>
+#include <eosiolib/asset.hpp>
+#include <eosiolib/contract.hpp>
 #include <string>
 
 using namespace eosio;
@@ -10,6 +12,7 @@ namespace rideEOS {
     using namespace eosio;
     using std::string;
     using eosio::key256;
+    using eosio::asset;
 
     class Orders : public contract{
         using contract::contract;
@@ -65,6 +68,9 @@ namespace rideEOS {
         void orderdelive(uint64_t orderKey, const checksum256& source);
 
         //@abi action
+        void ordercancel(uint64_t orderKey, const checksum256& source);
+
+        //@abi action
         void getorder(const uint64_t orderKey);
 
         //@abi action
@@ -83,10 +89,12 @@ namespace rideEOS {
             account_name seller;
             account_name deliver;
             uint64_t state;
-            uint64_t date;//TODO change type
+            eosio::time_point_sec date;
             vector<kart> karts;
             checksum256 takeverification;
             checksum256 deliveryverification;
+            asset seller_price;
+            asset deliver_price;
 
             uint64_t primary_key() const { return orderKey; }
             account_name get_buyer_key() const { return buyer; }
