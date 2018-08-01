@@ -93,18 +93,21 @@ namespace rideEOS {
             vector<kart> karts;
             checksum256 takeverification;
             checksum256 deliveryverification;
-            asset seller_price;
-            asset deliver_price;
 
             uint64_t primary_key() const { return orderKey; }
             account_name get_buyer_key() const { return buyer; }
             account_name get_seller_key() const { return seller; }
             account_name get_deliver_key() const { return deliver; }
 
+            static key256 get_commitment(const checksum256& commitment) {
+                const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&commitment);
+                return key256::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
+            }
+
             EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(karts)(takeverification)(deliveryverification))
         };
 
-        typedef multi_index<N(orders), order,
+        typedef multi_index<N(order), order,
             indexed_by < N(bybuyerkey),
                     const_mem_fun <order, account_name, &order::get_buyer_key>
             >,

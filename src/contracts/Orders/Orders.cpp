@@ -3,8 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)
-    (validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
+    EOSIO_ABI(Orders, (initialize)(addinkart)(deleteinkart)(getorder)(getorderbybu)(validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
 
     bool Orders::isinkart(const vector<rideEOS::Orders::kart> current, const uint64_t &productKey) {
         bool isin = false;
@@ -16,6 +15,15 @@ namespace rideEOS {
             }
         }
         return isin;
+    }
+
+    bool is_equal(const checksum256& a, const checksum256& b) {
+        return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
+    }
+
+    bool is_zero(const checksum256& a) {
+        const uint64_t *p64 = reinterpret_cast<const uint64_t*>(&a);
+        return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
     }
 
     void Orders::initialize(account_name buyer, account_name seller, account_name deliver) {
@@ -46,6 +54,7 @@ namespace rideEOS {
             print("- Deliver Key : ", order.deliver);
             print("- Statut : ", order.state);
             print("- Date : ", order.date.utc_seconds);
+
             print("- Kart : ");
 
             for (const auto& kart : order.karts ) {
@@ -64,20 +73,21 @@ namespace rideEOS {
         eosio_assert(iterator != orders.end(), "Address for order not found");
 
         auto currentOrder = orders.get(orderKey);
-        print("=== Order === ");
-        print("- Order Key : ", currentOrder.orderKey);
-        print("- Buyer Key : ", currentOrder.buyer);
-        print("- Seller Key : ", currentOrder.seller);
-        print("- Deliver Key : ", currentOrder.deliver);
-        print("- Statut : ", currentOrder.state);
-        print("- Date : ", currentOrder.date.utc_seconds);
-        print("- Kart : ");
+        print("=== Order === \n");
+        print("- Order Key : ", currentOrder.orderKey, "\n");
+        print("- Buyer Key : ", currentOrder.buyer, "\n");
+        print("- Seller Key : ", currentOrder.seller, "\n");
+        print("- Deliver Key : ", currentOrder.deliver, "\n");
+        print("- Statut : ", currentOrder.state, "\n");
+        print("- Date : ", currentOrder.date.utc_seconds, "\n");
+        print("- Kart : \n");
+
 
         for (const auto& kart : currentOrder.karts ) {
-            print("      ProductKey : ", kart.productKey);
-            print("      Quantity : ", kart.quantity);
-            print("      Price : ", kart.price);
-            print("________________________________");
+            print("      ProductKey : ", kart.productKey, "\n");
+            print("      Quantity : ", kart.quantity, "\n");
+            print("      Price : ", kart.price, "\n");
+            print("________________________________\n");
         }
     }
 
@@ -99,7 +109,7 @@ namespace rideEOS {
 
         eosio_assert(quantity > 0, "The quantity should be more than 0");
 
-        eosio_assert(isinkart(iteratorOrder->karts, iteratorProduct->productKey), "The product is already in the kart");
+        eosio_assert(!isinkart(iteratorOrder->karts, iteratorProduct->productKey), "The product is already in the kart");
 
         eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
@@ -224,7 +234,7 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->deliver);
 
-        assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification);
+        assert_sha256((char *)&source, sizeof(source),(const checksum256 *)&iteratorOrder->deliveryverification);
 
         eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
 

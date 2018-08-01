@@ -41,7 +41,7 @@ namespace rideEOS {
             EOSLIB_SERIALIZE(product, (productKey)(title)(description)(price)(available)(userKey))
         };
 
-        typedef multi_index<N(products), product,
+        typedef multi_index<N(product), product,
             indexed_by < N(byuserkey),
                 const_mem_fun <product, account_name , &product::get_user_key>
             >

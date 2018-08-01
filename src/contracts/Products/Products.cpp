@@ -37,15 +37,15 @@ namespace rideEOS {
 
         auto productsUser =products.get_index<N(byuserkey)>();
 
-        print("=== Product === ");
+        print("=== Product === \n");
 
         for (const auto& product : productsUser ) {
-            print("- Product Key : ", product.productKey);
-            print("- Title : ", product.title.c_str());
-            print("- Descri : ", product.description.c_str());
-            print("- Price : ", product.price);
-            print("- Available : ", product.available);
-            print("- Owner Key : ", product.userKey);
+            print("- Product Key : ", product.productKey, "\n");
+            print("- Title : ", product.title.c_str(), "\n");
+            print("- Descri : ", product.description.c_str(), "\n");
+            print("- Price : ", product.price, "\n");
+            print("- Available : ", product.available, "\n");
+            print("- Owner Key : ", product.userKey, "\n");
         }
     }
 
@@ -56,12 +56,12 @@ namespace rideEOS {
         eosio_assert(iterator != products.end(), "Address for product not found");
 
         auto currentProduct = products.get(productKey);
-        print("=== Product === ");
-        print("- Product Key : ", currentProduct.productKey);
-        print("- Title : ", currentProduct.title.c_str());
-        print("- Descri : ", currentProduct.description.c_str());
-        print("- Price : ", currentProduct.price);
-        print("- Available : ", currentProduct.available);
-        print("- Owner Key : ", currentProduct.userKey);
+        print("=== Product === \n");
+        print("- Product Key : ", currentProduct.productKey, "\n");
+        print("- Title : ", currentProduct.title.c_str(), "\n");
+        print("- Descri : ", currentProduct.description.c_str(), "\n");
+        print("- Price : ", currentProduct.price, "\n");
+        print("- Available : ", currentProduct.available, "\n");
+        print("- Owner Key : ", currentProduct.userKey, "\n");
     }
 }

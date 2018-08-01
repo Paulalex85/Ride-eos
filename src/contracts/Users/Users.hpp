@@ -33,6 +33,6 @@ namespace rideEOS {
             EOSLIB_SERIALIZE(user, (account_name)(username))
         };
 
-        typedef multi_index<N(userIndex), user> userIndex;
+        typedef multi_index<N(user), user> userIndex;
     };
 }
