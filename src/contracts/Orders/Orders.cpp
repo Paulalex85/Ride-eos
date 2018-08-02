@@ -1,5 +1,6 @@
 #include "Orders.hpp"
 #include "../Products/Products.hpp"
+#include "../Users/Users.hpp"
 
 namespace rideEOS {
 
@@ -29,6 +30,18 @@ namespace rideEOS {
     void Orders::initialize(account_name buyer, account_name seller, account_name deliver) {
         require_auth(buyer);
         orderIndex orders(_self,_self);
+
+        Users::userIndex userBuyer(buyer, buyer);
+        auto iteratorUser = userBuyer.find(buyer);
+        eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
+
+        Users::userIndex userSeller(seller, seller);
+        iteratorUser = userSeller.find(seller);
+        eosio_assert(iteratorUser != userSeller.end(), "Seller not found");
+
+        Users::userIndex userDeliver(deliver, deliver);
+        iteratorUser = userDeliver.find(deliver);
+        eosio_assert(iteratorUser != userDeliver.end(), "Deliver not found");
 
         orders.emplace(buyer, [&](auto& order) {
             order.orderKey = orders.available_primary_key();

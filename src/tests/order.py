@@ -21,6 +21,29 @@ deliver = eosf.account(sess.eosio)
 sess.wallet.import_key(deliver)
 assert(not deliver.error), "Deliver account creation problem"
 
+cprint("Add User contract...", 'blue')
+
+contractUserB = eosf.Contract(buyer, "contracts/Users")
+assert(not contractUserB.error), "Contract assign problem"
+contractUserB.deploy()
+assert(not contractUserB.error), "Contract deploy problem"
+
+assert(not contractUserB.push_action("add", '{"account":"'+str(buyer) + '", "username":"' + str(buyer) + '"}', buyer,output=True).error), "Failed to deploy Users contract"
+
+contractUserS = eosf.Contract(seller, "contracts/Users")
+assert(not contractUserS.error), "Contract assign problem"
+contractUserS.deploy()
+assert(not contractUserS.error), "Contract deploy problem"
+
+assert(not contractUserS.push_action("add", '{"account":"'+str(seller) + '", "username":"' + str(seller) + '"}', seller,output=True).error), "Failed to deploy Users contract"
+
+contractUserD = eosf.Contract(deliver, "contracts/Users")
+assert(not contractUserD.error), "Contract assign problem"
+contractUserD.deploy()
+assert(not contractUserD.error), "Contract deploy problem"
+
+assert(not contractUserD.push_action("add", '{"account":"'+str(deliver) + '", "username":"' + str(deliver) + '"}', deliver,output=True).error), "Failed to deploy Users contract"
+
 #test deploy
 contractOrder = eosf.Contract(buyer, "contracts/Orders")
 assert(not contractOrder.error), "Contract assign problem"
