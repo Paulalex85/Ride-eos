@@ -44,12 +44,6 @@ namespace rideEOS {
         void initialize(account_name buyer, account_name seller, account_name deliver);
 
         //@abi action
-        void addinkart(uint64_t orderKey, uint64_t productKey, uint64_t quantity);
-
-        //@abi action
-        void deleteinkart(uint64_t orderKey, uint64_t productKey);
-
-        //@abi action
         void validateinit(uint64_t orderKey, const checksum256& commitment);
 
         //@abi action
@@ -90,7 +84,6 @@ namespace rideEOS {
             account_name deliver;
             uint64_t state;
             eosio::time_point_sec date;
-            vector<kart> karts;
             checksum256 takeverification;
             checksum256 deliveryverification;
 
@@ -104,7 +97,7 @@ namespace rideEOS {
                 return key256::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
             }
 
-            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(karts)(takeverification)(deliveryverification))
+            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(takeverification)(deliveryverification))
         };
 
         typedef multi_index<N(order), order,
