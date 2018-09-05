@@ -34,8 +34,8 @@ cleos wallet import -n rideoswallet --private-key 5JpWT4ehouB2FF9aCfdfnZ5AwbQbTt
 cleos wallet import -n rideoswallet --private-key 5JD9AGTuTeD5BXZwGQ5AtwBqHK21aHmYnTetHgk1B3pjj7krT8N
 
 # create account for rideos with above wallet's public keys
-cleos create account eosio rideos EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9
-
+cleos create account eosio rideos EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B
+cleos create account eosio rideor EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9 EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9
 
 echo "=== create user accounts ==="
 # script for creating data into blockchain
@@ -48,8 +48,8 @@ echo "=== deploy smart contract ==="
 # $3 wallet that holds the keys for the account
 # $4 password for unlocking the wallet
 deploy_contract.sh Users rideos rideoswallet $(cat rideos_wallet_password.txt)
+deploy_contract.sh Orders rideor rideoswallet $(cat rideos_wallet_password.txt)
 cleos set contract eosio.token /contracts/eosio.token
-#deploy_contract.sh eosio.token eosio.token rideoswallet $(cat rideos_wallet_password.txt)
 
 #echo "=== create mock data for contract ==="
 # script for calling actions on the smart contract to create mock data

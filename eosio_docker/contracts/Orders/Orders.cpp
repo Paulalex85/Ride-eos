@@ -18,15 +18,15 @@ namespace rideEOS {
         require_auth(buyer);
         orderIndex orders(_self,_self);
 
-        Users::userIndex userBuyer(buyer, buyer);
+        Users::userIndex userBuyer(N(rideos), N(rideos));
         auto iteratorUser = userBuyer.find(buyer);
         eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
 
-        Users::userIndex userSeller(seller, seller);
+        Users::userIndex userSeller(N(rideos), N(rideos));
         iteratorUser = userSeller.find(seller);
         eosio_assert(iteratorUser != userSeller.end(), "Seller not found");
 
-        Users::userIndex userDeliver(deliver, deliver);
+        Users::userIndex userDeliver(N(rideos), N(rideos));
         iteratorUser = userDeliver.find(deliver);
         eosio_assert(iteratorUser != userDeliver.end(), "Deliver not found");
 

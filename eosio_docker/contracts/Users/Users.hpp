@@ -1,6 +1,9 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/print.hpp>
+#include <eosiolib/time.hpp>
+#include <eosiolib/crypto.h>
 #include <eosiolib/asset.hpp>
+#include <eosiolib/contract.hpp>
 #include <string>
 
 using namespace eosio;

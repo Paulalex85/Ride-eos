@@ -20,12 +20,6 @@ namespace rideEOS {
     public:
         Orders(account_name self):contract(self) {}
 
-        struct kart {
-            uint64_t productKey;
-            uint64_t quantity;
-            uint64_t price;
-        };
-
         /*
             Initialization = 0
             WaitBiker = 1
@@ -37,9 +31,6 @@ namespace rideEOS {
             OrderEnd
             OrderCancel = 8
         */
-
-        bool isinkart(const vector<kart> current, const uint64_t& productKey);
-
         //@abi action
         void initialize(account_name buyer, account_name seller, account_name deliver);
 
