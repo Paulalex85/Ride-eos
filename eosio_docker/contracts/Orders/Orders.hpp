@@ -32,10 +32,10 @@ namespace rideEOS {
             OrderCancel = 8
         */
         //@abi action
-        void initialize(account_name buyer, account_name seller, account_name deliver);
+        void initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver);
 
         //@abi action
-        void validateinit(uint64_t orderKey, const checksum256& commitment);
+        void validatebuy(uint64_t orderKey, const checksum256& commitment);
 
         //@abi action
         void validatedeli(uint64_t orderKey);
@@ -77,6 +77,8 @@ namespace rideEOS {
             eosio::time_point_sec date;
             checksum256 takeverification;
             checksum256 deliveryverification;
+            asset priceOrder;
+            asset priceDeliver;
 
             uint64_t primary_key() const { return orderKey; }
             account_name get_buyer_key() const { return buyer; }
@@ -88,7 +90,7 @@ namespace rideEOS {
                 return key256::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
             }
 
-            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(takeverification)(deliveryverification))
+            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(takeverification)(deliveryverification)(priceOrder)(priceDeliver))
         };
 
         typedef multi_index<N(order), order,

@@ -2,7 +2,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Users, (add)(update)(getuser)(deposit)(withdraw));
+    EOSIO_ABI(Users, (add)(update)(getuser)(deposit)(withdraw)(pay)(receive));
 
     void Users::add(account_name account, string& username) {
         require_auth(account);
@@ -81,5 +81,46 @@ namespace rideEOS {
             N(eosio.token), N(transfer),
             std::make_tuple(_self, account, quantity, std::string(""))
         ).send();
+    }
+
+    void Users::pay(const account_name account,const account_name receiver, const asset &quantity) {
+        require_auth(account);
+
+        eosio_assert( quantity.is_valid(), "invalid quantity" );
+        eosio_assert( quantity.amount > 0, "must withdraw positive quantity" );
+        eosio_assert( quantity.symbol == CORE_SYMBOL, "only core token allowed" );
+
+        userIndex users(_self, _self);
+
+        auto iterator = users.find(account);
+        eosio_assert(iterator != users.end(), "Address for account not found");
+
+        users.modify(iterator, account, [&](auto& user) {
+            eosio_assert( user.balance >= quantity, "insufficient balance" );
+            user.balance -= quantity;
+        });
+
+        action(
+            permission_level{ _self, N(active) },
+            N(eosio.token), N(transfer),
+            std::make_tuple(_self, receiver, quantity, std::string(""))
+        ).send();
+    }
+
+    void Users::receive(const account_name account,const account_name from, const asset &quantity) {
+        require_auth(from);
+
+        eosio_assert( quantity.is_valid(), "invalid quantity" );
+        eosio_assert( quantity.amount > 0, "must withdraw positive quantity" );
+        eosio_assert( quantity.symbol == CORE_SYMBOL, "only core token allowed" );
+
+        userIndex users(_self, _self);
+
+        auto iterator = users.find(account);
+        eosio_assert(iterator != users.end(), "Address for account not found");
+
+        users.modify(iterator, account, [&](auto& user) {
+            user.balance += quantity;
+        });
     }
 }

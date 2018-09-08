@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(getorder)(getorderbybu)(validateinit)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
+    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
 
     bool is_equal(const checksum256& a, const checksum256& b) {
         return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
@@ -14,9 +14,16 @@ namespace rideEOS {
         return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
     }
 
-    void Orders::initialize(account_name buyer, account_name seller, account_name deliver) {
-        require_auth(buyer);
+    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver) {
         orderIndex orders(_self,_self);
+
+        eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceOrder.is_valid(), "invalid bet" );
+        eosio_assert( priceOrder.amount > 0, "must bet positive quantity" );
+
+        eosio_assert( priceDeliver.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceDeliver.is_valid(), "invalid bet" );
+        eosio_assert( priceDeliver.amount > 0, "must bet positive quantity" );
 
         Users::userIndex userBuyer(N(rideos), N(rideos));
         auto iteratorUser = userBuyer.find(buyer);
@@ -37,43 +44,12 @@ namespace rideEOS {
             order.deliver = deliver;
             order.state = 0;
             order.date = eosio::time_point_sec(now());
+            order.priceOrder = priceOrder;
+            order.priceDeliver = priceDeliver;
         });
     }
 
-    void Orders::getorderbybu(const account_name buyer) {
-        orderIndex orders(_self, _self);
-
-        auto ordersBuyer = orders.get_index<N(bybuyerkey)>();
-
-        print("=== Order === ");
-
-        for (const auto& order : ordersBuyer ) {
-            print("- Order Key : ", order.orderKey);
-            print("- Buyer Key : ", order.buyer);
-            print("- Seller Key : ", order.seller);
-            print("- Deliver Key : ", order.deliver);
-            print("- Statut : ", order.state);
-            print("- Date : ", order.date.utc_seconds);
-        }
-    }
-
-    void Orders::getorder(const uint64_t orderKey) {
-        orderIndex orders(_self, _self);
-
-        auto iterator = orders.find(orderKey);
-        eosio_assert(iterator != orders.end(), "Address for order not found");
-
-        auto currentOrder = orders.get(orderKey);
-        print("=== Order === \n");
-        print("- Order Key : ", currentOrder.orderKey, "\n");
-        print("- Buyer Key : ", currentOrder.buyer, "\n");
-        print("- Seller Key : ", currentOrder.seller, "\n");
-        print("- Deliver Key : ", currentOrder.deliver, "\n");
-        print("- Statut : ", currentOrder.state, "\n");
-        print("- Date : ", currentOrder.date.utc_seconds, "\n");
-    }
-
-    void Orders::validateinit(uint64_t orderKey, const checksum256& commitment) {
+    void Orders::validatebuy(uint64_t orderKey, const checksum256& commitment) {
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
@@ -81,6 +57,17 @@ namespace rideEOS {
         require_auth(iteratorOrder->buyer);
 
         eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+
+        Users::userIndex userBuyer(N(rideos), N(rideos));
+        auto iteratorUser = userBuyer.find(iteratorOrder->buyer);
+        eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
+
+        eosio_assert( iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance" );
+        action(
+            permission_level{ iteratorOrder->buyer, N(active) },
+            N(rideos), N(pay),
+            std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver)
+        ).send();
 
         orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto& order) {
             order.state = 1;
@@ -161,6 +148,24 @@ namespace rideEOS {
         orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
             order.state = 6;
         });
+
+        action(
+            permission_level{ _self, N(active) },
+            N(eosio.token), N(transfer),
+            std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string(""))
+        ).send();
+
+        action(
+            permission_level{ _self, N(active) },
+            N(rideos), N(receive),
+            std::make_tuple(iteratorOrder->seller, _self, iteratorOrder->priceOrder)
+        ).send();
+
+        action(
+            permission_level{ _self, N(active) },
+            N(rideos), N(receive),
+            std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver)
+        ).send();
     }
 
     void Orders::ordercancel(uint64_t orderKey,const checksum256& source){

@@ -35,6 +35,12 @@ namespace rideEOS {
         //@abi action
         void withdraw(const account_name account, const asset& quantity);
 
+        //@abi action
+        void pay(const account_name accountUser,const account_name receiver, const asset& quantity);
+
+        //@abi action
+        void receive(const account_name account,const account_name from, const asset& quantity);
+
         //@abi table user i64
         struct user {
             uint64_t account_name;
