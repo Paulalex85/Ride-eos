@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(productready)(ordertaken)(orderdelive)(ordercancel));
+    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(ordercancel));
 
     bool is_equal(const checksum256& a, const checksum256& b) {
         return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
@@ -25,19 +25,17 @@ namespace rideEOS {
         eosio_assert( priceDeliver.is_valid(), "invalid bet" );
         eosio_assert( priceDeliver.amount > 0, "must bet positive quantity" );
 
-        Users::userIndex userBuyer(N(rideos), N(rideos));
-        auto iteratorUser = userBuyer.find(buyer);
-        eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
+        Users::userIndex users(N(rideos), N(rideos));
+        auto iteratorUser = users.find(buyer);
+        eosio_assert(iteratorUser != users.end(), "Buyer not found");
 
-        Users::userIndex userSeller(N(rideos), N(rideos));
-        iteratorUser = userSeller.find(seller);
-        eosio_assert(iteratorUser != userSeller.end(), "Seller not found");
+        iteratorUser = users.find(seller);
+        eosio_assert(iteratorUser != users.end(), "Seller not found");
 
-        Users::userIndex userDeliver(N(rideos), N(rideos));
-        iteratorUser = userDeliver.find(deliver);
-        eosio_assert(iteratorUser != userDeliver.end(), "Deliver not found");
+        iteratorUser = users.find(deliver);
+        eosio_assert(iteratorUser != users.end(), "Deliver not found");
 
-        orders.emplace(buyer, [&](auto& order) {
+        orders.emplace(_self, [&](auto& order) {
             order.orderKey = orders.available_primary_key();
             order.buyer = buyer;
             order.seller = seller;
@@ -46,6 +44,9 @@ namespace rideEOS {
             order.date = eosio::time_point_sec(now());
             order.priceOrder = priceOrder;
             order.priceDeliver = priceDeliver;
+            order.validateBuyer = false;
+            order.validateSeller = false;
+            order.validateDeliver = false;
         });
     }
 
@@ -62,6 +63,8 @@ namespace rideEOS {
         auto iteratorUser = userBuyer.find(iteratorOrder->buyer);
         eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
 
+        eosio_assert(iteratorOrder->validateBuyer == false, "Buyer already validate");
+
         eosio_assert( iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance" );
         action(
             permission_level{ iteratorOrder->buyer, N(active) },
@@ -69,9 +72,13 @@ namespace rideEOS {
             std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver)
         ).send();
 
-        orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto& order) {
-            order.state = 1;
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.validateBuyer = true;
             order.deliveryverification = commitment;
+
+            if(iteratorOrder->validateSeller && iteratorOrder->validateDeliver){
+                order.state = 1;
+            }
         });
     }
 
@@ -82,10 +89,16 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->deliver);
 
-        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of waiting deliver");
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
-        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
-            order.state = 2;
+        eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
+
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.validateDeliver = true;
+
+            if(iteratorOrder->validateSeller && iteratorOrder->validateBuyer){
+                order.state = 1;
+            }
         });
     }
 
@@ -96,25 +109,31 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->seller);
 
-        eosio_assert(iteratorOrder->state == 2, "The order is not in the state of waiting seller");
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
-        orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto& order) {
-            order.state = 3;
+        eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
+
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.validateSeller = true;
             order.takeverification = commitment;
+
+            if(iteratorOrder->validateDeliver && iteratorOrder->validateBuyer){
+                order.state = 1;
+            }
         });
     }
 
-    void Orders::productready(uint64_t orderKey){
+    void Orders::orderready(uint64_t orderKey){
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
 
         require_auth(iteratorOrder->seller);
 
-        eosio_assert(iteratorOrder->state == 3, "The order is not in the state of product ready");
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of product ready");
 
-        orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto& order) {
-            order.state = 4;
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 2;
         });
     }
 
@@ -127,10 +146,10 @@ namespace rideEOS {
 
         assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification);
 
-        eosio_assert(iteratorOrder->state == 4, "The order is not in the state of waiting deliver");
+        eosio_assert(iteratorOrder->state == 2, "The order is not in the state of waiting deliver");
 
-        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
-            order.state = 5;
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 3;
         });
     }
 
@@ -143,10 +162,10 @@ namespace rideEOS {
 
         assert_sha256((char *)&source, sizeof(source),(const checksum256 *)&iteratorOrder->deliveryverification);
 
-        eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
+        eosio_assert(iteratorOrder->state == 3, "The order is not in the state delivery");
 
-        orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
-            order.state = 6;
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 4;
         });
 
         action(

@@ -11,7 +11,7 @@ namespace rideEOS {
         auto iterator = users.find(account);
         eosio_assert(iterator == users.end(), "Address for account already exists");
 
-        users.emplace(account, [&](auto& user) {
+        users.emplace(_self, [&](auto& user) {
             user.account_name = account;
             user.username = username;
         });
@@ -24,7 +24,7 @@ namespace rideEOS {
         auto iterator = users.find(account);
         eosio_assert(iterator != users.end(), "Address for account not found");
 
-        users.modify(iterator, account, [&](auto& user) {
+        users.modify(iterator, _self, [&](auto& user) {
             user.username = username;
         });
     }
@@ -55,7 +55,7 @@ namespace rideEOS {
             std::make_tuple(account, _self, quantity, std::string(""))
         ).send();
 
-        users.modify(iterator, account, [&](auto& user) {
+        users.modify(iterator, _self, [&](auto& user) {
             user.balance += quantity;
         });
     }
@@ -71,7 +71,7 @@ namespace rideEOS {
         auto iterator = users.find(account);
         eosio_assert(iterator != users.end(), "Address for account not found");
 
-        users.modify(iterator, account, [&](auto& user) {
+        users.modify(iterator, _self, [&](auto& user) {
             eosio_assert( user.balance >= quantity, "insufficient balance" );
             user.balance -= quantity;
         });
@@ -95,7 +95,7 @@ namespace rideEOS {
         auto iterator = users.find(account);
         eosio_assert(iterator != users.end(), "Address for account not found");
 
-        users.modify(iterator, account, [&](auto& user) {
+        users.modify(iterator, _self, [&](auto& user) {
             eosio_assert( user.balance >= quantity, "insufficient balance" );
             user.balance -= quantity;
         });
@@ -119,7 +119,7 @@ namespace rideEOS {
         auto iterator = users.find(account);
         eosio_assert(iterator != users.end(), "Address for account not found");
 
-        users.modify(iterator, account, [&](auto& user) {
+        users.modify(iterator, _self, [&](auto& user) {
             user.balance += quantity;
         });
     }
