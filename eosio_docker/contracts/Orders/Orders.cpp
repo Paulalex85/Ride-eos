@@ -14,7 +14,7 @@ namespace rideEOS {
         return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
     }
 
-    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver) {
+    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver,string& details) {
         orderIndex orders(_self,_self);
 
         eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
@@ -47,6 +47,7 @@ namespace rideEOS {
             order.validateBuyer = false;
             order.validateSeller = false;
             order.validateDeliver = false;
+            order.details = details;
         });
     }
 
