@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(ordercancel));
+    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel));
 
     bool is_equal(const checksum256& a, const checksum256& b) {
         return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
@@ -12,6 +12,13 @@ namespace rideEOS {
     bool is_zero(const checksum256& a) {
         const uint64_t *p64 = reinterpret_cast<const uint64_t*>(&a);
         return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
+    }
+
+    bool is_actor(account_name sender, account_name buyer, account_name seller, account_name deliver){
+        if(sender == buyer || sender == seller || sender == deliver){
+            return true;
+        }
+        return false;
     }
 
     void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver,string& details) {
@@ -188,33 +195,34 @@ namespace rideEOS {
         ).send();
     }
 
-    void Orders::ordercancel(uint64_t orderKey,const checksum256& source){
+    void Orders::initcancel(uint64_t orderKey, account_name account) {
         orderIndex orders(_self, _self);
         auto iteratorOrder = orders.find(orderKey);
         eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
 
-        require_auth(iteratorOrder->buyer);
+        require_auth(account);
 
-        assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification);
+        eosio_assert(is_actor(account,iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not in the contract");
 
-        eosio_assert(iteratorOrder->state == 5, "The order is not in the state delivery");
+        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
 
-        if(iteratorOrder->state <= 4){
-            orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto& order) {
-                order.state = 8;
-                //TODO asset handle
-            });
-            //TODO 100% asset
+        if(iteratorOrder->validateBuyer){
+            action(
+                permission_level{ _self, N(active) },
+                N(eosio.token), N(transfer),
+                std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string(""))
+            ).send();
+
+            action(
+                permission_level{ _self, N(active) },
+                N(rideos), N(receive),
+                std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder+ iteratorOrder->priceDeliver)
+            ).send();
         }
-        else if(iteratorOrder->state == 5)
-        {
-            //TODO 0% deliver
-        }
-        else {
-            abort();
-        }
 
-
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 99;
+        });
     }
 
 }

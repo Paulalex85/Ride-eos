@@ -50,7 +50,7 @@ namespace rideEOS {
         void orderdelive(uint64_t orderKey, const checksum256& source);
 
         //@abi action
-        void ordercancel(uint64_t orderKey, const checksum256& source);
+        void initcancel(uint64_t orderKey, account_name account);
 
         //@abi action
         void getorder(const uint64_t orderKey);
