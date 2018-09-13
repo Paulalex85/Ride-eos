@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel));
+    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
 
     bool is_equal(const checksum256& a, const checksum256& b) {
         return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
@@ -21,7 +21,7 @@ namespace rideEOS {
         return false;
     }
 
-    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver,string& details) {
+    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver,string& details, uint64_t delay) {
         orderIndex orders(_self,_self);
 
         eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
@@ -49,12 +49,14 @@ namespace rideEOS {
             order.deliver = deliver;
             order.state = 0;
             order.date = eosio::time_point_sec(now());
+            order.dateDelay = eosio::time_point_sec(now());
             order.priceOrder = priceOrder;
             order.priceDeliver = priceDeliver;
             order.validateBuyer = false;
             order.validateSeller = false;
             order.validateDeliver = false;
             order.details = details;
+            order.delay = delay;
         });
     }
 
@@ -86,6 +88,7 @@ namespace rideEOS {
 
             if(iteratorOrder->validateSeller && iteratorOrder->validateDeliver){
                 order.state = 1;
+                order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
     }
@@ -106,6 +109,7 @@ namespace rideEOS {
 
             if(iteratorOrder->validateSeller && iteratorOrder->validateBuyer){
                 order.state = 1;
+                order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
     }
@@ -127,6 +131,7 @@ namespace rideEOS {
 
             if(iteratorOrder->validateDeliver && iteratorOrder->validateBuyer){
                 order.state = 1;
+                order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
     }
@@ -225,4 +230,32 @@ namespace rideEOS {
         });
     }
 
+    void Orders::delaycancel(uint64_t orderKey) {
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
+
+        eosio_assert(iteratorOrder->state > 0, "The order is in the state of initialization");
+        eosio_assert(iteratorOrder->state < 4, "The order is finish");
+
+        eosio_assert(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
+
+        action(
+            permission_level{ _self, N(active) },
+            N(eosio.token), N(transfer),
+            std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string(""))
+        ).send();
+
+        action(
+            permission_level{ _self, N(active) },
+            N(rideos), N(receive),
+            std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder+ iteratorOrder->priceDeliver)
+        ).send();
+
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 98;
+        });
+    }
 }

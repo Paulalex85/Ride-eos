@@ -29,7 +29,7 @@ namespace rideEOS {
             OrderCancel = 8
         */
         //@abi action
-        void initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver, string& details);
+        void initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver, string& details, uint64_t delay);
 
         //@abi action
         void validatebuy(uint64_t orderKey, const checksum256& commitment);
@@ -53,16 +53,7 @@ namespace rideEOS {
         void initcancel(uint64_t orderKey, account_name account);
 
         //@abi action
-        void getorder(const uint64_t orderKey);
-
-        //@abi action
-        void getorderbyse(const account_name seller);
-
-        //@abi action
-        void getorderbybu(const account_name buyer);
-
-        //@abi action
-        void getorderbyde(const account_name deliver);
+        void delaycancel(uint64_t orderKey);
 
         //@abi table order i64
         struct order {
@@ -72,6 +63,7 @@ namespace rideEOS {
             account_name deliver;
             uint64_t state;
             eosio::time_point_sec date;
+            eosio::time_point_sec dateDelay;
             checksum256 takeverification;
             checksum256 deliveryverification;
             asset priceOrder;
@@ -80,6 +72,8 @@ namespace rideEOS {
             bool validateSeller;
             bool validateDeliver;
             string details;
+            uint64_t delay;
+
 
             uint64_t primary_key() const { return orderKey; }
             account_name get_buyer_key() const { return buyer; }
@@ -91,7 +85,7 @@ namespace rideEOS {
                 return key256::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
             }
 
-            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(takeverification)(deliveryverification)(priceOrder)(priceDeliver)(validateBuyer)(validateDeliver)(validateSeller)(details))
+            EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(dateDelay)(takeverification)(deliveryverification)(priceOrder)(priceDeliver)(validateBuyer)(validateDeliver)(validateSeller)(details)(delay))
         };
 
         typedef multi_index<N(order), order,
