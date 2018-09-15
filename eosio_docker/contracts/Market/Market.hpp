@@ -27,6 +27,9 @@ namespace rideEOS {
         void updateplace(uint64_t key, string& country,string& zipCode);
 
         //@abi action
+        void deleteplace(uint64_t key);
+
+        //@abi action
         void newassign(account_name account, uint64_t place);
 
         //@abi action
@@ -62,5 +65,6 @@ namespace rideEOS {
                     const_mem_fun <assignment, account_name , &assignment::get_user_key>
             >
         > assignmentIndex;
+
     };
 }

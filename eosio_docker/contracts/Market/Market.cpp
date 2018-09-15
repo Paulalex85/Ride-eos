@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Market, (addplace)(updateplace)(newassign)(endassign));
+    EOSIO_ABI(Market, (addplace)(updateplace)(deleteplace)(newassign)(endassign));
 
     //24h
     int DELAY_END_ASSIGN = 86400;
@@ -30,6 +30,16 @@ namespace rideEOS {
             place.country = country;
             place.zipCode = zipCode;
         });
+    }
+
+    void Market::deleteplace(uint64_t key) {
+        require_auth(_self);
+
+        placeIndex places(_self, _self);
+        auto iteratorPlace = places.find(key);
+        eosio_assert(iteratorPlace != places.end(), "Address for place not found");
+
+        places.erase(iteratorPlace);
     }
 
     void Market::newassign(account_name account, uint64_t place) {
