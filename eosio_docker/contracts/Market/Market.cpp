@@ -40,6 +40,26 @@ namespace rideEOS {
         auto iteratorPlace = places.find(key);
         eosio_assert(iteratorPlace != places.end(), "Address for place not found");
 
+        std::vector<uint64_t> keysForDeletion;
+
+        assignmentIndex assignments(_self, _self);
+        auto indexAssign = assignments.get_index<N(byplacekey)>();
+        auto iteratorAssign = indexAssign.find(key);
+
+        while (iteratorAssign != indexAssign.end()) {
+            if (iteratorAssign->placeKey == key) {
+                keysForDeletion.push_back(iteratorAssign->assignmentKey);
+            }
+            iteratorAssign++;
+        }
+
+        for(uint64_t keyDelete : keysForDeletion){
+            auto itr = assignments.find(keyDelete);
+            if(itr != assignments.end()){
+                assignments.erase(itr);
+            }
+        }
+
         places.erase(iteratorPlace);
     }
 

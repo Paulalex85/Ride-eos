@@ -71,12 +71,16 @@ namespace rideEOS {
 
             uint64_t primary_key() const { return assignmentKey; }
             account_name get_user_key() const { return userKey; }
+            uint64_t get_place_key() const { return placeKey; }
 
             EOSLIB_SERIALIZE(assignment, (assignmentKey)(placeKey)(userKey)(endAssignment))
         };
         typedef multi_index<N(assignment), assignment,
             indexed_by < N(byuserkey),
                 const_mem_fun <assignment, account_name , &assignment::get_user_key>
+            >,
+            indexed_by < N(byplacekey),
+                    const_mem_fun <assignment, uint64_t , &assignment::get_place_key>
             >
         > assignmentIndex;
 
