@@ -4,7 +4,7 @@ cd "/opt/eosio/bin/tests"
 ./init_test_account.sh
 ./init_order.sh
 
-cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS", "jambon"]' -p tester
+cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS", "jambon", "4"]' -p tester
 
 keyTester=$(openssl rand -hex 32)
 keySeller=$(openssl rand -hex 32)
