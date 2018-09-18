@@ -18,6 +18,11 @@ if [ ! -x "$(command -v docker)" ]; then
     exit
 fi
 
+# download jq for json reader, we use jq here for reading the json file ( accounts.json )
+
+mkdir -p ~/bin && curl -sSL -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x ~/bin/jq && export PATH=$PATH:~/bin
+
+
 # download eosio/eos-dev:v1.1.0 image
 echo "=== pull eosio/eos-dev image v1.1.0 from docker hub ==="
 docker pull eosio/eos-dev:v1.1.0

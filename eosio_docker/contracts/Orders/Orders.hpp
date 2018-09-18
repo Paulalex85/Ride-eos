@@ -21,13 +21,22 @@ namespace rideEOS {
         Orders(account_name self):contract(self) {}
 
         /*
-            Initialization = 0
-            OrderReady = 1
-            OrderTaken = 2
-            OrderDelivered = 3
-            OrderEnd = 4
-            OrderCancel = 8
+         *  NeedDeliver = 0
+            Initialization = 1
+            OrderReady = 2
+            OrderTaken = 3
+            OrderDelivered = 4
+            OrderEnd = 5
+            InitCancel = 99
+            OrderCancel = 98
         */
+
+        //@abi action
+        void needdeliver(account_name buyer, account_name seller,asset& priceOrder, asset& priceDeliver, string& details, uint64_t delay);
+
+        //@abi action
+        void deliverfound(account_name deliver, uint64_t orderKey);
+
         //@abi action
         void initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver, string& details, uint64_t delay);
 

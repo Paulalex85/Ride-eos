@@ -35,6 +35,21 @@ namespace rideEOS {
         //@abi action
         void endassign(uint64_t assignmentKey);
 
+        //@abi action
+        void addoffer(uint64_t orderKey, uint64_t placeKey);
+
+        //@abi action
+        void endoffer(uint64_t offerKey);
+
+        //@abi action
+        void canceloffer(uint64_t offerKey);
+
+        //@abi action
+        void addapply(account_name account,uint64_t offerKey);
+
+        //@abi action
+        void cancelapply(uint64_t applyKey);
+
         //@abi table place i64
         struct place {
             uint64_t placeKey;
@@ -45,7 +60,6 @@ namespace rideEOS {
 
             EOSLIB_SERIALIZE(place, (placeKey)(country)(zipCode))
         };
-
         typedef multi_index<N(place), place> placeIndex;
 
         //@abi table assignment i64
@@ -62,9 +76,45 @@ namespace rideEOS {
         };
         typedef multi_index<N(assignment), assignment,
             indexed_by < N(byuserkey),
-                    const_mem_fun <assignment, account_name , &assignment::get_user_key>
+                const_mem_fun <assignment, account_name , &assignment::get_user_key>
             >
         > assignmentIndex;
 
+        //@abi table offer i64
+        struct offer {
+            uint64_t offerKey;
+            uint64_t orderKey;
+            uint64_t placeKey;
+            uint64_t stateOffer;
+
+            /*
+             * StateOffer =
+             * 0 - Open
+             * 1 - Closed
+             * 2 - Founded
+             */
+
+            uint64_t primary_key() const { return offerKey; }
+
+            EOSLIB_SERIALIZE(offer, (offerKey)(orderKey)(placeKey)(stateOffer))
+        };
+        typedef multi_index<N(offer), offer> offerIndex;
+
+        //@abi table apply i64
+        struct apply {
+            uint64_t applyKey;
+            account_name deliver;
+            uint64_t offerKey;
+
+            uint64_t primary_key() const { return applyKey; }
+            uint64_t get_offer() const { return offerKey; }
+
+            EOSLIB_SERIALIZE(apply, (applyKey)(deliver)(offerKey))
+        };
+        typedef multi_index<N(apply), apply,
+            indexed_by < N(byoffer),
+                const_mem_fun <apply, uint64_t , &apply::get_offer>
+            >
+        > applyIndex;
     };
 }

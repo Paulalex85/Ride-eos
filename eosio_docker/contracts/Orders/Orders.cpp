@@ -3,7 +3,7 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Orders, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
+    EOSIO_ABI(Orders, (needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
 
     bool is_equal(const checksum256& a, const checksum256& b) {
         return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
@@ -21,7 +21,57 @@ namespace rideEOS {
         return false;
     }
 
-    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder, asset& priceDeliver,string& details, uint64_t delay) {
+    void Orders::needdeliver(account_name buyer, account_name seller, asset &priceOrder, asset &priceDeliver,
+                             std::string &details, uint64_t delay) {
+        orderIndex orders(_self,_self);
+
+        eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceOrder.is_valid(), "invalid bet" );
+        eosio_assert( priceOrder.amount > 0, "must bet positive quantity" );
+
+        eosio_assert( priceDeliver.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceDeliver.is_valid(), "invalid bet" );
+        eosio_assert( priceDeliver.amount > 0, "must bet positive quantity" );
+
+        Users::userIndex users(N(rideos), N(rideos));
+        auto iteratorUser = users.find(buyer);
+        eosio_assert(iteratorUser != users.end(), "Buyer not found");
+
+        iteratorUser = users.find(seller);
+        eosio_assert(iteratorUser != users.end(), "Seller not found");
+
+        orders.emplace(_self, [&](auto& order) {
+            order.orderKey = orders.available_primary_key();
+            order.buyer = buyer;
+            order.seller = seller;
+            order.state = 0;
+            order.date = eosio::time_point_sec(now());
+            order.dateDelay = eosio::time_point_sec(now());
+            order.priceOrder = priceOrder;
+            order.priceDeliver = priceDeliver;
+            order.validateBuyer = false;
+            order.validateSeller = false;
+            order.validateDeliver = false;
+            order.details = details;
+            order.delay = delay;
+        });
+    }
+
+    void Orders::deliverfound(account_name deliver, uint64_t orderKey) {
+        orderIndex orders(_self, _self);
+        auto iteratorOrder = orders.find(orderKey);
+        eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+
+        require_auth(iteratorOrder->buyer);
+
+        orders.modify(iteratorOrder, _self, [&](auto& order) {
+            order.state = 1;
+            order.deliver = deliver;
+        });
+    }
+
+    void Orders::initialize(account_name buyer, account_name seller, account_name deliver,asset& priceOrder,
+                            asset& priceDeliver,string& details, uint64_t delay) {
         orderIndex orders(_self,_self);
 
         eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
@@ -47,7 +97,7 @@ namespace rideEOS {
             order.buyer = buyer;
             order.seller = seller;
             order.deliver = deliver;
-            order.state = 0;
+            order.state = 1;
             order.date = eosio::time_point_sec(now());
             order.dateDelay = eosio::time_point_sec(now());
             order.priceOrder = priceOrder;
@@ -67,7 +117,7 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->buyer);
 
-        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of initialization");
 
         Users::userIndex userBuyer(N(rideos), N(rideos));
         auto iteratorUser = userBuyer.find(iteratorOrder->buyer);
@@ -87,7 +137,7 @@ namespace rideEOS {
             order.deliveryverification = commitment;
 
             if(iteratorOrder->validateSeller && iteratorOrder->validateDeliver){
-                order.state = 1;
+                order.state = 2;
                 order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
@@ -100,7 +150,7 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->deliver);
 
-        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of initialization");
 
         eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
@@ -108,7 +158,7 @@ namespace rideEOS {
             order.validateDeliver = true;
 
             if(iteratorOrder->validateSeller && iteratorOrder->validateBuyer){
-                order.state = 1;
+                order.state = 2;
                 order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
@@ -121,7 +171,7 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->seller);
 
-        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of initialization");
 
         eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
 
@@ -130,7 +180,7 @@ namespace rideEOS {
             order.takeverification = commitment;
 
             if(iteratorOrder->validateDeliver && iteratorOrder->validateBuyer){
-                order.state = 1;
+                order.state = 2;
                 order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
             }
         });
@@ -143,10 +193,10 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->seller);
 
-        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of product ready");
+        eosio_assert(iteratorOrder->state == 2, "The order is not in the state of product ready");
 
         orders.modify(iteratorOrder, _self, [&](auto& order) {
-            order.state = 2;
+            order.state = 3;
         });
     }
 
@@ -159,10 +209,10 @@ namespace rideEOS {
 
         assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification);
 
-        eosio_assert(iteratorOrder->state == 2, "The order is not in the state of waiting deliver");
+        eosio_assert(iteratorOrder->state == 3, "The order is not in the state of waiting deliver");
 
         orders.modify(iteratorOrder, _self, [&](auto& order) {
-            order.state = 3;
+            order.state = 4;
         });
     }
 
@@ -175,10 +225,10 @@ namespace rideEOS {
 
         assert_sha256((char *)&source, sizeof(source),(const checksum256 *)&iteratorOrder->deliveryverification);
 
-        eosio_assert(iteratorOrder->state == 3, "The order is not in the state delivery");
+        eosio_assert(iteratorOrder->state == 4, "The order is not in the state delivery");
 
         orders.modify(iteratorOrder, _self, [&](auto& order) {
-            order.state = 4;
+            order.state = 5;
         });
 
         action(
@@ -209,7 +259,7 @@ namespace rideEOS {
 
         eosio_assert(is_actor(account,iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not in the contract");
 
-        eosio_assert(iteratorOrder->state == 0, "The order is not in the state of initialization");
+        eosio_assert(iteratorOrder->state == 1, "The order is not in the state of initialization");
 
         if(iteratorOrder->validateBuyer){
             action(
@@ -237,8 +287,8 @@ namespace rideEOS {
 
         require_auth(iteratorOrder->buyer);
 
-        eosio_assert(iteratorOrder->state > 0, "The order is in the state of initialization");
-        eosio_assert(iteratorOrder->state < 4, "The order is finish");
+        eosio_assert(iteratorOrder->state > 1, "The order is in the state of initialization");
+        eosio_assert(iteratorOrder->state < 5, "The order is finish");
 
         eosio_assert(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
 
