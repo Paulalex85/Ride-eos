@@ -18,14 +18,10 @@ if [ ! -x "$(command -v docker)" ]; then
     exit
 fi
 
-# download jq for json reader, we use jq here for reading the json file ( accounts.json )
 
-mkdir -p ~/bin && curl -sSL -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x ~/bin/jq && export PATH=$PATH:~/bin
-
-
-# download eosio/eos-dev:v1.1.0 image
-echo "=== pull eosio/eos-dev image v1.1.0 from docker hub ==="
-docker pull eosio/eos-dev:v1.1.0
+# download eosio/eos-dev:v1.2.5 image
+echo "=== pull eosio/eos-dev image v1.2.5 from docker hub ==="
+docker pull eosio/eos-dev:v1.2.5
 
 # force remove the previous eosio container if it exists
 # create a clean data folder in the eosio_docker to preserve block data
@@ -33,3 +29,9 @@ echo "=== setup/reset data for eosio_docker ==="
 docker stop eosio_rideos_container || true && docker rm --force eosio_rideos_container || true
 rm -rf "./eosio_docker/data"
 mkdir -p "./eosio_docker/data"
+
+# set up node_modules for frontend
+echo "=== npm install packpage for frontend react app ==="
+# change directory to ./frontend
+cd "./frontend"
+npm install
