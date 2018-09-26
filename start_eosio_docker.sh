@@ -18,7 +18,7 @@ docker run --rm --name eosio_rideos_container -d \
 --mount type=bind,src="$(pwd)"/scripts,dst=/opt/eosio/bin/scripts \
 --mount type=bind,src="$(pwd)"/tests,dst=/opt/eosio/bin/tests \
 --mount type=bind,src="$(pwd)"/data,dst=/mnt/dev/data \
--w "/opt/eosio/bin/" eosio/eos-dev:v1.2.5 /bin/bash -c "$script"
+-w "/opt/eosio/bin/" eosio/eos-dev:v1.1.0 /bin/bash -c "$script"
 
 if [ "$1" != "--nolog" ]
 then
