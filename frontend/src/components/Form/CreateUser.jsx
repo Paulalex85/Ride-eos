@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Eos from 'eosjs';
 
 // material-ui dependencies
 import TextField from '@material-ui/core/TextField';
@@ -9,6 +8,7 @@ class CreateUser extends Component{
 
     constructor(props) {
         super(props)
+        this.api = this.props.api;
         this.handleFormEvent = this.handleFormEvent.bind(this);
     }
 
@@ -21,28 +21,7 @@ class CreateUser extends Component{
         let privateKey = event.target.privateKey.value;
         let userName = event.target.userName.value;
     
-        // prepare variables for the switch below to send transactions
-        let actionName = "add";
-        let actionData = {
-            account: account,
-            username: userName,
-        };
-    
-        // eosjs function call: connect to the blockchain
-        const eos = Eos({keyProvider: privateKey});
-        const result = await eos.transaction({
-          actions: [{
-            account: "rideos",
-            name: actionName,
-            authorization: [{
-              actor: account,
-              permission: 'active',
-            }],
-            data: actionData,
-          }],
-        });
-    
-        console.log(result);
+        this.api.createUser(privateKey, account,userName);
     }
 
     render(){
