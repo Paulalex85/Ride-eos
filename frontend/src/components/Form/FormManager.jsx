@@ -28,11 +28,9 @@ class FormManager extends Component {
         this.setState({formToShow: event.target.value});
     }
 
-    handleEosChange(account, privateKey,publicKey) {
+    handleEosChange(name,value) {
         this.setState({
-            privateKey: privateKey,
-            account: account,
-            publicKey: publicKey,
+            [name]:value
         });
     }
     
@@ -59,8 +57,20 @@ class FormManager extends Component {
 
         return (
             <div>
-                <Account 
-                    onSubmit={this.handleEosChange}/>
+                <FormControl>
+                    <Account 
+                        name='account'
+                        label='Account'
+                        onChange={this.handleEosChange}/>
+                    <Account 
+                        name='privateKey'
+                        label='Private Key'
+                        onChange={this.handleEosChange}/>
+                    <Account 
+                        name='publicKey'
+                        label='Public Key'
+                        onChange={this.handleEosChange}/>
+                </FormControl>
                 <FormControl>
                     <InputLabel>Send to EOS</InputLabel>
                     <Select
@@ -72,7 +82,9 @@ class FormManager extends Component {
                         <MenuItem value={'deposit'}>Deposit</MenuItem>
                     </Select>
                 </FormControl>
-                {formAPI}
+                <FormControl>
+                    {formAPI}
+                </FormControl>
             </div>
         );
     }

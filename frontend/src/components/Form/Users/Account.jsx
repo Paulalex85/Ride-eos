@@ -3,57 +3,39 @@ import PropTypes from 'prop-types'
 
 // material-ui dependencies
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 
 class Account extends Component{
 
     constructor(props) {
         super(props)
         this.handleFormEvent = this.handleFormEvent.bind(this);
+        this.name = this.props.name;
+        this.label = this.props.label;
     }
 
     PropTypes = {
-        onSubmit: PropTypes.func.isRequired,
+        onChange: PropTypes.func.isRequired,
+        name: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
     }
 
     handleFormEvent(event) {
         event.preventDefault();
 
-        const privateKey = event.target.privateKey.value;
-        const account = event.target.account.value;
-        const publicKey = event.target.publicKey.value;
+        const value = event.target.value;
 
-        this.props.onSubmit(account, privateKey,publicKey);
+        this.props.onChange(this.name,value);
     }
 
     render(){
         return(
-            <form onSubmit={this.handleFormEvent}>
-                <TextField
-                    name="account"
-                    autoComplete="off"
-                    label="Account"
-                    margin="normal"
-                />
-                <TextField
-                    name="publicKey"
-                    autoComplete="off"
-                    label="Public Key"
-                    margin="normal"
-                />
-                <TextField
-                    name="privateKey"
-                    autoComplete="off"
-                    label="Private Key"
-                    margin="normal"
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit">
-                    Set
-                </Button>
-            </form>
+            <TextField
+                name={this.name}
+                autoComplete="off"
+                label={this.label}
+                margin="normal"
+                onChange={this.handleFormEvent}
+            />
         )
     }
 }
