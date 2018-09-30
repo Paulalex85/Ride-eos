@@ -33,4 +33,5 @@ yarn-error.log*
 # VS Code
 jsconfig.json
 .history
+.vscode/launch.json
 .vscode/settings.json
