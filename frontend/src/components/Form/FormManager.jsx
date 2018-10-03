@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
-import CreateUser from '../Form/Users/CreateUser';
-import UpdateUser from '../Form/Users/UpdateUser';
+import Account from './Account';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import DepositUser from './Users/DepositUser';
-import Account from './Users/Account';
+import FormAPI from './FormAPI';
 
 class FormManager extends Component {
     constructor(props){
@@ -34,27 +32,7 @@ class FormManager extends Component {
         });
     }
     
-    render() {
-        let formAPI;
-        const formToShow = this.state.formToShow;
-
-        switch (formToShow) {
-            case 'add':
-                formAPI = <CreateUser privateKey={this.state.privateKey} account={this.state.account} publicKey={this.state.publicKey}/>
-                break;
-
-            case 'update':
-                formAPI = <UpdateUser privateKey={this.state.privateKey} account={this.state.account} publicKey={this.state.publicKey}/>
-                break;
-
-            case 'deposit':
-                formAPI = <DepositUser privateKey={this.state.privateKey} account={this.state.account} publicKey={this.state.publicKey}/>
-                break;
-        
-            default:
-                break;
-        }
-
+    render() {   
         return (
             <div>
                 <FormControl>
@@ -80,10 +58,13 @@ class FormManager extends Component {
                         <MenuItem value={'add'}>Add</MenuItem>
                         <MenuItem value={'update'}>Update</MenuItem>
                         <MenuItem value={'deposit'}>Deposit</MenuItem>
+                        <MenuItem value={'withdraw'}>Withdraw</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl>
-                    {formAPI}
+                    <FormAPI 
+                        globalInfo={this.state}
+                    />
                 </FormControl>
             </div>
         );

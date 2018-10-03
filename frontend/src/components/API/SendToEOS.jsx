@@ -36,6 +36,16 @@ export default class SendToEOS {
         this.auth("rideos").then(this.send(actionName, actionData, "rideos"));
     }
 
+    withdrawUser(quantity){
+        let actionName = "withdraw";
+        let actionData = {
+            account: this.sender,
+            quantity: quantity,
+        };
+        const result = this.send(actionName, actionData, "rideos");
+        console.log(result);
+    }
+
     async auth(contractDestination){
         const eos = Eos({keyProvider: this.privateKey});
 
