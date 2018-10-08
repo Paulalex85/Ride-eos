@@ -6,6 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import FormAPI from './FormAPI';
+import KeyGenerator from './KeyGenerator';
 
 class FormManager extends Component {
     constructor(props){
@@ -59,12 +60,20 @@ class FormManager extends Component {
                         <MenuItem value={'update'}>Update</MenuItem>
                         <MenuItem value={'deposit'}>Deposit</MenuItem>
                         <MenuItem value={'withdraw'}>Withdraw</MenuItem>
+                        <MenuItem value={'needdeliver'}>Need Deliver</MenuItem>
+                        <MenuItem value={'deliverfound'}>Deliver Found</MenuItem>
+                        <MenuItem value={'initialize'}>Create Order</MenuItem>
+                        <MenuItem value={'validatebuy'}>Buyer validate</MenuItem>
+                        <MenuItem value={'validatesell'}>Seller validate</MenuItem>
+                        <MenuItem value={'validatedeli'}>Deliver validate</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl>
                     <FormAPI 
                         globalInfo={this.state}
+                        onChange={this.handleEosChange}
                     />
+                    <KeyGenerator />
                 </FormControl>
             </div>
         );

@@ -7,7 +7,9 @@
     "eosjs": "16.0.7",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-scripts": "^1.1.5"
+    "react-scripts": "^1.1.5",
+    "sha.js": "^2.4.11",
+    "random-bytes": "^1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

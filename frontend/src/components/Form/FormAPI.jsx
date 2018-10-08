@@ -13,11 +13,6 @@ class FormAPI extends Component{
         this.updateInputValue = this.updateInputValue.bind(this);
     }
 
-    state = {
-        username: '',
-        amount: '',
-    }
-
     shouldComponentUpdate(nextProps, nextState){
         return nextProps.globalInfo.formToShow !== this.props.globalInfo.formToShow;
     }
@@ -48,6 +43,24 @@ class FormAPI extends Component{
             case 'withdraw':
                 api.withdrawUser(this.state.amount);
                 break;
+            case 'needdeliver':
+                api.needDeliver(this.state.seller,this.state.priceOrder,this.state.priceDeliver,this.state.details,this.state.delay);
+                break;
+            case 'deliverfound':
+                api.deliverFound(this.state.deliver,this.state.orderKey);
+                break;
+            case 'initialize':
+                api.initialize(this.state.seller,this.state.deliver,this.state.priceOrder,this.state.priceDeliver,this.state.details,this.state.delay);
+                break;
+            case 'validatebuy':
+                api.validateBuy(this.state.orderKey,this.state.commitment);
+                break;
+            case 'validatesell':
+                api.validateSell(this.state.orderKey,this.state.commitment);
+                break;
+            case 'validatedeli':
+                api.validateDeli(this.state.orderKey);
+                break;
             default:
                 break;
         }
@@ -60,37 +73,73 @@ class FormAPI extends Component{
             case 'add':
                 valueButton = 'Create user';
                 valueForm = [
-                    {
-                        name:'username',
-                        label:'User name',
-                    }
+                    {name:'username',label:'User name',}
                 ];
                 break;
             case 'update':
                 valueButton = 'Update user';
                 valueForm = [
-                    {
-                        name:'username',
-                        label:'User name',
-                    }
+                    {name:'username',label:'User name',}
                 ];
                 break;
             case 'deposit':
                 valueButton = 'Deposit';
                 valueForm = [
-                    {
-                        name:'amount',
-                        label:'Amount',
-                    }
+                    {name:'amount',label:'Amount',}
                 ];
                 break;
             case 'withdraw':
                 valueButton = 'Withdraw';
                 valueForm = [
-                    {
-                        name:'amount',
-                        label:'Amount',
-                    }
+                    {name:'amount',label:'Amount', }
+                ];
+                break;
+            case 'needdeliver':
+                valueButton = 'Send Request';
+                valueForm = [
+                    {name:'seller',label:'Seller',},
+                    {name:'priceOrder',label:'Price Order',},
+                    {name:'priceDeliver',label:'Price Deliver',},
+                    {name:'details',label:'Details',},
+                    {name:'delay',label:'Delay',}
+                ];
+                break;
+            case 'deliverfound':
+                valueButton = 'Found';
+                valueForm = [
+                    {name:'deliver',label:'Deliver', },
+                    {name:'orderKey',label:'Order Key', }
+                ];
+                break;
+            case 'initialize':
+                valueButton = 'Create order';
+                valueForm = [
+                    {name:'seller',label:'Seller',},
+                    {name:'deliver',label:'Deliver',},
+                    {name:'priceOrder',label:'Price Order',},
+                    {name:'priceDeliver',label:'Price Deliver',},
+                    {name:'details',label:'Details',},
+                    {name:'delay',label:'Delay',}
+                ];
+                break;
+            case 'validatebuy':
+                valueButton = 'Validate';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', },
+                    {name:'commitment',label:'Hash', }
+                ];
+                break;
+            case 'validatesell':
+                valueButton = 'Validate';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', },
+                    {name:'commitment',label:'Hash', }
+                ];
+                break;
+            case 'validatedeli':
+                valueButton = 'Validate';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', }
                 ];
                 break;
             default:

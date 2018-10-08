@@ -7,6 +7,7 @@ export default class SendToEOS {
         this.publicKey = publicKey;
     }
 
+    //Users API
     createUser(username){
         let actionName = "add";
         let actionData = {
@@ -44,6 +45,72 @@ export default class SendToEOS {
         };
         const result = this.send(actionName, actionData, "rideos");
         console.log(result);
+    }
+
+    //Orders API
+    needDeliver(seller,priceOrder, priceDeliver, details, delay){
+        let actionName = "needdeliver";
+        let actionData = {
+            buyer: this.sender,
+            seller :seller,
+            priceOrder: priceOrder,
+            priceDeliver: priceDeliver,
+            details: details,
+            delay: delay,
+        }
+        const result = this.send(actionName, actionData, "rideor");
+        console.log(result);
+    }
+
+    deliverFound(deliver, orderKey){
+        let actionName = "deliverfound";
+        let actionData = {
+            deliver: deliver,
+            orderKey: orderKey,
+        };
+        const result = this.send(actionName, actionData, "rideor");
+        console.log(result);
+    }
+
+    initialize(seller,deliver,priceOrder, priceDeliver, details, delay){
+        let actionName = "initialize";
+        let actionData = {
+            buyer: this.sender,
+            seller :seller,
+            deliver: deliver,
+            priceOrder: priceOrder,
+            priceDeliver: priceDeliver,
+            details: details,
+            delay: delay,
+        }
+        const result = this.send(actionName, actionData, "rideor");
+        console.log(result);
+    }
+
+    validateBuy(orderKey,commitment){
+        let actionName = "validatebuy";
+        let actionData = {
+            orderKey: orderKey,
+            commitment: commitment,
+        };
+        this.auth("rideor").then(this.send(actionName, actionData, "rideor"));
+    }
+
+    validateSell(orderKey,commitment){
+        let actionName = "validatesell";
+        let actionData = {
+            orderKey: orderKey,
+            commitment: commitment,
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    validateDeli(orderKey){
+        let actionName = "validatedeli";
+        let actionData = {
+            orderKey: orderKey,
+        };
+        this.send(actionName, actionData, "rideor");
     }
 
     async auth(contractDestination){

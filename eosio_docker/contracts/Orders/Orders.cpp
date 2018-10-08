@@ -25,11 +25,11 @@ namespace rideEOS {
                              std::string &details, uint64_t delay) {
         orderIndex orders(_self,_self);
 
-        eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceOrder.symbol == CORE_SYMBOL, "only core token allowed");
         eosio_assert( priceOrder.is_valid(), "invalid bet" );
         eosio_assert( priceOrder.amount > 0, "must bet positive quantity" );
 
-        eosio_assert( priceDeliver.symbol == CORE_SYMBOL, "only core token allowed" );
+        eosio_assert( priceDeliver.symbol == CORE_SYMBOL, "only core token allowed");
         eosio_assert( priceDeliver.is_valid(), "invalid bet" );
         eosio_assert( priceDeliver.amount > 0, "must bet positive quantity" );
 
