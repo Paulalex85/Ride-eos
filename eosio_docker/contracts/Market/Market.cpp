@@ -63,11 +63,11 @@ namespace rideEOS {
         places.erase(iteratorPlace);
     }
 
-    void Market::newassign(account_name account, uint64_t place) {
+    void Market::newassign(account_name account, uint64_t placeKey) {
         require_auth(account);
 
         placeIndex places(_self, _self);
-        auto iteratorPlace = places.find(place);
+        auto iteratorPlace = places.find(placeKey);
         eosio_assert(iteratorPlace != places.end(), "Place not found");
 
         Users::userIndex users(N(rideos), N(rideos));

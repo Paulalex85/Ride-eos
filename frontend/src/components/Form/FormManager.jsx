@@ -66,6 +66,18 @@ class FormManager extends Component {
                         <MenuItem value={'validatebuy'}>Buyer validate</MenuItem>
                         <MenuItem value={'validatesell'}>Seller validate</MenuItem>
                         <MenuItem value={'validatedeli'}>Deliver validate</MenuItem>
+                        <MenuItem value={'orderready'}>Order Ready</MenuItem>
+                        <MenuItem value={'ordertaken'}>Order Taken</MenuItem>
+                        <MenuItem value={'orderdelive'}>Order Delive</MenuItem>
+                        <MenuItem value={'initcancel'}>Initialization Cancel</MenuItem>
+                        <MenuItem value={'delaycancel'}>Delay Cancel</MenuItem>
+                        <MenuItem value={'newassign'}>New Assign</MenuItem>
+                        <MenuItem value={'endassign'}>End Assign</MenuItem>
+                        <MenuItem value={'addoffer'}>Add Offer</MenuItem>
+                        <MenuItem value={'endoffer'}>End Offer</MenuItem>
+                        <MenuItem value={'canceloffer'}>Cancel Offer</MenuItem>
+                        <MenuItem value={'addapply'}>Add Apply</MenuItem>
+                        <MenuItem value={'cancelapply'}>Cancel Apply</MenuItem>
                     </Select>
                 </FormControl>
                 <FormControl>

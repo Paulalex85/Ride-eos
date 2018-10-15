@@ -30,7 +30,7 @@ namespace rideEOS {
         void deleteplace(uint64_t key);
 
         //@abi action
-        void newassign(account_name account, uint64_t place);
+        void newassign(account_name account, uint64_t placeKey);
 
         //@abi action
         void endassign(uint64_t assignmentKey);

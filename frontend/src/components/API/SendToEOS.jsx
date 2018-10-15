@@ -113,6 +113,109 @@ export default class SendToEOS {
         this.send(actionName, actionData, "rideor");
     }
 
+    orderReady(orderKey){
+        let actionName = "orderready";
+        let actionData = {
+            orderKey: orderKey,
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    orderTaken(orderKey,source){
+        let actionName = "ordertaken";
+        let actionData = {
+            orderKey: orderKey,
+            source: source,
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    orderDelive(orderKey,source){
+        let actionName = "orderdelive";
+        let actionData = {
+            orderKey: orderKey,
+            source: source,
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    initCancel(orderKey,account){
+        let actionName = "initcancel";
+        let actionData = {
+            orderKey: orderKey,
+            account: account,
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    delayCancel(orderKey){
+        let actionName = "delaycancel";
+        let actionData = {
+            orderKey: orderKey
+        };
+        this.send(actionName, actionData, "rideor");
+    }
+
+    //Markets API
+    newAssign(account, placekey){
+        let actionName = "newassign";
+        let actionData = {
+            account: account,
+            placeKey: placekey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    endAssign(assignmentKey){
+        let actionName = "endassign";
+        let actionData = {
+            assignmentKey: assignmentKey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    addOffer(orderkey, placekey){
+        let actionName = "addoffer";
+        let actionData = {
+            orderKey: orderkey,
+            placeKey: placekey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    endOffer(offerkey){
+        let actionName = "endoffer";
+        let actionData = {
+            offerKey: offerkey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    cancelOffer(offerkey){
+        let actionName = "canceloffer";
+        let actionData = {
+            offerKey: offerkey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    addApply(account,offerkey){
+        let actionName = "addapply";
+        let actionData = {
+            account: account,
+            offerKey: offerkey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
+    cancelApply(applykey){
+        let actionName = "cancelapply";
+        let actionData = {
+            applyKey: applykey
+        };
+        this.send(actionName, actionData, "rideom");
+    }
+
     async auth(contractDestination){
         const eos = Eos({keyProvider: this.privateKey});
 

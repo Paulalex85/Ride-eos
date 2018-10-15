@@ -61,6 +61,42 @@ class FormAPI extends Component{
             case 'validatedeli':
                 api.validateDeli(this.state.orderKey);
                 break;
+            case 'orderready':
+                api.orderReady(this.state.orderKey);
+                break;
+            case 'ordertaken':
+                api.orderTaken(this.state.orderKey, this.state.source);
+                break;
+            case 'orderdelive':
+                api.orderDelive(this.state.orderKey, this.state.source);
+                break;
+            case 'initcancel':
+                api.initCancel(this.state.orderKey, account);
+                break;
+            case 'delaycancel':
+                api.delayCancel(this.state.orderKey);
+                break;
+            case 'newassign':
+                api.newAssign(account, this.state.placeKey);
+                break;
+            case 'endassign':
+                api.endAssign(this.state.assignmentKey);
+                break;
+            case 'addoffer':
+                api.addOffer(this.state.orderKey,this.state.placeKey);
+                break;
+            case 'endoffer':
+                api.endOffer(this.state.offerKey);
+                break;
+            case 'canceloffer':
+                api.cancelOffer(this.state.offerKey);
+                break;
+            case 'addapply':
+                api.addApply(account, this.state.offerKey);
+                break;
+            case 'cancelapply':
+                api.cancelApply(account, this.state.offerKey);
+                break;
             default:
                 break;
         }
@@ -140,6 +176,82 @@ class FormAPI extends Component{
                 valueButton = 'Validate';
                 valueForm = [
                     {name:'orderKey',label:'Order Key', }
+                ];
+                break;
+            case 'orderready':
+                valueButton = 'Order Ready';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', }
+                ];
+                break;
+            case 'ordertaken':
+                valueButton = 'Order Taken';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', },
+                    {name:'source',label:'Source', }
+                ];
+                break;
+            case 'orderdelive':
+                valueButton = 'Order Delive';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', },
+                    {name:'source',label:'Source', }
+                ];
+                break;
+            case 'initcancel':
+                valueButton = 'Cancel';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', }
+                ];
+                break;
+            case 'delaycancel':
+                valueButton = 'Cancel';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', }
+                ];
+                break;
+            case 'newassign':
+                valueButton = 'Assign';
+                valueForm = [
+                    {name:'account',label:'Account', },
+                    {name:'placeKey',label:'Place Key', }
+                ];
+            case 'endassign':
+                valueButton = 'End';
+                valueForm = [
+                    {name:'assignmentKey',label:'Assignment Key', },
+                ];
+                break;
+            case 'addoffer':
+                valueButton = 'Add';
+                valueForm = [
+                    {name:'orderKey',label:'Order Key', },
+                    {name:'assignmentKey',label:'Assignment Key', }
+                ];
+                break;
+            case 'endoffer':
+                valueButton = 'End';
+                valueForm = [
+                    {name:'offerKey',label:'Offer Key', },
+                ];
+                break;
+            case 'canceloffer':
+                valueButton = 'Cancel';
+                valueForm = [
+                    {name:'offerKey',label:'Offer Key', },
+                ];
+                break;
+            case 'addapply':
+                valueButton = 'Add';
+                valueForm = [
+                    {name:'account',label:'Account', },
+                    {name:'offerKey',label:'Offer Key', }
+                ];
+                break;
+            case 'cancelapply':
+                valueButton = 'Cancel';
+                valueForm = [
+                    {name:'applykey',label:'Cancel', }
                 ];
                 break;
             default:
