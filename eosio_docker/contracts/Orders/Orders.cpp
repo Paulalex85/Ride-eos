@@ -135,6 +135,8 @@ namespace rideEOS {
         orders.modify(iteratorOrder, _self, [&](auto& order) {
             order.validateBuyer = true;
             order.deliveryverification = commitment;
+            
+            ripemd160((char *)&commitment, sizeof(commitment), (const checksum256 *)&iteratorOrder->takeverification);
 
             if(iteratorOrder->validateSeller && iteratorOrder->validateDeliver){
                 order.state = 2;
