@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { listConfirmed } from '../services/post'
+import { listUsers } from '../services/user'
 
 export default () => {
   let api = Router()
 
-  api.get('/', listConfirmed)
+  api.get('/users', listUsers)
 
   return api
 }

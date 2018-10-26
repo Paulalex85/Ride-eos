@@ -12,7 +12,7 @@ namespace rideEOS {
         eosio_assert(iterator == users.end(), "Address for account already exists");
 
         users.emplace(_self, [&](auto& user) {
-            user.account_name = account;
+            user.account = account;
             user.username = username;
         });
     }

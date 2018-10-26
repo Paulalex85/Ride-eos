@@ -7,4 +7,4 @@
 ./start_eosio_docker.sh
 
 # start mongodb and put in background
-#./start_mongodb_docker.sh --nolog
+./start_mongodb_docker.sh

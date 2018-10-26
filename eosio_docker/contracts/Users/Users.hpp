@@ -43,13 +43,13 @@ namespace rideEOS {
 
         //@abi table user i64
         struct user {
-            uint64_t account_name;
+            uint64_t account;
             string username;
             asset balance;
 
-            uint64_t primary_key() const { return account_name; }
+            uint64_t primary_key() const { return account; }
 
-            EOSLIB_SERIALIZE(user, (account_name)(username)(balance))
+            EOSLIB_SERIALIZE(user, (account)(username)(balance))
         };
 
         typedef multi_index<N(user), user> userIndex;

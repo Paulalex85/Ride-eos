@@ -7,7 +7,7 @@ let User = null
 try {
   const UserSchema = new Schema({
     _id: {
-      account: String
+      account: Number
     },
     username: String,
     balance: String,
