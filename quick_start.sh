@@ -5,6 +5,3 @@
 
 # # start blockchain and put in background
 ./start_eosio_docker.sh
-
-# start mongodb and put in background
-./start_mongodb_docker.sh
