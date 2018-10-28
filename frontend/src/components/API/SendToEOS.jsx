@@ -9,7 +9,7 @@ export default class SendToEOS {
 
     //Users API
     createUser(username){
-        let actionName = "add";
+        let actionName = "adduser";
         let actionData = {
             account: this.sender,
             username: username,
@@ -19,7 +19,7 @@ export default class SendToEOS {
     }
 
     updateUser(username){
-        let actionName = "update";
+        let actionName = "updateuser";
         let actionData = {
             account: this.sender,
             username: username,

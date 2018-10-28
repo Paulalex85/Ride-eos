@@ -31,11 +31,28 @@ async function takeAction(action, dataValue, contractName) {
 
 class ApiService {
 
+  static getCurrentUser() {
+    return new Promise((resolve, reject) => {
+      if (!localStorage.getItem("userAccount")) {
+        return reject();
+      }
+      this.getUserByAccount(localStorage.getItem("userAccount"))
+        .then(() => {
+          resolve(localStorage.getItem("userAccount"));
+        })
+        .catch(err => {
+          localStorage.removeItem("userAccount");
+          localStorage.removeItem("privateKey");
+          reject(err);
+        });
+    });
+  }
+
   static login({ account,username, key }) {
     return new Promise((resolve, reject) => {
       localStorage.setItem("userAccount", account);
       localStorage.setItem("privateKey", key);
-      takeAction("add", { account: account, username:username },process.env.REACT_APP_EOSIO_CONTRACT_USERS )
+      takeAction("adduser", { account: account, username:username },process.env.REACT_APP_EOSIO_CONTRACT_USERS )
         .then(() => {
           resolve();
         })
@@ -45,6 +62,23 @@ class ApiService {
           reject(err);
         });
     });
+  }
+
+  static async getUserByAccount(account) {
+    try {
+      const rpc = new Rpc.JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
+      const result = await rpc.get_table_rows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
+        "table": "user",    // name of the table as specified by the contract abi
+        "limit": 1,
+        "lower_bound": account,
+      });
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+    }
   }
 
 }

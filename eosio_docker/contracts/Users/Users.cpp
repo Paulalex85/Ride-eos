@@ -2,9 +2,9 @@
 
 namespace rideEOS {
 
-    EOSIO_ABI(Users, (add)(update)(getuser)(deposit)(withdraw)(pay)(receive));
+    EOSIO_ABI(Users, (adduser)(updateuser)(getuser)(deposit)(withdraw)(pay)(receive));
 
-    void Users::add(account_name account, string& username) {
+    void Users::adduser(account_name account, string& username) {
         require_auth(account);
         userIndex users(_self, _self);
 
@@ -17,7 +17,7 @@ namespace rideEOS {
         });
     }
 
-    void Users::update(account_name account, string& username) {
+    void Users::updateuser(account_name account, string& username) {
         require_auth(account);
         userIndex users(_self, _self);
 

@@ -11,9 +11,9 @@ cleos set account permission rider active '{"threshold": 1,"keys": [{"key": "EOS
 cleos set account permission seller active '{"threshold": 1,"keys": [{"key": "EOS5yd9aufDv7MqMquGcQdD6Bfmv6umqSuh9ru3kheDBqbi6vtJ58","weight": 1}],"accounts": [{"permission":{"actor":"rideos","permission":"active"},"weight":1}]}' owner -p seller@active
 sleep 1
 
-cleos push action rideos add '["tester","tester"]' -p tester
-cleos push action rideos add '["rider","rid"]' -p rider
-cleos push action rideos add '["seller","sel"]' -p seller
+cleos push action rideos adduser '["tester","tester"]' -p tester
+cleos push action rideos adduser '["rider","rid"]' -p rider
+cleos push action rideos adduser '["seller","sel"]' -p seller
 sleep 1
 
 cleos get table rideos rideos user

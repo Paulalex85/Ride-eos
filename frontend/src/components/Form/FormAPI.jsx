@@ -31,10 +31,10 @@ class FormAPI extends Component{
 
         let api = new SendToEOS(account,privateKey,publicKey);
         switch (this.props.globalInfo.formToShow) {
-            case 'add':
+            case 'adduser':
                 api.createUser(this.state.username);
                 break;
-            case 'update':
+            case 'updateuser':
                 api.updateUser(this.state.username);
                 break;
             case 'deposit':
@@ -106,13 +106,13 @@ class FormAPI extends Component{
         let valueForm;
         let valueButton;
         switch (this.props.globalInfo.formToShow) {
-            case 'add':
+            case 'adduser':
                 valueButton = 'Create user';
                 valueForm = [
                     {name:'username',label:'User name',}
                 ];
                 break;
-            case 'update':
+            case 'updateuser':
                 valueButton = 'Update user';
                 valueForm = [
                     {name:'username',label:'User name',}

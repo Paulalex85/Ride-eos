@@ -3,7 +3,7 @@ import { ActionTypes } from 'const';
 const initialState = {
   account: "",
   username: "",
-  balance: "0 " + process.env.EOSIO_CURRENCY,
+  balance: "0.0000 SYS",
 };
 
 export default function (state = initialState, action) {

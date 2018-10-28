@@ -7,11 +7,15 @@ import TextField from '@material-ui/core/TextField';
 import { UserAction } from 'actions';
 import { ApiService } from 'services';
 
+
 class Login extends Component {
 
   constructor(props) {
     // Inherit constructor
     super(props);
+
+    this.testAccounts = require('./accounts.json');
+
     // State for form data and error message
     this.state = {
       form: {
@@ -26,7 +30,7 @@ class Login extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  // Runs on every keystroke to update the React state
+  // Runs on every keystroke to updateuser the React state
   handleChange(event) {
     const { name, value } = event.target;
     const { form } = this.state;
@@ -98,11 +102,16 @@ class Login extends Component {
                 { error && <span className="error">{ error }</span> }
             </div>
             <div className="bottom">
-                <Button type="submit" className="green">
+                <Button 
+                    type="submit" 
+                    className="green" 
+                    variant='contained'
+                    color='primary'>
                 { "CONFIRM" }
                 </Button>
             </div>
         </form>
+        {JSON.stringify(this.testAccounts)}
       </div>
     )
   }

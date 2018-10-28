@@ -8,7 +8,7 @@ cleos set account permission tester active '{"threshold": 1,"keys": [{"key": "EO
 sleep 1
 cleos set account permission rideos active '{"threshold": 1,"keys": [{"key": "EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B","weight": 1}],"accounts": [{"permission":{"actor":"rideos","permission":"eosio.code"},"weight":1}]}' owner -p rideos
 sleep 1
-cleos push action rideos add '["tester","usertest1"]' -p tester
+cleos push action rideos adduser '["tester","usertest1"]' -p tester
 sleep 1
 cleos push action rideos deposit '["tester", "100.0000 SYS"]' -p tester
 sleep 1

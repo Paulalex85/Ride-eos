@@ -21,10 +21,10 @@ namespace rideEOS {
         Users(account_name self):contract(self) {}
 
         //@abi action
-        void add(account_name account, string& username);
+        void adduser(account_name account, string& username);
 
         //@abi action
-        void update(account_name account, string& username);
+        void updateuser(account_name account, string& username);
 
         //@abi action
         void getuser(const account_name account);
