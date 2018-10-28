@@ -216,6 +216,7 @@ class FormAPI extends Component{
                     {name:'account',label:'Account', },
                     {name:'placeKey',label:'Place Key', }
                 ];
+                break;
             case 'endassign':
                 valueButton = 'End';
                 valueForm = [

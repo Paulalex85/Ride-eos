@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^1.5.1",
-    "eosjs": "16.0.7",
+    "eosjs": "20.0.0-beta1",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
-    "react-scripts": "^1.1.5",
+    "redux": "^4.0.1",
+    "react-redux": "^5.1.0",
+    "react-scripts": "^1.1.4",
     "sha.js": "^2.4.11",
     "random-bytes": "^1.0.0"
   },
