@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Account from './Account';
-import {UserProfile} from 'components';
+import { UserProfile } from 'components';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -15,13 +14,13 @@ import { UserAction } from 'actions';
 import { ApiService } from 'services';
 
 class FormManager extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
 
         // Bind functions
         this.loadUser = this.loadUser.bind(this);
         // Call `loadUser` before mounting the app
-        this.loadUser();
+        //this.loadUser();
 
         this.handleChange = this.handleChange.bind(this);
         this.handleEosChange = this.handleEosChange.bind(this);
@@ -31,7 +30,7 @@ class FormManager extends Component {
         formToShow: 'adduser',
         privateKey: '',
         account: '',
-        publicKey:'',
+        publicKey: '',
     };
 
     // Get latest user object from blockchain
@@ -50,39 +49,19 @@ class FormManager extends Component {
     }
 
     handleChange(event) {
-        this.setState({formToShow: event.target.value});
+        this.setState({ formToShow: event.target.value });
     }
 
-    handleEosChange(name,value) {
+    handleEosChange(name, value) {
         this.setState({
-            [name]:value
+            [name]: value
         });
     }
-    
-    render() {   
-        const { user: { account, username, balance } } = this.props;
 
+    render() {
         return (
             <div>
-                <FormControl>
-                    <UserProfile
-                        account = {account}
-                        username = {username}
-                        balance = {balance}
-                    />
-                    <Account 
-                        name='account'
-                        label='Account'
-                        onChange={this.handleEosChange}/>
-                    <Account 
-                        name='privateKey'
-                        label='Private Key'
-                        onChange={this.handleEosChange}/>
-                    <Account 
-                        name='publicKey'
-                        label='Public Key'
-                        onChange={this.handleEosChange}/>
-                </FormControl>
+                <UserProfile />
                 <FormControl>
                     <InputLabel>Send to EOS</InputLabel>
                     <Select
@@ -114,7 +93,7 @@ class FormManager extends Component {
                     </Select>
                 </FormControl>
                 <FormControl>
-                    <FormAPI 
+                    <FormAPI
                         globalInfo={this.state}
                         onChange={this.handleEosChange}
                     />
@@ -130,7 +109,7 @@ const mapStateToProps = state => state;
 
 // Map the following action to props
 const mapDispatchToProps = {
-  setUser: UserAction.setUser,
+    setUser: UserAction.setUser,
 };
 
 // Export a redux connected component

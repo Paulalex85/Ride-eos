@@ -20,12 +20,12 @@ async function takeAction(action, dataValue, contractName) {
         data: dataValue,
       }]
     }, {
-      blocksBehind: 3,
-      expireSeconds: 30,
-    });
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
     return resultWithConfig;
   } catch (err) {
-    throw(err)
+    throw (err)
   }
 }
 
@@ -37,8 +37,33 @@ class ApiService {
         return reject();
       }
       this.getUserByAccount(localStorage.getItem("userAccount"))
+        .then((row) => {
+          console.log(row);
+          if (row === undefined) {
+            console.log("Utilisateur inconnu");
+            localStorage.removeItem("userAccount");
+            localStorage.removeItem("privateKey");
+            reject();
+          } else {
+            resolve(row);
+          }
+        })
+        .catch(err => {
+          console.log("erreur");
+          localStorage.removeItem("userAccount");
+          localStorage.removeItem("privateKey");
+          reject(err);
+        });
+    });
+  }
+
+  static login({ account, username, key }) {
+    return new Promise((resolve, reject) => {
+      localStorage.setItem("userAccount", account);
+      localStorage.setItem("privateKey", key);
+      takeAction("adduser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
         .then(() => {
-          resolve(localStorage.getItem("userAccount"));
+          resolve();
         })
         .catch(err => {
           localStorage.removeItem("userAccount");
@@ -48,11 +73,11 @@ class ApiService {
     });
   }
 
-  static login({ account,username, key }) {
+  static updateUser({ account, username, key }) {
     return new Promise((resolve, reject) => {
       localStorage.setItem("userAccount", account);
       localStorage.setItem("privateKey", key);
-      takeAction("adduser", { account: account, username:username },process.env.REACT_APP_EOSIO_CONTRACT_USERS )
+      takeAction("updateuser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
         .then(() => {
           resolve();
         })
@@ -77,7 +102,7 @@ class ApiService {
       });
       return result.rows[0];
     } catch (err) {
-      console.error(err);
+      return console.error(err);
     }
   }
 

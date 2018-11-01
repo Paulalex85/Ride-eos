@@ -24,11 +24,11 @@ class App extends Component {
     // Send a request to API (blockchain) to get the current logged in user
     return ApiService.getCurrentUser()
       // If the server return an account
-      .then(account => {
-        setUser({ account: account });
+      .then(user => {
+        setUser({ account: user.account, username: user.username, balance: user.balance });
       })
       // To ignore 401 console error
-      .catch(() => {})
+      .catch(() => { })
   }
 
   render() {
@@ -39,8 +39,8 @@ class App extends Component {
     // If the account is NOT set in redux, display the Login component
     return (
       <div className="App">
-        { account && <FormManager /> }
-        { !account && <Login /> }
+        {account && <FormManager />}
+        {!account && <Login />}
       </div>
     );
   }
@@ -56,4 +56,4 @@ const mapDispatchToProps = {
 };
 
 // Export a redux connected component
-export default connect(mapStateToProps,mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -43,11 +43,11 @@ namespace rideEOS {
 
         //@abi table user i64
         struct user {
-            uint64_t account;
+            account_name account;
             string username;
             asset balance;
 
-            uint64_t primary_key() const { return account; }
+            account_name primary_key() const { return account; }
 
             EOSLIB_SERIALIZE(user, (account)(username)(balance))
         };
