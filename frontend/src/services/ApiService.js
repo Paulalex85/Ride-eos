@@ -73,11 +73,9 @@ class ApiService {
     });
   }
 
-  static updateUser({ account, username, key }) {
+  static updateUser({ username }) {
     return new Promise((resolve, reject) => {
-      localStorage.setItem("userAccount", account);
-      localStorage.setItem("privateKey", key);
-      takeAction("updateuser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      takeAction("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
         .then(() => {
           resolve();
         })

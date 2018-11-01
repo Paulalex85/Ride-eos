@@ -12,6 +12,14 @@ class UpdateProfile extends Component {
         // Inherit constructor
         super(props);
 
+        // State for form data and error message
+        this.state = {
+            form: {
+                username: '',
+                error: '',
+            },
+        }
+
         // Bind functions
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
