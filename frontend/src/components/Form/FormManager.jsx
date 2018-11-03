@@ -11,17 +11,12 @@ import KeyGenerator from './KeyGenerator';
 import { connect } from 'react-redux';
 // Services and redux action
 import { UserAction } from 'actions';
-import { ApiService } from 'services';
 
 class FormManager extends Component {
     constructor(props) {
         super(props)
 
         // Bind functions
-        this.loadUser = this.loadUser.bind(this);
-        // Call `loadUser` before mounting the app
-        //this.loadUser();
-
         this.handleChange = this.handleChange.bind(this);
         this.handleEosChange = this.handleEosChange.bind(this);
     }
@@ -32,21 +27,6 @@ class FormManager extends Component {
         account: '',
         publicKey: '',
     };
-
-    // Get latest user object from blockchain
-    loadUser() {
-        // Extract `setUser` of `UserAction` and `user.name` of UserReducer from redux
-        const { setUser, user: { account } } = this.props;
-        // Send request the blockchain by calling the ApiService,
-        // Get the user object and store
-        return ApiService.getUserByAccount(account).then(user => {
-            setUser({
-                account: user.account,
-                username: user.username,
-                balance: user.balance,
-            });
-        });
-    }
 
     handleChange(event) {
         this.setState({ formToShow: event.target.value });

@@ -3,7 +3,7 @@ import { ActionTypes } from 'const';
 const initialState = {
   account: "",
   username: "",
-  balance: "0.0000 SYS",
+  balance: "0 SYS",
 };
 
 export default function (state = initialState, action) {
@@ -13,7 +13,7 @@ export default function (state = initialState, action) {
         // If the name is not specified, do not change it
         // The places that will change the name is login
         // In that cases, the `username`, `balance` will be reset
-        account: typeof action.account === "undefined" ? state.account : action.account,
+        account: typeof action.account === undefined ? state.account : action.account,
         username: action.username || initialState.username,
         balance: action.balance || initialState.balance,
       });

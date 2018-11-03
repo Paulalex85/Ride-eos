@@ -1,32 +1,63 @@
-import { Api, Rpc, SignatureProvider } from 'eosjs';
+import Eos from 'eosjs';
+import ecc from 'eosjs-ecc'
 
-// Main action call to blockchain
-async function takeAction(action, dataValue, contractName) {
-  const privateKey = localStorage.getItem("privateKey");
-  const rpc = new Rpc.JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
-  const signatureProvider = new SignatureProvider([privateKey]);
-  const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
-  // Main call to blockchain after setting action, account_name and data
-  try {
-    const resultWithConfig = await api.transact({
-      actions: [{
-        account: contractName,
-        name: action,
-        authorization: [{
-          actor: localStorage.getItem("userAccount"),
-          permission: 'active',
-        }],
-        data: dataValue,
-      }]
-    }, {
-        blocksBehind: 3,
-        expireSeconds: 30,
-      });
-    return resultWithConfig;
-  } catch (err) {
-    throw (err)
+function eosConfiguration() {
+  // configuration
+  let config = {
+    chainId: null, // 32 byte (64 char) hex string
+    keyProvider: [localStorage.getItem("privateKey")], // WIF string or array of keys..
+    httpEndpoint: 'http://127.0.0.1:8888',
+    expireInSeconds: 60,
+    broadcast: true,
+    verbose: false, // API activity
+    sign: true
   }
+  return Eos(config);
+}
+
+async function auth(contractDestination) {
+  const eos = eosConfiguration();
+
+  const auth = {
+    "threshold": 1,
+    "keys": [{
+      "key": ecc.privateToPublic(localStorage.getItem("privateKey")),
+      "weight": 1
+    }],
+    "accounts": [{
+      "permission": {
+        "actor": contractDestination,
+        "permission": "active"
+      }, "weight": 1
+    }]
+  }
+
+  const tx = {
+    account: localStorage.getItem("userAccount"),
+    permission: 'active',
+    parent: 'owner',
+    auth: auth
+  };
+
+  return await eos.updateauth(tx);
+}
+
+async function send(actionName, actionData, contractDestination) {
+  const eos = eosConfiguration();
+
+  const result = await eos.transaction({
+    actions: [{
+      account: contractDestination,
+      name: actionName,
+      authorization: [{
+        actor: localStorage.getItem("userAccount"),
+        permission: 'active',
+      }],
+      data: actionData,
+    }],
+  });
+
+  return result;
 }
 
 class ApiService {
@@ -61,7 +92,7 @@ class ApiService {
     return new Promise((resolve, reject) => {
       localStorage.setItem("userAccount", account);
       localStorage.setItem("privateKey", key);
-      takeAction("adduser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      send("adduser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
         .then(() => {
           resolve();
         })
@@ -75,22 +106,35 @@ class ApiService {
 
   static updateUser({ username }) {
     return new Promise((resolve, reject) => {
-      takeAction("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
         .then(() => {
           resolve();
         })
         .catch(err => {
-          localStorage.removeItem("userAccount");
-          localStorage.removeItem("privateKey");
           reject(err);
         });
     });
   }
 
+  static deposit({ quantity }) {
+    return new Promise((resolve, reject) => {
+      auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+        .then(() => {
+          send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+            .then(() => {
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
+        });
+    });
+  }
+
   static async getUserByAccount(account) {
+    const eos = eosConfiguration();
     try {
-      const rpc = new Rpc.JsonRpc(process.env.REACT_APP_EOS_HTTP_ENDPOINT);
-      const result = await rpc.get_table_rows({
+      const result = await eos.getTableRows({
         "json": true,
         "code": process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
         "scope": process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table

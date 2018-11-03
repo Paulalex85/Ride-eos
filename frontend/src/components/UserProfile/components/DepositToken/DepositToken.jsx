@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { UserAction } from 'actions';
 import { ApiService } from 'services';
 
-class UpdateProfile extends Component {
+class DepositToken extends Component {
     constructor(props) {
         // Inherit constructor
         super(props);
@@ -15,7 +15,7 @@ class UpdateProfile extends Component {
         // State for form data and error message
         this.state = {
             form: {
-                username: props.user.username,
+                quantity: 0.0000,
                 error: '',
             },
         }
@@ -46,13 +46,19 @@ class UpdateProfile extends Component {
         // Extract `form` state
         const { form } = this.state;
         // Extract `setUser` of `UserAction`
-        const { setUser } = this.props;
+        const { setUser, user: { account } } = this.props;
         // Send a login transaction to the blockchain by calling the ApiService,
         // If it successes, save the account to redux store
         // Otherwise, save the error state for displaying the message
-        return ApiService.updateUser(form)
+        return ApiService.deposit(form)
             .then(() => {
-                setUser({ username: form.username });
+                ApiService.getUserByAccount(account).then(user => {
+                    setUser({
+                        account: user.account,
+                        username: user.username,
+                        balance: user.balance,
+                    });
+                });
             })
             .catch(err => {
                 this.setState({ error: err.toString() });
@@ -64,14 +70,13 @@ class UpdateProfile extends Component {
         const { form, error } = this.state;
 
         return (
-            <div className="Update">
-                <div className="title">Update</div>
-                <div className="description">Update informations</div>
+            <div className="Deposit">
+                <div className="title">Deposit</div>
                 <form name="form" onSubmit={this.handleSubmit}>
                     <TextField
-                        name="username"
-                        value={form.username}
-                        label="Username"
+                        name="quantity"
+                        value={form.quantity}
+                        label="Quantity"
                         onChange={this.handleChange}
                     />
                     <div className="field form-error">
@@ -83,8 +88,8 @@ class UpdateProfile extends Component {
                             className="green"
                             variant='contained'
                             color='primary'>
-                            UPDATE
-                    </Button>
+                            DEPOSIT
+                        </Button>
                     </div>
                 </form>
             </div>
@@ -101,4 +106,4 @@ const mapDispatchToProps = {
 };
 
 // Export a redux connected component
-export default connect(mapStateToProps, mapDispatchToProps)(UpdateProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(DepositToken);
