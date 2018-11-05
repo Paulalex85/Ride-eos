@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import UpdateProfile from './components/UpdateProfile/UpdateProfile';
 import DepositToken from './components/DepositToken/DepositToken';
+import WithdrawToken from './components/WithdrawToken/WithdrawToken';
 
 class UserProfile extends Component {
 
@@ -58,6 +59,7 @@ class UserProfile extends Component {
         </Button>
         {this.state.update && <UpdateProfile />}
         <DepositToken />
+        <WithdrawToken />
       </div>
     )
   }
