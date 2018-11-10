@@ -105,45 +105,21 @@ class ApiService {
   }
 
   static updateUser({ username }) {
-    return new Promise((resolve, reject) => {
-      send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-        .then(() => {
-          resolve();
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+    return send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
   }
 
   static deposit({ quantity }) {
-    return new Promise((resolve, reject) => {
-      auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-        .then(() => {
-          send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-            .then(() => {
-              resolve();
-            })
-            .catch(err => {
-              reject(err);
-            });
-        });
-    });
+    return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      .then(() => {
+        send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      });
   }
 
   static withdraw({ quantity }) {
-    return new Promise((resolve, reject) => {
-      auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-        .then(() => {
-          send("withdraw", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-            .then(() => {
-              resolve();
-            })
-            .catch(err => {
-              reject(err);
-            });
-        });
-    });
+    return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      .then(() => {
+        send("withdraw", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+      });
   }
 
   //ORDERS
