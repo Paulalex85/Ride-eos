@@ -11,6 +11,7 @@ import KeyGenerator from './KeyGenerator';
 import { connect } from 'react-redux';
 // Services and redux action
 import { UserAction } from 'actions';
+import OrderDashboard from '../OrderDashboard/OrderDashboard';
 
 class FormManager extends Component {
     constructor(props) {
@@ -42,6 +43,7 @@ class FormManager extends Component {
         return (
             <div>
                 <UserProfile />
+                <OrderDashboard />
                 <FormControl>
                     <InputLabel>Send to EOS</InputLabel>
                     <Select

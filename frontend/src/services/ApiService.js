@@ -61,7 +61,7 @@ async function send(actionName, actionData, contractDestination) {
 }
 
 class ApiService {
-
+  //USERS
   static getCurrentUser() {
     return new Promise((resolve, reject) => {
       if (!localStorage.getItem("userAccount")) {
@@ -146,6 +146,32 @@ class ApiService {
     });
   }
 
+  //ORDERS
+  static getOrder({ orderKey }) {
+    return new Promise((resolve, reject) => {
+      this.getOrderByKey(orderKey)
+        .then((order) => {
+          resolve(order);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  static getOrders({ account }) {
+    return new Promise((resolve, reject) => {
+      this.getOrderByBuyer(account)
+        .then((list) => {
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+  //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();
     try {
@@ -158,6 +184,41 @@ class ApiService {
         "lower_bound": account,
       });
       return result.rows[0];
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getOrderByKey(orderKey) {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        "table": "order",    // name of the table as specified by the contract abi
+        "limit": 1,
+        "lower_bound": orderKey,
+      });
+      return result.rows[0];
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getOrderByBuyer(account) {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        "table": "order",    // name of the table as specified by the contract abi
+        "limit": 10,
+        "lower_bound": account,
+        "index_position": "1",
+      });
+      return result;
     } catch (err) {
       return console.error(err);
     }

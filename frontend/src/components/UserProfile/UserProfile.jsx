@@ -3,9 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import Button from '@material-ui/core/Button';
-import UpdateProfile from './components/UpdateProfile/UpdateProfile';
-import DepositToken from './components/DepositToken/DepositToken';
-import WithdrawToken from './components/WithdrawToken/WithdrawToken';
+import { UpdateProfile, DepositToken, WithdrawToken } from './components'
 
 class UserProfile extends Component {
 
