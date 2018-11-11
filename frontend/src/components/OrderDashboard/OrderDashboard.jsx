@@ -22,8 +22,7 @@ class OrderDashboard extends Component {
         return ApiService.getOrders(account)
             // If the server return an account
             .then(list => {
-                console.log(list);
-                setListOrders({ listOrders: list });
+                setListOrders({ listOrders: list, account: account });
             })
             // To ignore 401 console error
             .catch(() => { })

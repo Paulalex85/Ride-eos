@@ -11,11 +11,13 @@ const initialState = {
     dateDelay: 0,
     priceOrder: "0 SYS",
     priceDeliver: "0 SYS",
-    validateBuyer: false,
-    validateSeller: false,
-    validateDeliver: false,
+    validateBuyer: 0,
+    validateSeller: 0,
+    validateDeliver: 0,
     details: "",
     delay: 0,
+    currentActor: "",
+    canValidate: false,
 };
 
 export default function (state = initialState, action) {
@@ -23,32 +25,28 @@ export default function (state = initialState, action) {
         case ActionTypes.SET_LIST_ORDERS: {
             let listJSON = action.listOrders || initialState.listOrders;
             let listObject = [];
-            console.log("coucou");
-            console.log(listJSON);
             for (let i = 0; i < listJSON.rows.length; i++) {
                 const element = listJSON.rows[i];
-                console.log(element.orderKey);
                 let order = {
                     orderKey: element.orderKey.toString() || initialState.orderKey,
                     buyer: element.buyer || initialState.buyer,
                     seller: element.seller || initialState.seller,
                     deliver: element.deliver || initialState.deliver,
-                    state: element.state || initialState.state,
+                    state: element.state.toString() || initialState.state,
                     date: element.date || initialState.date,
                     dateDelay: element.dateDelay || initialState.dateDelay,
                     priceOrder: element.priceOrder || initialState.priceOrder,
                     priceDeliver: element.priceDeliver || initialState.priceDeliver,
-                    validateBuyer: element.validateBuyer || initialState.validateBuyer,
-                    validateSeller: element.validateSeller || initialState.validateSeller,
-                    validateDeliver: element.validateDeliver || initialState.validateDeliver,
+                    validateBuyer: element.validateBuyer.toString() || initialState.validateBuyer,
+                    validateSeller: element.validateSeller.toString() || initialState.validateSeller,
+                    validateDeliver: element.validateDeliver.toString() || initialState.validateDeliver,
                     details: element.details || initialState.details,
                     delay: element.delay || initialState.delay,
                 }
-                console.log(order);
+                order.currentActor = setCurrentActor(order, action.account);
+                order.canValidate = setCanValidate(order);
                 listObject.push(order);
             }
-            console.log(listJSON);
-            console.log(listObject);
             return Object.assign({}, state, {
                 listOrders: listObject
             });
@@ -59,17 +57,20 @@ export default function (state = initialState, action) {
                 buyer: action.order.buyer || initialState.buyer,
                 seller: action.order.seller || initialState.seller,
                 deliver: action.order.deliver || initialState.deliver,
-                state: action.order.state || initialState.state,
+                state: action.order.state.toString() || initialState.state,
                 date: action.order.date || initialState.date,
                 dateDelay: action.order.dateDelay || initialState.dateDelay,
                 priceOrder: action.order.priceOrder || initialState.priceOrder,
                 priceDeliver: action.order.priceDeliver || initialState.priceDeliver,
-                validateBuyer: action.order.validateBuyer || initialState.validateBuyer,
-                validateSeller: action.order.validateSeller || initialState.validateSeller,
-                validateDeliver: action.order.validateDeliver || initialState.validateDeliver,
+                validateBuyer: action.order.validateBuyer.toString() || initialState.validateBuyer,
+                validateSeller: action.order.validateSeller.toString() || initialState.validateSeller,
+                validateDeliver: action.order.validateDeliver.toString() || initialState.validateDeliver,
                 details: action.order.details || initialState.details,
                 delay: action.order.delay || initialState.delay,
             }
+            order.currentActor = setCurrentActor(order, action.account);
+            order.canValidate = setCanValidate(order);
+
             if (action.listOrders === []) {
                 return Object.assign({}, state, {
                     listOrders: [order]
@@ -94,4 +95,40 @@ export default function (state = initialState, action) {
         default:
             return state;
     }
+}
+
+function setCurrentActor(order, account) {
+
+    if (order.seller === account) {
+        return "seller";
+    } else if (order.buyer === account) {
+        return "buyer";
+    } else if (order.deliver === account) {
+        return "deliver";
+    } else {
+        return "";
+    }
+}
+
+function setCanValidate(order) {
+    if (order.currentActor === "seller") {
+        if (order.validateSeller === "0") {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (order.currentActor === "deliver") {
+        if (order.validateDeliver === "0") {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (order.currentActor === "buyer") {
+        if (order.validateBuyer === "0") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return false
 }

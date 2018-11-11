@@ -123,10 +123,11 @@ class ApiService {
   }
 
   //ORDERS
-  static getOrder({ orderKey }) {
+  static getOrder(orderKey) {
     return new Promise((resolve, reject) => {
       this.getOrderByKey(orderKey)
         .then((order) => {
+          console.log(order);
           resolve(order);
         })
         .catch(err => {
@@ -139,12 +140,25 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getOrderByBuyer(account)
         .then((list) => {
+          console.log(list);
           resolve(list);
         })
         .catch(err => {
           reject(err);
         });
     });
+  }
+
+  static validateBuyer(orderKey, hash) {
+    return send("validatebuy", { orderKey: orderKey, commitment: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
+  static validateSeller(orderKey, hash) {
+    return send("validatesell", { orderKey: orderKey, commitment: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
+  static validateDeliver(orderKey) {
+    return send("validatedeli", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
   //Table row
@@ -199,7 +213,6 @@ class ApiService {
       return console.error(err);
     }
   }
-
 }
 
 export default ApiService;

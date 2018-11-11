@@ -27,4 +27,6 @@ cleos push action rideor validatedeli '["2"]' -p rider
 cleos push action rideor validatesell '["2", "'$hashSeller'"]' -p seller
 cleos push action rideor validatebuy '["2", "'$hashTester'"]' -p tester
 
+cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","bite"]' -p tester
+
 cleos get table rideor rideor order
