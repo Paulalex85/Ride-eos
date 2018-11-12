@@ -149,6 +149,10 @@ class ApiService {
     });
   }
 
+  static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay }) {
+    return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
   static validateBuyer(orderKey, hash) {
     return send("validatebuy", { orderKey: orderKey, commitment: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }

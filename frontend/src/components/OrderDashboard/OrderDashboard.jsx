@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { OrderElement } from './components';
+import { OrderElement, CreateOrder } from './components';
 import { OrderAction } from 'actions';
 import { ApiService } from 'services';
 
@@ -39,11 +39,9 @@ class OrderDashboard extends Component {
             />
         ))
 
-        // Display welcome message,
-        //         buttons for login,
-        //         username and balance
         return (
             <div className="OrderDashboard">
+                <CreateOrder />
                 <div className="title">Orders</div>
                 {Orders}
             </div>
