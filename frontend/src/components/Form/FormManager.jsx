@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { UserProfile } from 'components';
+import { UserProfile, Logout } from 'components';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -42,6 +42,7 @@ class FormManager extends Component {
     render() {
         return (
             <div>
+                <Logout />
                 <UserProfile />
                 <OrderDashboard />
                 <FormControl>
