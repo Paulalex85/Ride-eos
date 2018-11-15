@@ -165,6 +165,10 @@ class ApiService {
     return send("validatedeli", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
+  static orderReady(orderKey) {
+    return send("orderready", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
   //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();

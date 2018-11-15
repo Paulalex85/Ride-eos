@@ -6,6 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
 import ValidateOrder from '../ValidateOrder';
+import OrderReady from '../OrderReady'
 
 class OrderElement extends Component {
 
@@ -34,6 +35,12 @@ class OrderElement extends Component {
                     <ValidateOrder
                         orderKey={order.orderKey}
                         currentActor={order.currentActor}
+                    />
+                }
+                {order.state === "2" &&
+                    order.currentActor === "seller" &&
+                    <OrderReady
+                        orderKey={order.orderKey}
                     />
                 }
             </Card>
