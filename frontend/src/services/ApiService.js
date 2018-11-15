@@ -169,6 +169,20 @@ class ApiService {
     return send("orderready", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
+  //MARKET
+  static getPlaces() {
+    return new Promise((resolve, reject) => {
+      this.getAllPlaces()
+        .then((list) => {
+          console.log(list);
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();
@@ -215,6 +229,22 @@ class ApiService {
         "limit": 10,
         "lower_bound": account,
         "index_position": "1",
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getAllPlaces() {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        "table": "place",    // name of the table as specified by the contract abi
+        "limit": 10,
       });
       return result;
     } catch (err) {
