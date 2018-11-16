@@ -5,7 +5,7 @@ import {
     BrowserRouter
 } from "react-router-dom";
 
-import MarketDashboard from '../MarketDashboard';
+import AssignPlace from '../AssignPlace';
 import OrderDashboard from '../OrderDashboard';
 import UserProfile from '../UserProfile';
 
@@ -20,13 +20,13 @@ class Main extends Component {
                         <li><NavLink exact to="/">Home</NavLink></li>
                         <li><NavLink to="/profile">Profile</NavLink></li>
                         <li><NavLink to="/orders">Orders</NavLink></li>
-                        <li><NavLink to="/market">Market</NavLink></li>
+                        <li><NavLink to="/assign">Assign Place</NavLink></li>
                     </ul>
                     <div className="content">
                         {/* <Route exact path="/" component={} /> */}
                         <Route path="/profile" component={UserProfile} />
                         <Route path="/orders" component={OrderDashboard} />
-                        <Route path="/market" component={MarketDashboard} />
+                        <Route path="/assign" component={AssignPlace} />
                     </div>
                 </div>
             </BrowserRouter>

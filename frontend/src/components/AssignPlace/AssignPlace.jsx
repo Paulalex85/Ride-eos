@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import PlaceList from './components/PlaceList';
 
-class MarketDashboard extends Component {
+class AssignPlace extends Component {
 
 
     render() {
-
         return (
-            <div className="MarketDashboard">
+            <div className="AssignPlace">
                 <PlaceList />
             </div>
         )
@@ -16,4 +15,4 @@ class MarketDashboard extends Component {
 
 
 // Export a redux connected component
-export default (MarketDashboard);
+export default (AssignPlace);

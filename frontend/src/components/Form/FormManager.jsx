@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 // Services and redux action
 import { UserAction } from 'actions';
 import OrderDashboard from '../OrderDashboard/OrderDashboard';
-import MarketDashboard from '../MarketDashboard/MarketDashboard';
+import AssignPlace from '../AssignPlace/AssignPlace';
 
 class FormManager extends Component {
     constructor(props) {
@@ -45,7 +45,7 @@ class FormManager extends Component {
             <div>
                 <Logout />
                 <UserProfile />
-                <MarketDashboard />
+                <AssignPlace />
                 <OrderDashboard />
                 <FormControl>
                     <InputLabel>Send to EOS</InputLabel>

@@ -4,7 +4,7 @@ import FormManager from './Form/FormManager';
 import UserProfile from './UserProfile';
 import OrderDashboard from './OrderDashboard';
 import Logout from './Logout';
-import MarketDashboard from './MarketDashboard';
+import AssignPlace from './AssignPlace';
 import Main from './Main'
 
 export {
@@ -14,6 +14,6 @@ export {
   UserProfile,
   OrderDashboard,
   Logout,
-  MarketDashboard,
+  AssignPlace,
   Main
 }
