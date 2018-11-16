@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import { FormManager, Login } from 'components';
+import { Main, Login } from 'components';
 
 import { UserAction } from 'actions';
 import { ApiService } from 'services';
@@ -39,7 +39,7 @@ class App extends Component {
     // If the account is NOT set in redux, display the Login component
     return (
       <div className="App">
-        {account && <FormManager />}
+        {account && <Main />}
         {!account && <Login />}
       </div>
     );
