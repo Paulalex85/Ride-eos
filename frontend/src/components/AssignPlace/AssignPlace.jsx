@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PlaceList from './components/PlaceList';
+import { PlaceList, AssignmentUser } from './components';
 
 class AssignPlace extends Component {
 
@@ -8,6 +8,7 @@ class AssignPlace extends Component {
         return (
             <div className="AssignPlace">
                 <PlaceList />
+                <AssignmentUser />
             </div>
         )
     }

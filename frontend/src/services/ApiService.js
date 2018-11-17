@@ -183,6 +183,20 @@ class ApiService {
     });
   }
 
+  static getAssignments() {
+    return new Promise((resolve, reject) => {
+      this.getAssignmentsByUser()
+        .then((list) => {
+          console.log(list);
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
+
   //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();
@@ -251,6 +265,42 @@ class ApiService {
       return console.error(err);
     }
   }
+
+  static async getPlace(placeKey) {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        "table": "place",    // name of the table as specified by the contract abi
+        "limit": 1,
+        "lower_bound": placeKey,
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getAssignmentsByUser(account) {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        "table": "assignment",    // name of the table as specified by the contract abi
+        "limit": 10,
+        "lower_bound": account,
+        "index_position": "1",
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
 }
 
 export default ApiService;

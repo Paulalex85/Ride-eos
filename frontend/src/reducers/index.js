@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
 import UserReducer from './UserReducer';
-import OrderReducer from './OrderReducer'
-import PlaceReducer from './PlaceReducer'
+import OrderReducer from './OrderReducer';
+import PlaceReducer from './PlaceReducer';
+import AssignmentsReducer from './AssignmentsReducer'
 
 export default combineReducers({
   user: UserReducer,
   orders: OrderReducer,
-  places: PlaceReducer
+  places: PlaceReducer,
+  assignments: AssignmentsReducer,
 })
