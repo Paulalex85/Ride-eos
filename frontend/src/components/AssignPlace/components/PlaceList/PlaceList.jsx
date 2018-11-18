@@ -9,9 +9,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
-import { PlaceAction } from 'actions';
+import { PlaceAction, AssignmentAction } from 'actions';
 import { ApiService } from 'services';
-import { Button } from '@material-ui/core';
+
+import ButtonAssign from './ButtonAssign'
 
 class AssignPlace extends Component {
 
@@ -20,6 +21,8 @@ class AssignPlace extends Component {
         super(props);
 
         this.loadPlaces();
+        // Bind functions
+        this.onClickAssignment = this.onClickAssignment.bind(this);
     }
 
     loadPlaces() {
@@ -35,6 +38,28 @@ class AssignPlace extends Component {
             .catch(() => { })
     }
 
+    setListPlace(index) {
+        const { setPlaceOfAssignment, assignments: { listAssignments } } = this.props;
+        if (listAssignments.length > index) {
+            ApiService.getPlace(listAssignments[index].placeKey).then(place => {
+                setPlaceOfAssignment({ listAssignments: listAssignments, assignmentKey: listAssignments[index].assignmentKey, place: place });
+                this.setListPlace(index + 1);
+            }).catch((err) => { console.error(err) });
+        }
+    }
+
+    onClickAssignment(placeKey) {
+
+        const { setListAssignment, user: { account } } = this.props;
+
+        return ApiService.newAssign(account, placeKey).then(() => {
+            ApiService.getAssignments().then(listAPI => {
+                setListAssignment({ listAssignments: listAPI });
+                this.setListPlace(0);
+            }).catch((err) => { console.error(err) });
+        });
+    }
+
     render() {
         // Extract data and event functions from props
         const { places: { listPlaces } } = this.props;
@@ -48,12 +73,10 @@ class AssignPlace extends Component {
                     {place.zipCode}
                 </TableCell>
                 <TableCell>
-                    <Button
-                        className="green"
-                        variant='contained'
-                        color='primary'>
-                        ASSIGN
-                    </Button>
+                    <ButtonAssign
+                        onAssignClick={this.onClickAssignment}
+                        value={place.placeKey}
+                    />
                 </TableCell>
             </TableRow>
         ))
@@ -83,6 +106,8 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setListPlaces: PlaceAction.setListPlaces,
+    setPlaceOfAssignment: AssignmentAction.setPlaceOfAssignment,
+    setListAssignment: AssignmentAction.setListAssignment,
 };
 
 // Export a redux connected component

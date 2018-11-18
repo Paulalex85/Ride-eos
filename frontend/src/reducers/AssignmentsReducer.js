@@ -3,9 +3,9 @@ import { ActionTypes } from 'const';
 const initialState = {
     listAssignments: [],
     assignmentKey: undefined,
+    placeKey: undefined,
     place: { country: '', zipCode: '' },
     endAssignment: 0,
-    placeKey: undefined,
 };
 
 export default function (state = initialState, action) {
@@ -17,6 +17,7 @@ export default function (state = initialState, action) {
                 const element = listJSON.rows[i];
                 let assignment = {
                     assignmentKey: element.assignmentKey.toString() || initialState.assignmentKey,
+                    placeKey: element.placeKey.toString() || initialState.placeKey,
                     place: element.place || initialState.place,
                     endAssignment: element.endAssignment || initialState.endAssignment,
                 }
@@ -28,7 +29,6 @@ export default function (state = initialState, action) {
         }
         case ActionTypes.SET_PLACE_OF_ASSIGNMENT: {
             let place = {
-                placeKey: action.place.placeKey.toString() || initialState.placeKey,
                 country: action.place.country || initialState.place.country,
                 zipCode: action.place.zipCode || initialState.place.zipCode,
             }

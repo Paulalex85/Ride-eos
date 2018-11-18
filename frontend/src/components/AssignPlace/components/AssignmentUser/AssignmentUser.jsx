@@ -22,25 +22,24 @@ class AssignmentUser extends Component {
         this.loadAssignments();
     }
 
+    setListPlace(index) {
+        const { setPlaceOfAssignment, assignments: { listAssignments } } = this.props;
+        if (listAssignments.length > index) {
+            ApiService.getPlace(listAssignments[index].placeKey).then(place => {
+                setPlaceOfAssignment({ listAssignments: listAssignments, assignmentKey: listAssignments[index].assignmentKey, place: place });
+                this.setListPlace(index + 1);
+            }).catch((err) => { console.error(err) });
+        }
+    }
+
     loadAssignments() {
         const { setListAssignment } = this.props;
 
         // Send a request to API (blockchain) to get the current logged in user
-        return ApiService.getAssignments()
-            // If the server return an account
-            .then(listAPI => {
-                let list = listAPI;
-                for (let i = 0; i < list.length; i++) {
-                    ApiService.getPlace(list[i].placeKey)
-                        .then(place => {
-                            list[i].place = place;
-                        })
-                        .catch(() => { })
-                }
-                setListAssignment({ listAssignments: list });
-            })
-            // To ignore 401 console error
-            .catch(() => { })
+        return ApiService.getAssignments().then(listAPI => {
+            setListAssignment({ listAssignments: listAPI });
+            this.setListPlace(0);
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
@@ -95,6 +94,7 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setListAssignment: AssignmentAction.setListAssignment,
+    setPlaceOfAssignment: AssignmentAction.setPlaceOfAssignment,
 };
 
 // Export a redux connected component

@@ -196,6 +196,10 @@ class ApiService {
     });
   }
 
+  static newAssign(account, placeKey) {
+    return send("newassign", { account: account, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
+  }
+
 
   //Table row
   static async getUserByAccount(account) {
@@ -277,7 +281,7 @@ class ApiService {
         "limit": 1,
         "lower_bound": placeKey,
       });
-      return result;
+      return result.rows[0];
     } catch (err) {
       return console.error(err);
     }
