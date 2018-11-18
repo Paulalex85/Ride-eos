@@ -54,9 +54,11 @@ class AssignmentUser extends Component {
                 <TableCell component="th" scope="row">
                     {assign.place.zipCode}
                 </TableCell>
-                <TableCell component="th" scope="row">
-                    {assign.endAssignment}
-                </TableCell>
+                {assign.endAssignment.getTime() === 0 && <TableCell />}
+                {assign.endAssignment.getTime() !== 0 &&
+                    <TableCell>
+                        {assign.endAssignment.toDateString()}
+                    </TableCell>}
                 <TableCell>
                     <Button
                         className="green"

@@ -19,7 +19,7 @@ export default function (state = initialState, action) {
                     assignmentKey: element.assignmentKey.toString() || initialState.assignmentKey,
                     placeKey: element.placeKey.toString() || initialState.placeKey,
                     place: element.place || initialState.place,
-                    endAssignment: element.endAssignment || initialState.endAssignment,
+                    endAssignment: new Date(element.endAssignment + "Z") || initialState.endAssignment,
                 }
                 listObject.push(assignment);
             }
