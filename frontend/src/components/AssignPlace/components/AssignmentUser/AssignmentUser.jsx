@@ -8,10 +8,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-
 import { AssignmentAction } from 'actions';
 import { ApiService } from 'services';
-import { Button } from '@material-ui/core';
+
+import ButtonLeave from './ButtonLeave';
 
 class AssignmentUser extends Component {
 
@@ -20,6 +20,9 @@ class AssignmentUser extends Component {
         super(props);
 
         this.loadAssignments();
+
+        // Bind functions
+        this.clickLeaveButton = this.clickLeaveButton.bind(this);
     }
 
     setListPlace(index) {
@@ -42,6 +45,18 @@ class AssignmentUser extends Component {
         }).catch((err) => { console.error(err) });
     }
 
+    clickLeaveButton(assignmentKey) {
+        const { setAssignment, assignments: { listAssignments } } = this.props;
+
+        return ApiService.endAssign(assignmentKey).then(() => {
+            ApiService.getAssignment().then(assign => {
+                console.log("bite")
+                console.log(assign)
+                setAssignment({ listAssignments: listAssignments, assignment: assign });
+            }).catch((err) => { console.error(err) });
+        });
+    }
+
     render() {
         // Extract data and event functions from props
         const { assignments: { listAssignments } } = this.props;
@@ -54,19 +69,19 @@ class AssignmentUser extends Component {
                 <TableCell component="th" scope="row">
                     {assign.place.zipCode}
                 </TableCell>
-                {assign.endAssignment.getTime() === 0 && <TableCell />}
+                {assign.endAssignment.getTime() === 0 &&
+                    <TableCell>
+                        <ButtonLeave
+                            value={assign.assignmentKey}
+                            onLeaveClick={this.clickLeaveButton}
+                        />
+                    </TableCell>
+                }
                 {assign.endAssignment.getTime() !== 0 &&
                     <TableCell>
                         {assign.endAssignment.toDateString()}
                     </TableCell>}
-                <TableCell>
-                    <Button
-                        className="green"
-                        variant='contained'
-                        color='primary'>
-                        LEAVE
-                    </Button>
-                </TableCell>
+
             </TableRow>
         ))
 
@@ -78,7 +93,6 @@ class AssignmentUser extends Component {
                             <TableCell>Country</TableCell>
                             <TableCell>Zip Code</TableCell>
                             <TableCell>End Assignment</TableCell>
-                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -97,6 +111,7 @@ const mapStateToProps = state => state;
 const mapDispatchToProps = {
     setListAssignment: AssignmentAction.setListAssignment,
     setPlaceOfAssignment: AssignmentAction.setPlaceOfAssignment,
+    setAssignment: AssignmentAction.setAssignment,
 };
 
 // Export a redux connected component

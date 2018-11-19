@@ -27,6 +27,36 @@ export default function (state = initialState, action) {
                 listAssignments: listObject
             });
         }
+        case ActionTypes.SET_ASSIGNMENT: {
+            let assignment = {
+                assignmentKey: action.assignment.assignmentKey.toString() || initialState.assignmentKey,
+                placeKey: action.assignment.placeKey.toString() || initialState.placeKey,
+                place: action.assignment.place || initialState.place,
+                endAssignment: new Date(action.assignment.endAssignment + "Z") || initialState.endAssignment,
+            }
+
+            if (action.listAssignments === []) {
+                return Object.assign({}, state, {
+                    listAssignments: [assignment]
+                });
+            } else {
+                let list = action.listAssignments;
+                for (let i = 0; i < list.length; i++) {
+                    if (list[i].assignmentKey === assignment.assignmentKey) {
+                        assignment.place = list[i].place;
+                        list[i] = assignment;
+                        return Object.assign({}, state, {
+                            listAssignments: list
+                        });
+                    }
+                }
+
+                list.push(assignment);
+                return Object.assign({}, state, {
+                    listAssignments: list
+                });
+            }
+        }
         case ActionTypes.SET_PLACE_OF_ASSIGNMENT: {
             let place = {
                 country: action.place.country || initialState.place.country,

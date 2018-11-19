@@ -9,6 +9,14 @@ class AssignmentAction {
         }
     }
 
+    static setAssignment({ listAssignments, assignment }) {
+        return {
+            type: ActionTypes.SET_ASSIGNMENT,
+            listAssignments,
+            assignment
+        }
+    }
+
     static setPlaceOfAssignment({ listAssignments, assignmentKey, place }) {
         return {
             type: ActionTypes.SET_PLACE_OF_ASSIGNMENT,
