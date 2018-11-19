@@ -134,7 +134,7 @@ void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
         offer.offerKey = offers.available_primary_key();
         offer.orderKey = orderKey;
         offer.placeKey = placeKey;
-        offer.stateOffer = 0;
+        offer.stateOffer = OPEN;
     });
 }
 
@@ -144,7 +144,7 @@ void Market::endoffer(uint64_t offerKey)
     auto iteratorOffer = offers.find(offerKey);
     eosio_assert(iteratorOffer != offers.end(), "Offer not found");
 
-    eosio_assert(iteratorOffer->stateOffer == 0, "The state of the offer is not open");
+    eosio_assert(iteratorOffer->stateOffer == OPEN, "The state of the offer is not open");
 
     Orders::orderIndex orders(N(rideor), N(rideor));
     auto iteratorOrder = orders.find(iteratorOffer->orderKey);
@@ -187,7 +187,7 @@ void Market::endoffer(uint64_t offerKey)
         .send();
 
     offers.modify(iteratorOffer, _self, [&](auto &offer) {
-        offer.stateOffer = 2;
+        offer.stateOffer = FOUNDED;
     });
 }
 
@@ -197,7 +197,7 @@ void Market::canceloffer(uint64_t offerKey)
     auto iteratorOffer = offers.find(offerKey);
     eosio_assert(iteratorOffer != offers.end(), "Offer not found");
 
-    eosio_assert(iteratorOffer->stateOffer == 0, "The state of the offer is not open");
+    eosio_assert(iteratorOffer->stateOffer == OPEN, "The state of the offer is not open");
 
     Orders::orderIndex orders(N(rideor), N(rideor));
     auto iteratorOrder = orders.find(iteratorOffer->orderKey);
@@ -206,7 +206,7 @@ void Market::canceloffer(uint64_t offerKey)
     require_auth(iteratorOrder->buyer);
 
     offers.modify(iteratorOffer, _self, [&](auto &offer) {
-        offer.stateOffer = 1;
+        offer.stateOffer = CLOSED;
     });
 }
 
@@ -222,7 +222,7 @@ void Market::addapply(account_name account, uint64_t offerKey)
     auto iteratorOffer = offers.find(offerKey);
     eosio_assert(iteratorOffer != offers.end(), "Offer not found");
 
-    eosio_assert(iteratorOffer->stateOffer == 0, "The offer is not open");
+    eosio_assert(iteratorOffer->stateOffer == OPEN, "The offer is not open");
 
     applyIndex applies(_self, _self);
 

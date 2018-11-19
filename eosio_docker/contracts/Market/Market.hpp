@@ -86,20 +86,20 @@ class Market : public contract
                                    const_mem_fun<assignment, uint64_t, &assignment::get_place_key>>>
         assignmentIndex;
 
+    enum offer_state : uint8_t
+    {
+        OPEN = 0,
+        CLOSED = 1,
+        FOUNDED = 2,
+    };
+
     //@abi table offer i64
     struct offer
     {
         uint64_t offerKey;
         uint64_t orderKey;
         uint64_t placeKey;
-        uint64_t stateOffer;
-
-        /*
-             * StateOffer =
-             * 0 - Open
-             * 1 - Closed
-             * 2 - Founded
-             */
+        uint8_t stateOffer;
 
         uint64_t primary_key() const { return offerKey; }
 
