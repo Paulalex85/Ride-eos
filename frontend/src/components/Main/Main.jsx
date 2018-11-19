@@ -8,6 +8,7 @@ import {
 import AssignPlace from '../AssignPlace';
 import OrderDashboard from '../OrderDashboard';
 import UserProfile from '../UserProfile';
+import CreateOrder from '../CreateOrder';
 
 import "./Main.css";
 
@@ -19,12 +20,14 @@ class Main extends Component {
                     <ul className="header">
                         <li><NavLink exact to="/">Home</NavLink></li>
                         <li><NavLink to="/profile">Profile</NavLink></li>
+                        <li><NavLink to="/createOrder">Create Order</NavLink></li>
                         <li><NavLink to="/orders">Orders</NavLink></li>
                         <li><NavLink to="/assign">Assign Place</NavLink></li>
                     </ul>
                     <div className="content">
                         {/* <Route exact path="/" component={} /> */}
                         <Route path="/profile" component={UserProfile} />
+                        <Route path="/createOrder" component={CreateOrder} />
                         <Route path="/orders" component={OrderDashboard} />
                         <Route path="/assign" component={AssignPlace} />
                     </div>

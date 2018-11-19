@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { OrderElement, CreateOrder } from './components';
+import { OrderElement } from './components';
 import { OrderAction } from 'actions';
 import { ApiService } from 'services';
 
@@ -41,7 +41,6 @@ class OrderDashboard extends Component {
 
         return (
             <div className="OrderDashboard">
-                <CreateOrder />
                 <div className="title">Orders</div>
                 {Orders}
             </div>

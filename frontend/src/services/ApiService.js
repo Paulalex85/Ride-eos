@@ -149,6 +149,10 @@ class ApiService {
     });
   }
 
+  static needDeliver({ buyer, seller, priceOrder, priceDeliver, details, delay }) {
+    return send("needdeliver", { buyer: buyer, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
   static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay }) {
     return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }

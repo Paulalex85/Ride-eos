@@ -4,12 +4,12 @@ import { connect } from 'react-redux';
 // Components
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
 // Services and redux action
-import { OrderAction } from 'actions';
 import { ApiService } from 'services';
 
 
-class CreateOrder extends Component {
+class FullOrder extends Component {
     constructor(props) {
         // Inherit constructor
         super(props);
@@ -52,15 +52,7 @@ class CreateOrder extends Component {
         event.preventDefault();
         // Extract `form` state
         const { form } = this.state;
-        const { setListOrders, user: { account } } = this.props;
-
         return ApiService.initializeOrder(form)
-            .then(() => {
-                ApiService.getOrders(account)
-                    .then(list => {
-                        setListOrders({ listOrders: list, account: account });
-                    })
-            })
             .catch(err => {
                 this.setState({ error: err.toString() });
             });
@@ -71,9 +63,8 @@ class CreateOrder extends Component {
 
 
         return (
-            <div>
-                <div className="title">Create Order</div>
-                <form name="form" onSubmit={this.handleSubmit}>
+            <form name="form" onSubmit={this.handleSubmit}>
+                <FormControl >
                     <TextField
                         name="buyer"
                         value={form.buyer}
@@ -119,17 +110,15 @@ class CreateOrder extends Component {
                     <div className="field form-error">
                         {error && <span className="error">{error}</span>}
                     </div>
-                    <div className="bottom">
-                        <Button
-                            type="submit"
-                            className="green"
-                            variant='contained'
-                            color='primary'>
-                            CREATE
-                    </Button>
-                    </div>
-                </form>
-            </div >
+                    <Button
+                        type="submit"
+                        className="green"
+                        variant='contained'
+                        color='primary'>
+                        CREATE
+                        </Button>
+                </FormControl>
+            </form>
         )
     }
 }
@@ -137,10 +126,5 @@ class CreateOrder extends Component {
 // Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
-// Map the following action to props
-const mapDispatchToProps = {
-    setListOrders: OrderAction.setListOrders,
-};
-
 // Export a redux connected component
-export default connect(mapStateToProps, mapDispatchToProps)(CreateOrder);
+export default connect(mapStateToProps)(FullOrder);
