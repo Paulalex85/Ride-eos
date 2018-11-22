@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from "react-router";
 
 // Components
 import Button from '@material-ui/core/Button';
@@ -52,7 +53,11 @@ class FullOrder extends Component {
         event.preventDefault();
         // Extract `form` state
         const { form } = this.state;
-        return ApiService.initializeOrder(form)
+        const { history } = this.props;
+
+        return ApiService.initializeOrder(form).then(() => {
+            history.push("/orders");
+        })
             .catch(err => {
                 this.setState({ error: err.toString() });
             });
@@ -127,4 +132,4 @@ class FullOrder extends Component {
 const mapStateToProps = state => state;
 
 // Export a redux connected component
-export default connect(mapStateToProps)(FullOrder);
+export default withRouter(connect(mapStateToProps)(FullOrder));

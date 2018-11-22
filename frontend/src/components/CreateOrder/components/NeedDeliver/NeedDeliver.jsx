@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from "react-router";
 
 // Components
 import Button from '@material-ui/core/Button';
@@ -51,8 +52,11 @@ class NeedDeliver extends Component {
         event.preventDefault();
         // Extract `form` state
         const { form } = this.state;
+        const { history } = this.props;
 
-        return ApiService.needDeliver(form)
+        return ApiService.needDeliver(form).then(() => {
+            history.push("/orders");
+        })
             .catch(err => {
                 this.setState({ error: err.toString() });
             });
@@ -121,4 +125,4 @@ class NeedDeliver extends Component {
 const mapStateToProps = state => state;
 
 // Export a redux connected component
-export default connect(mapStateToProps)(NeedDeliver);
+export default withRouter(connect(mapStateToProps)(NeedDeliver));
