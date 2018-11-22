@@ -111,23 +111,25 @@ function setCurrentActor(order, account) {
 }
 
 function setCanValidate(order) {
-    if (order.currentActor === "seller") {
-        if (order.validateSeller === "0") {
-            return true;
-        } else {
-            return false;
-        }
-    } else if (order.currentActor === "deliver") {
-        if (order.validateDeliver === "0") {
-            return true;
-        } else {
-            return false;
-        }
-    } else if (order.currentActor === "buyer") {
-        if (order.validateBuyer === "0") {
-            return true;
-        } else {
-            return false;
+    if (order.state === "1") {
+        if (order.currentActor === "seller") {
+            if (order.validateSeller === "0") {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (order.currentActor === "deliver") {
+            if (order.validateDeliver === "0") {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (order.currentActor === "buyer") {
+            if (order.validateBuyer === "0") {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
     return false
