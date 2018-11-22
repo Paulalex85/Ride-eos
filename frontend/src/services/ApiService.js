@@ -234,6 +234,10 @@ class ApiService {
     });
   }
 
+  static addOffer(orderKey, placeKey) {
+    return send("addoffer", { orderKey: orderKey, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
+  }
+
   //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();
