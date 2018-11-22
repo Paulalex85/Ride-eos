@@ -221,6 +221,19 @@ class ApiService {
     return send("endassign", { assignmentKey: assignmentKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }
 
+  static getOffers() {
+    return new Promise((resolve, reject) => {
+      this.getAllOffers()
+        .then((list) => {
+          console.log(list);
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   //Table row
   static async getUserByAccount(account) {
     const eos = eosConfiguration();
@@ -343,6 +356,21 @@ class ApiService {
     }
   }
 
+  static async getAllOffers() {
+    const eos = eosConfiguration();
+    try {
+      const result = await eos.getTableRows({
+        "json": true,
+        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        "table": "offer",    // name of the table as specified by the contract abi
+        "limit": 10,
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
 }
 
 export default ApiService;

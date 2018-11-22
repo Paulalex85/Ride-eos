@@ -6,7 +6,8 @@ import Logout from './Logout';
 import AssignPlace from './AssignPlace';
 import Main from './Main';
 import KeyGenerator from './KeyGenerator';
-import CreateOrder from './CreateOrder'
+import CreateOrder from './CreateOrder';
+import OfferDashboard from './OfferDashboard'
 
 export {
   App,
@@ -17,5 +18,6 @@ export {
   AssignPlace,
   Main,
   KeyGenerator,
-  CreateOrder
+  CreateOrder,
+  OfferDashboard
 }
