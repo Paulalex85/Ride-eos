@@ -14,6 +14,8 @@ cleos push action rideor needdeliver '["tester", "seller", "50.0000 SYS", "20.00
 
 cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2"]' -p tester
 
+cleos push action rideor initialize '["sarabrown", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2"]' -p sarabrown
+
 cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 3"]' -p tester
 cleos push action rideor validatebuy '["2", "'$hashTester'"]' -p tester
 cleos push action rideor validatedeli '["2"]' -p rider

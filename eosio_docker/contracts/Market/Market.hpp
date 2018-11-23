@@ -102,10 +102,17 @@ class Market : public contract
         uint8_t stateOffer;
 
         uint64_t primary_key() const { return offerKey; }
+        uint64_t getOrderKey() const { return orderKey; }
+        uint64_t getPlaceKey() const { return placeKey; }
 
         EOSLIB_SERIALIZE(offer, (offerKey)(orderKey)(placeKey)(stateOffer))
     };
-    typedef multi_index<N(offer), offer> offerIndex;
+    typedef multi_index<N(offer), offer,
+                        indexed_by<N(byorderkey),
+                                   const_mem_fun<offer, uint64_t, &offer::getOrderKey>>,
+                        indexed_by<N(byplacekey),
+                                   const_mem_fun<offer, uint64_t, &offer::getPlaceKey>>>
+        offerIndex;
 
     //@abi table apply i64
     struct apply
