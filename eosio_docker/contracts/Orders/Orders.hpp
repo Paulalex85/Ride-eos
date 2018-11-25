@@ -15,21 +15,21 @@ using eosio::asset;
 using eosio::key256;
 using std::string;
 
-class Orders : public contract
+CONTRACT Orders : public eosio::contract
 {
     using contract::contract;
 
   public:
-    Orders(account_name self) : contract(self) {}
+    Orders(name self) : contract(self) {}
 
     //@abi action
-    void needdeliver(account_name buyer, account_name seller, asset &priceOrder, asset &priceDeliver, string &details, uint64_t delay);
+    void needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
 
     //@abi action
-    void deliverfound(account_name deliver, uint64_t orderKey);
+    void deliverfound(name deliver, uint64_t orderKey);
 
     //@abi action
-    void initialize(account_name buyer, account_name seller, account_name deliver, asset &priceOrder, asset &priceDeliver, string &details, uint64_t delay);
+    void initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
 
     //@abi action
     void validatebuy(uint64_t orderKey, const checksum256 &commitment);
@@ -50,7 +50,7 @@ class Orders : public contract
     void orderdelive(uint64_t orderKey, const checksum256 &source);
 
     //@abi action
-    void initcancel(uint64_t orderKey, account_name account);
+    void initcancel(uint64_t orderKey, name account);
 
     //@abi action
     void delaycancel(uint64_t orderKey);
@@ -67,13 +67,14 @@ class Orders : public contract
         ORDER_CANCEL = 98
     };
 
+  private:
     //@abi table order i64
-    struct order
+    TABLE order
     {
         uint64_t orderKey;
-        account_name buyer;
-        account_name seller;
-        account_name deliver;
+        name buyer;
+        name seller;
+        name deliver;
         uint8_t state;
         eosio::time_point_sec date;
         eosio::time_point_sec dateDelay;
@@ -88,9 +89,9 @@ class Orders : public contract
         uint64_t delay;
 
         uint64_t primary_key() const { return orderKey; }
-        account_name get_buyer_key() const { return buyer; }
-        account_name get_seller_key() const { return seller; }
-        account_name get_deliver_key() const { return deliver; }
+        uint64_t get_buyer_key() const { return buyer.value; }
+        uint64_t get_seller_key() const { return seller.value; }
+        uint64_t get_deliver_key() const { return deliver.value; }
 
         static key256 get_commitment(const checksum256 &commitment)
         {
@@ -101,13 +102,13 @@ class Orders : public contract
         EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(dateDelay)(takeverification)(deliveryverification)(priceOrder)(priceDeliver)(validateBuyer)(validateSeller)(validateDeliver)(details)(delay))
     };
 
-    typedef multi_index<N(order), order,
-                        indexed_by<N(bybuyerkey),
-                                   const_mem_fun<order, account_name, &order::get_buyer_key>>,
-                        indexed_by<N(bysellerkey),
-                                   const_mem_fun<order, account_name, &order::get_seller_key>>,
-                        indexed_by<N(bydeliverkey),
-                                   const_mem_fun<order, account_name, &order::get_deliver_key>>>
+    typedef multi_index<name("order"), order,
+                        indexed_by<name("bybuyerkey"),
+                                   const_mem_fun<order, uint64_t, &order::get_buyer_key>>,
+                        indexed_by<name("bysellerkey"),
+                                   const_mem_fun<order, uint64_t, &order::get_seller_key>>,
+                        indexed_by<name("bydeliverkey"),
+                                   const_mem_fun<order, uint64_t, &order::get_deliver_key>>>
         orderIndex;
 };
 } // namespace rideEOS

@@ -15,24 +15,24 @@ using eosio::action;
 using eosio::asset;
 using std::string;
 
-class Market : public contract
+CONTRACT Market : public eosio::contract
 {
     using contract::contract;
 
   public:
-    Market(account_name self) : contract(self) {}
+    Market(name self) : contract(self) {}
 
     //@abi action
-    void addplace(string &country, string &zipCode);
+    void addplace(string & country, string & zipCode);
 
     //@abi action
-    void updateplace(uint64_t key, string &country, string &zipCode);
+    void updateplace(uint64_t key, string & country, string & zipCode);
 
     //@abi action
     void deleteplace(uint64_t key);
 
     //@abi action
-    void newassign(account_name account, uint64_t placeKey);
+    void newassign(name account, uint64_t placeKey);
 
     //@abi action
     void endassign(uint64_t assignmentKey);
@@ -47,13 +47,13 @@ class Market : public contract
     void canceloffer(uint64_t offerKey);
 
     //@abi action
-    void addapply(account_name account, uint64_t offerKey);
+    void addapply(name account, uint64_t offerKey);
 
     //@abi action
     void cancelapply(uint64_t applyKey);
 
     //@abi table place i64
-    struct place
+    TABLE place
     {
         uint64_t placeKey;
         string country;
@@ -63,26 +63,26 @@ class Market : public contract
 
         EOSLIB_SERIALIZE(place, (placeKey)(country)(zipCode))
     };
-    typedef multi_index<N(place), place> placeIndex;
+    typedef multi_index<name("place"), place> placeIndex;
 
     //@abi table assignment i64
-    struct assignment
+    TABLE assignment
     {
         uint64_t assignmentKey;
         uint64_t placeKey;
-        account_name account;
+        name account;
         eosio::time_point_sec endAssignment;
 
         uint64_t primary_key() const { return assignmentKey; }
-        account_name get_account() const { return account; }
+        uint64_t get_account() const { return account.value; }
         uint64_t get_place_key() const { return placeKey; }
 
         EOSLIB_SERIALIZE(assignment, (assignmentKey)(placeKey)(account)(endAssignment))
     };
-    typedef multi_index<N(assignment), assignment,
-                        indexed_by<N(byuserkey),
-                                   const_mem_fun<assignment, account_name, &assignment::get_account>>,
-                        indexed_by<N(byplacekey),
+    typedef multi_index<name("assignment"), assignment,
+                        indexed_by<name("byuserkey"),
+                                   const_mem_fun<assignment, uint64_t, &assignment::get_account>>,
+                        indexed_by<name("byplacekey"),
                                    const_mem_fun<assignment, uint64_t, &assignment::get_place_key>>>
         assignmentIndex;
 
@@ -94,7 +94,7 @@ class Market : public contract
     };
 
     //@abi table offer i64
-    struct offer
+    TABLE offer
     {
         uint64_t offerKey;
         uint64_t orderKey;
@@ -107,18 +107,18 @@ class Market : public contract
 
         EOSLIB_SERIALIZE(offer, (offerKey)(orderKey)(placeKey)(stateOffer))
     };
-    typedef multi_index<N(offer), offer,
-                        indexed_by<N(byorderkey),
+    typedef multi_index<name("offer"), offer,
+                        indexed_by<name("byorderkey"),
                                    const_mem_fun<offer, uint64_t, &offer::getOrderKey>>,
-                        indexed_by<N(byplacekey),
+                        indexed_by<name("byplacekey"),
                                    const_mem_fun<offer, uint64_t, &offer::getPlaceKey>>>
         offerIndex;
 
     //@abi table apply i64
-    struct apply
+    TABLE apply
     {
         uint64_t applyKey;
-        account_name deliver;
+        name deliver;
         uint64_t offerKey;
 
         uint64_t primary_key() const { return applyKey; }
@@ -126,8 +126,8 @@ class Market : public contract
 
         EOSLIB_SERIALIZE(apply, (applyKey)(deliver)(offerKey))
     };
-    typedef multi_index<N(apply), apply,
-                        indexed_by<N(byoffer),
+    typedef multi_index<name("apply"), apply,
+                        indexed_by<name("byoffer"),
                                    const_mem_fun<apply, uint64_t, &apply::get_offer>>>
         applyIndex;
 };

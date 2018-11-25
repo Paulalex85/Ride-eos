@@ -5,7 +5,7 @@
 namespace rideEOS
 {
 
-EOSIO_ABI(Market, (addplace)(updateplace)(deleteplace)(newassign)(endassign)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply));
+EOSIO_DISPATCH(Market, (addplace)(updateplace)(deleteplace)(newassign)(endassign)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply));
 
 //24h
 int DELAY_END_ASSIGN = 86400;
@@ -71,7 +71,7 @@ void Market::deleteplace(uint64_t key)
     places.erase(iteratorPlace);
 }
 
-void Market::newassign(account_name account, uint64_t placeKey)
+void Market::newassign(name account, uint64_t placeKey)
 {
     require_auth(account);
 
@@ -160,7 +160,7 @@ void Market::endoffer(uint64_t offerKey)
     Users::userIndex users(N(rideos), N(rideos));
 
     bool found_one = false;
-    account_name deliver;
+    name deliver;
     asset current_best_asset;
 
     while (iteratorApply != indexApply.end())
@@ -210,7 +210,7 @@ void Market::canceloffer(uint64_t offerKey)
     });
 }
 
-void Market::addapply(account_name account, uint64_t offerKey)
+void Market::addapply(name account, uint64_t offerKey)
 {
     require_auth(account);
 

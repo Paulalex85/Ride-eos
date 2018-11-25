@@ -4,7 +4,7 @@
 namespace rideEOS
 {
 
-EOSIO_ABI(Orders, (needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
+EOSIO_DISPATCH(Orders, (needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
 
 bool is_equal(const checksum256 &a, const checksum256 &b)
 {
@@ -17,7 +17,7 @@ bool is_zero(const checksum256 &a)
     return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
 }
 
-bool is_actor(account_name sender, account_name buyer, account_name seller, account_name deliver)
+bool is_actor(name sender, name buyer, name seller, name deliver)
 {
     if (sender == buyer || sender == seller || sender == deliver)
     {
@@ -26,7 +26,7 @@ bool is_actor(account_name sender, account_name buyer, account_name seller, acco
     return false;
 }
 
-void Orders::needdeliver(account_name buyer, account_name seller, asset &priceOrder, asset &priceDeliver,
+void Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
                          std::string &details, uint64_t delay)
 {
     orderIndex orders(_self, _self);
@@ -63,7 +63,7 @@ void Orders::needdeliver(account_name buyer, account_name seller, asset &priceOr
     });
 }
 
-void Orders::deliverfound(account_name deliver, uint64_t orderKey)
+void Orders::deliverfound(name deliver, uint64_t orderKey)
 {
     orderIndex orders(_self, _self);
     auto iteratorOrder = orders.find(orderKey);
@@ -79,7 +79,7 @@ void Orders::deliverfound(account_name deliver, uint64_t orderKey)
     });
 }
 
-void Orders::initialize(account_name buyer, account_name seller, account_name deliver, asset &priceOrder,
+void Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder,
                         asset &priceDeliver, string &details, uint64_t delay)
 {
     orderIndex orders(_self, _self);
@@ -269,7 +269,7 @@ void Orders::orderdelive(uint64_t orderKey, const checksum256 &source)
         .send();
 }
 
-void Orders::initcancel(uint64_t orderKey, account_name account)
+void Orders::initcancel(uint64_t orderKey, name account)
 {
     orderIndex orders(_self, _self);
     auto iteratorOrder = orders.find(orderKey);

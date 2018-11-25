@@ -1,57 +1,51 @@
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/print.hpp>
-#include <eosiolib/time.hpp>
-#include <eosiolib/crypto.h>
 #include <eosiolib/asset.hpp>
-#include <eosiolib/contract.hpp>
-#include <string>
 
 using namespace eosio;
-namespace rideEOS {
 
-    using namespace eosio;
-    using std::string;
-    using eosio::asset;
-    using eosio::action;
+using std::string;
 
-    class Users : public contract{
-        using contract::contract;
+CONTRACT Users : public eosio::contract
+{
+  using contract::contract;
 
-    public:
-        Users(account_name self):contract(self) {}
+public:
+  // constructor
+  Users(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
+                                                                 _users(receiver, receiver.value) {}
 
-        //@abi action
-        void adduser(account_name account, string& username);
+  ACTION adduser(name account, string & username);
 
-        //@abi action
-        void updateuser(account_name account, string& username);
+  ACTION updateuser(name account, string & username);
 
-        //@abi action
-        void getuser(const account_name account);
+  ACTION deposit(const name account, const asset &quantity);
 
-        //@abi action
-        void deposit(const account_name account,const asset& quantity);
+  ACTION withdraw(const name account, const asset &quantity);
 
-        //@abi action
-        void withdraw(const account_name account, const asset& quantity);
+  ACTION pay(const name accountUser, const name receiver, const asset &quantity);
 
-        //@abi action
-        void pay(const account_name accountUser,const account_name receiver, const asset& quantity);
+  ACTION receive(const name account, const name from, const asset &quantity);
 
-        //@abi action
-        void receive(const account_name account,const account_name from, const asset& quantity);
+  //@abi table user i64
+  TABLE user
+  {
+    name account;
+    string username;
+    asset balance;
 
-        //@abi table user i64
-        struct user {
-            account_name account;
-            string username;
-            asset balance;
+    uint64_t primary_key() const { return account.value; }
+  };
 
-            account_name primary_key() const { return account; }
+  typedef multi_index<name("user"), user> user_table;
 
-            EOSLIB_SERIALIZE(user, (account)(username)(balance))
-        };
+  // accessor for external contracts to easily send inline actions to your contract
+  using adduser_action = action_wrapper<"adduser"_n, &Users::adduser>;
+  using updateuser_action = action_wrapper<"updateuser"_n, &Users::updateuser>;
+  using deposit_action = action_wrapper<"deposit"_n, &Users::deposit>;
+  using withdraw_action = action_wrapper<"withdraw"_n, &Users::withdraw>;
+  using pay_action = action_wrapper<"pay"_n, &Users::pay>;
+  using receive_action = action_wrapper<"receive"_n, &Users::receive>;
 
-        typedef multi_index<N(user), user> userIndex;
-    };
-}
+private:
+  user_table _users;
+};

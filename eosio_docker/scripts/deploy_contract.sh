@@ -20,8 +20,7 @@ if [ ! -z $3 ]; then ./cleos wallet unlock -n $3 --password $4 || true; fi
 
 # compile smart contract to wast and abi files
 (
-  eosiocpp -o "$COMPILEDCONTRACTSPATH/$1/$1.wast" "$CONTRACTSPATH/$1/$1.cpp" &&
-  eosiocpp -g "$COMPILEDCONTRACTSPATH/$1/$1.abi" "$CONTRACTSPATH/$1/$1.cpp"
+  eosio-cpp -abigen "$CONTRACTSPATH/$1/$1.cpp" -o "$COMPILEDCONTRACTSPATH/$1/$1.wasm" --contract "$1"
 ) &&
 
 # set (deploy) compiled contract to blockchain
