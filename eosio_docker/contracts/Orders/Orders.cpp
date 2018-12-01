@@ -1,17 +1,12 @@
 #include "Orders.hpp"
-#include "../Users/Users.hpp"
+using namespace eosio;
 
-namespace rideEOS
+bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
 {
-
-EOSIO_DISPATCH(Orders, (needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));
-
-bool is_equal(const checksum256 &a, const checksum256 &b)
-{
-    return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
+    return memcmp((void *)&a, (const void *)&b, sizeof(capi_checksum256)) == 0;
 }
 
-bool is_zero(const checksum256 &a)
+bool is_zero(const capi_checksum256 &a)
 {
     const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&a);
     return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
@@ -19,40 +14,39 @@ bool is_zero(const checksum256 &a)
 
 bool is_actor(name sender, name buyer, name seller, name deliver)
 {
-    if (sender == buyer || sender == seller || sender == deliver)
+    if (sender.value == buyer.value || sender.value == seller.value || sender.value == deliver.value)
     {
         return true;
     }
     return false;
 }
 
-void Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
-                         std::string &details, uint64_t delay)
+ACTION Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
+                           std::string &details, uint64_t delay)
 {
-    orderIndex orders(_self, _self);
-
-    eosio_assert(priceOrder.symbol == CORE_SYMBOL, "only core token allowed");
+    eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
     eosio_assert(priceOrder.amount > 0, "must bet positive quantity");
 
-    eosio_assert(priceDeliver.symbol == CORE_SYMBOL, "only core token allowed");
+    eosio_assert(priceDeliver.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceDeliver.is_valid(), "invalid bet");
     eosio_assert(priceDeliver.amount > 0, "must bet positive quantity");
 
-    Users::userIndex users(N(rideos), N(rideos));
-    auto iteratorUser = users.find(buyer);
-    eosio_assert(iteratorUser != users.end(), "Buyer not found");
+    Users::user_table _users(name("rideos"), name("rideos").value);
 
-    iteratorUser = users.find(seller);
-    eosio_assert(iteratorUser != users.end(), "Seller not found");
+    auto iteratorUser = _users.find(buyer.value);
+    eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
-    orders.emplace(_self, [&](auto &order) {
-        order.orderKey = orders.available_primary_key();
+    iteratorUser = _users.find(seller.value);
+    eosio_assert(iteratorUser != _users.end(), "Seller not found");
+
+    _orders.emplace(_self, [&](auto &order) {
+        order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
         order.seller = seller;
         order.state = NEED_DELIVER;
-        order.date = eosio::time_point_sec(now());
-        order.dateDelay = eosio::time_point_sec(now());
+        order.date = time_point_sec(now());
+        order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
         order.validateBuyer = false;
@@ -63,53 +57,51 @@ void Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &pric
     });
 }
 
-void Orders::deliverfound(name deliver, uint64_t orderKey)
+ACTION Orders::deliverfound(name deliver, uint64_t orderKey)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->buyer);
 
     eosio_assert(iteratorOrder->state == NEED_DELIVER, "Should be at the state Need deliver");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = INITIALIZATION;
         order.deliver = deliver;
     });
 }
 
-void Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder,
-                        asset &priceDeliver, string &details, uint64_t delay)
+ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder,
+                          asset &priceDeliver, string &details, uint64_t delay)
 {
-    orderIndex orders(_self, _self);
-
-    eosio_assert(priceOrder.symbol == CORE_SYMBOL, "only core token allowed");
+    eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
     eosio_assert(priceOrder.amount > 0, "must bet positive quantity");
 
-    eosio_assert(priceDeliver.symbol == CORE_SYMBOL, "only core token allowed");
+    eosio_assert(priceDeliver.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceDeliver.is_valid(), "invalid bet");
     eosio_assert(priceDeliver.amount > 0, "must bet positive quantity");
 
-    Users::userIndex users(N(rideos), N(rideos));
-    auto iteratorUser = users.find(buyer);
-    eosio_assert(iteratorUser != users.end(), "Buyer not found");
+    Users::user_table _users(name("rideos"), name("rideos").value);
 
-    iteratorUser = users.find(seller);
-    eosio_assert(iteratorUser != users.end(), "Seller not found");
+    auto iteratorUser = _users.find(buyer.value);
+    eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
-    iteratorUser = users.find(deliver);
-    eosio_assert(iteratorUser != users.end(), "Deliver not found");
+    iteratorUser = _users.find(seller.value);
+    eosio_assert(iteratorUser != _users.end(), "Seller not found");
 
-    orders.emplace(_self, [&](auto &order) {
-        order.orderKey = orders.available_primary_key();
+    iteratorUser = _users.find(deliver.value);
+    eosio_assert(iteratorUser != _users.end(), "Deliver not found");
+
+    _orders.emplace(_self, [&](auto &order) {
+        order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
         order.seller = seller;
         order.deliver = deliver;
         order.state = INITIALIZATION;
-        order.date = eosio::time_point_sec(now());
-        order.dateDelay = eosio::time_point_sec(now());
+        order.date = time_point_sec(now());
+        order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
         order.validateBuyer = false;
@@ -120,32 +112,32 @@ void Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder
     });
 }
 
-void Orders::validatebuy(uint64_t orderKey, const checksum256 &commitment)
+ACTION Orders::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->buyer);
 
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
-    Users::userIndex userBuyer(N(rideos), N(rideos));
-    auto iteratorUser = userBuyer.find(iteratorOrder->buyer);
-    eosio_assert(iteratorUser != userBuyer.end(), "Buyer not found");
+    Users::user_table _users(name("rideos"), name("rideos").value);
+
+    auto iteratorUser = _users.find(iteratorOrder->buyer.value);
+    eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
     eosio_assert(iteratorOrder->validateBuyer == false, "Buyer already validate");
 
     eosio_assert(iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance");
     action(
-        permission_level{iteratorOrder->buyer, N(active)},
-        N(rideos), N(pay),
+        permission_level{iteratorOrder->buyer, name("active")},
+        name("rideos"), name("pay"),
         std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
         .send();
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateBuyer = true;
-        order.deliveryverification = commitment;
+        order.deliveryverification = hash;
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateDeliver)
         {
@@ -155,11 +147,10 @@ void Orders::validatebuy(uint64_t orderKey, const checksum256 &commitment)
     });
 }
 
-void Orders::validatedeli(uint64_t orderKey)
+ACTION Orders::validatedeli(uint64_t orderKey)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
@@ -167,7 +158,7 @@ void Orders::validatedeli(uint64_t orderKey)
 
     eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateDeliver = true;
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateBuyer)
@@ -178,11 +169,10 @@ void Orders::validatedeli(uint64_t orderKey)
     });
 }
 
-void Orders::validatesell(uint64_t orderKey, const checksum256 &commitment)
+ACTION Orders::validatesell(uint64_t orderKey, const capi_checksum256 &hash)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->seller);
 
@@ -190,9 +180,9 @@ void Orders::validatesell(uint64_t orderKey, const checksum256 &commitment)
 
     eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;
-        order.takeverification = commitment;
+        order.takeverification = hash;
 
         if (iteratorOrder->validateDeliver && iteratorOrder->validateBuyer)
         {
@@ -202,78 +192,74 @@ void Orders::validatesell(uint64_t orderKey, const checksum256 &commitment)
     });
 }
 
-void Orders::orderready(uint64_t orderKey)
+ACTION Orders::orderready(uint64_t orderKey)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->seller);
 
     eosio_assert(iteratorOrder->state == ORDER_READY, "The order is not in the state of product ready");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_TAKEN;
     });
 }
 
-void Orders::ordertaken(uint64_t orderKey, const checksum256 &source)
+ACTION Orders::ordertaken(uint64_t orderKey, const capi_checksum256 &source)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->takeverification);
+    assert_sha256((char *)&source, sizeof(source), (const capi_checksum256 *)&iteratorOrder->takeverification);
 
     eosio_assert(iteratorOrder->state == ORDER_TAKEN, "The order is not in the state of waiting deliver");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_DELIVERED;
     });
 }
 
-void Orders::orderdelive(uint64_t orderKey, const checksum256 &source)
+ACTION Orders::orderdelive(uint64_t orderKey, const capi_checksum256 &source)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    assert_sha256((char *)&source, sizeof(source), (const checksum256 *)&iteratorOrder->deliveryverification);
+    assert_sha256((char *)&source, sizeof(source), (const capi_checksum256 *)&iteratorOrder->deliveryverification);
 
     eosio_assert(iteratorOrder->state == ORDER_DELIVERED, "The order is not in the state delivery");
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_END;
     });
 
     action(
-        permission_level{_self, N(active)},
-        N(eosio.token), N(transfer),
-        std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
+        permission_level{_self, name("active")},
+        name("eosio.token"), name("transfer"),
+        std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
         .send();
 
     action(
-        permission_level{_self, N(active)},
-        N(rideos), N(receive),
+        permission_level{_self, name("active")},
+        name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->seller, _self, iteratorOrder->priceOrder))
         .send();
 
     action(
-        permission_level{_self, N(active)},
-        N(rideos), N(receive),
+        permission_level{_self, name("active")},
+        name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver))
         .send();
 }
 
-void Orders::initcancel(uint64_t orderKey, name account)
+ACTION Orders::initcancel(uint64_t orderKey, name account)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(account);
 
@@ -284,28 +270,27 @@ void Orders::initcancel(uint64_t orderKey, name account)
     if (iteratorOrder->validateBuyer)
     {
         action(
-            permission_level{_self, N(active)},
-            N(eosio.token), N(transfer),
-            std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
+            permission_level{_self, name("active")},
+            name("eosio.token"), name("transfer"),
+            std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
             .send();
 
         action(
-            permission_level{_self, N(active)},
-            N(rideos), N(receive),
+            permission_level{_self, name("active")},
+            name("rideos"), name("receive"),
             std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
             .send();
     }
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = INIT_CANCEL;
     });
 }
 
-void Orders::delaycancel(uint64_t orderKey)
+ACTION Orders::delaycancel(uint64_t orderKey)
 {
-    orderIndex orders(_self, _self);
-    auto iteratorOrder = orders.find(orderKey);
-    eosio_assert(iteratorOrder != orders.end(), "Address for order not found");
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->buyer);
 
@@ -315,19 +300,19 @@ void Orders::delaycancel(uint64_t orderKey)
     eosio_assert(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
 
     action(
-        permission_level{_self, N(active)},
-        N(eosio.token), N(transfer),
-        std::make_tuple(_self, N(rideos), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
+        permission_level{_self, name("active")},
+        name("eosio.token"), name("transfer"),
+        std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
         .send();
 
     action(
-        permission_level{_self, N(active)},
-        N(rideos), N(receive),
+        permission_level{_self, name("active")},
+        name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
         .send();
 
-    orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_CANCEL;
     });
 }
-} // namespace rideEOS
+EOSIO_DISPATCH(Orders, (needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel));

@@ -1,18 +1,12 @@
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/print.hpp>
-#include <eosiolib/time.hpp>
 #include <eosiolib/crypto.h>
 #include <eosiolib/asset.hpp>
-#include <eosiolib/contract.hpp>
-#include <string>
+#include <eosiolib/time.hpp>
+
+#include "../Users/Users.hpp"
 
 using namespace eosio;
-namespace rideEOS
-{
 
-using namespace eosio;
-using eosio::asset;
-using eosio::key256;
 using std::string;
 
 CONTRACT Orders : public eosio::contract
@@ -20,40 +14,31 @@ CONTRACT Orders : public eosio::contract
     using contract::contract;
 
   public:
-    Orders(name self) : contract(self) {}
+    Orders(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
+                                                                    _orders(receiver, receiver.value),
+                                                                    _users(name("rideos"), name("rideos").value) {}
 
-    //@abi action
-    void needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
+    ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
 
-    //@abi action
-    void deliverfound(name deliver, uint64_t orderKey);
+    ACTION deliverfound(name deliver, uint64_t orderKey);
 
-    //@abi action
-    void initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
+    ACTION initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
 
-    //@abi action
-    void validatebuy(uint64_t orderKey, const checksum256 &commitment);
+    ACTION validatebuy(uint64_t orderKey, const capi_checksum256 &hash);
 
-    //@abi action
-    void validatedeli(uint64_t orderKey);
+    ACTION validatedeli(uint64_t orderKey);
 
-    //@abi action
-    void validatesell(uint64_t orderKey, const checksum256 &commitment);
+    ACTION validatesell(uint64_t orderKey, const capi_checksum256 &hash);
 
-    //@abi action
-    void orderready(uint64_t orderKey);
+    ACTION orderready(uint64_t orderKey);
 
-    //@abi action
-    void ordertaken(uint64_t orderKey, const checksum256 &source);
+    ACTION ordertaken(uint64_t orderKey, const capi_checksum256 &source);
 
-    //@abi action
-    void orderdelive(uint64_t orderKey, const checksum256 &source);
+    ACTION orderdelive(uint64_t orderKey, const capi_checksum256 &source);
 
-    //@abi action
-    void initcancel(uint64_t orderKey, name account);
+    ACTION initcancel(uint64_t orderKey, name account);
 
-    //@abi action
-    void delaycancel(uint64_t orderKey);
+    ACTION delaycancel(uint64_t orderKey);
 
     enum order_state : uint8_t
     {
@@ -67,8 +52,6 @@ CONTRACT Orders : public eosio::contract
         ORDER_CANCEL = 98
     };
 
-  private:
-    //@abi table order i64
     TABLE order
     {
         uint64_t orderKey;
@@ -76,10 +59,10 @@ CONTRACT Orders : public eosio::contract
         name seller;
         name deliver;
         uint8_t state;
-        eosio::time_point_sec date;
-        eosio::time_point_sec dateDelay;
-        checksum256 takeverification;
-        checksum256 deliveryverification;
+        time_point_sec date;
+        time_point_sec dateDelay;
+        capi_checksum256 takeverification;
+        capi_checksum256 deliveryverification;
         asset priceOrder;
         asset priceDeliver;
         bool validateBuyer;
@@ -93,13 +76,11 @@ CONTRACT Orders : public eosio::contract
         uint64_t get_seller_key() const { return seller.value; }
         uint64_t get_deliver_key() const { return deliver.value; }
 
-        static key256 get_commitment(const checksum256 &commitment)
+        static fixed_bytes<32> checksum256_to_sha256(const capi_checksum256 &hash)
         {
-            const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&commitment);
-            return key256::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
+            const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&hash);
+            return fixed_bytes<32>::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
         }
-
-        EOSLIB_SERIALIZE(order, (orderKey)(buyer)(seller)(deliver)(state)(date)(dateDelay)(takeverification)(deliveryverification)(priceOrder)(priceDeliver)(validateBuyer)(validateSeller)(validateDeliver)(details)(delay))
     };
 
     typedef multi_index<name("order"), order,
@@ -109,6 +90,22 @@ CONTRACT Orders : public eosio::contract
                                    const_mem_fun<order, uint64_t, &order::get_seller_key>>,
                         indexed_by<name("bydeliverkey"),
                                    const_mem_fun<order, uint64_t, &order::get_deliver_key>>>
-        orderIndex;
+        order_table;
+
+    // accessor for external contracts to easily send inline actions to your contract
+    using needdeliver_action = action_wrapper<"needdeliver"_n, &Orders::needdeliver>;
+    using deliverfound_action = action_wrapper<"deliverfound"_n, &Orders::deliverfound>;
+    using initialize_action = action_wrapper<"initialize"_n, &Orders::initialize>;
+    using validatebuy_action = action_wrapper<"validatebuy"_n, &Orders::validatebuy>;
+    using validatedeli_action = action_wrapper<"validatedeli"_n, &Orders::validatedeli>;
+    using validatesell_action = action_wrapper<"validatesell"_n, &Orders::validatesell>;
+    using orderready_action = action_wrapper<"orderready"_n, &Orders::orderready>;
+    using ordertaken_action = action_wrapper<"ordertaken"_n, &Orders::ordertaken>;
+    using orderdelive_action = action_wrapper<"orderdelive"_n, &Orders::orderdelive>;
+    using initcancel_action = action_wrapper<"initcancel"_n, &Orders::initcancel>;
+    using delaycancel_action = action_wrapper<"delaycancel"_n, &Orders::delaycancel>;
+
+  private:
+    order_table _orders;
+    Users::user_table _users;
 };
-} // namespace rideEOS

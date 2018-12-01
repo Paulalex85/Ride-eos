@@ -62,7 +62,7 @@ echo "=== deploy smart contract ==="
 # $3 wallet that holds the keys for the account
 # $4 password for unlocking the wallet
 deploy_contract.sh Users rideos rideoswallet $(cat rideos_wallet_password.txt)
-#deploy_contract.sh Orders rideor rideoswallet $(cat rideos_wallet_password.txt)
+deploy_contract.sh Orders rideor rideoswallet $(cat rideos_wallet_password.txt)
 #deploy_contract.sh Market rideom rideoswallet $(cat rideos_wallet_password.txt)
 cleos set contract eosio.token /contracts/eosio.token
 
