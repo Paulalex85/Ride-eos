@@ -1,63 +1,67 @@
-import Eos from 'eosjs';
-import ecc from 'eosjs-ecc'
+import { Api, JsonRpc, RpcError, JsSignatureProvider } from 'eosjs';
 
-function eosConfiguration() {
-  // configuration
-  let config = {
-    chainId: null, // 32 byte (64 char) hex string
-    keyProvider: [localStorage.getItem("privateKey")], // WIF string or array of keys..
-    httpEndpoint: 'http://127.0.0.1:8888',
-    expireInSeconds: 60,
-    broadcast: true,
-    verbose: false, // API activity
-    sign: true
-  }
-  return Eos(config);
+function getRPC() {
+  return new JsonRpc('http://127.0.0.1:8888');
 }
 
-async function auth(contractDestination) {
-  const eos = eosConfiguration();
+function eosAPI() {
+  const rpc = getRPC();
+  //const { TextDecoder, TextEncoder } = require('text-encoding');
+  const signatureProvider = new JsSignatureProvider([localStorage.getItem("privateKey")]);
 
-  const auth = {
-    "threshold": 1,
-    "keys": [{
-      "key": ecc.privateToPublic(localStorage.getItem("privateKey")),
-      "weight": 1
-    }],
-    "accounts": [{
-      "permission": {
-        "actor": contractDestination,
-        "permission": "active"
-      }, "weight": 1
-    }]
-  }
-
-  const tx = {
-    account: localStorage.getItem("userAccount"),
-    permission: 'active',
-    parent: 'owner',
-    auth: auth
-  };
-
-  return await eos.updateauth(tx);
+  return new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
 }
 
 async function send(actionName, actionData, contractDestination) {
-  const eos = eosConfiguration();
-
-  const result = await eos.transaction({
-    actions: [{
-      account: contractDestination,
-      name: actionName,
-      authorization: [{
-        actor: localStorage.getItem("userAccount"),
-        permission: 'active',
+  const eos = eosAPI();
+  try {
+    const result = await eos.transact({
+      actions: [{
+        account: contractDestination,
+        name: actionName,
+        authorization: [{
+          actor: localStorage.getItem("userAccount"),
+          permission: 'active',
+        }],
+        data: actionData,
       }],
-      data: actionData,
-    }],
-  });
+    }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+      });
+    return result;
+  } catch (e) {
+    console.log('\nCaught exception: ' + e);
+    if (e instanceof RpcError)
+      console.log(JSON.stringify(e.json, null, 2));
+  }
+}
 
-  return result;
+async function getTableRows({
+  json = true,
+  code,
+  scope,
+  table,
+  table_key = "",
+  lower_bound = "",
+  upper_bound = "",
+  index_position = 1,
+  key_type = "",
+  limit = 10 }: any): Promise<any> {
+  const rpc = getRPC();
+  return await rpc.fetch(
+    "/v1/chain/get_table_rows", {
+      json,
+      code,
+      scope,
+      table,
+      table_key,
+      lower_bound,
+      upper_bound,
+      index_position,
+      key_type,
+      limit,
+    });
 }
 
 class ApiService {
@@ -69,7 +73,6 @@ class ApiService {
       }
       this.getUserByAccount(localStorage.getItem("userAccount"))
         .then((row) => {
-          console.log(row);
           if (row === undefined) {
             console.log("Utilisateur inconnu");
             localStorage.removeItem("userAccount");
@@ -105,21 +108,18 @@ class ApiService {
   }
 
   static updateUser({ username }) {
-    return send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+    return send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
   }
 
   static deposit({ quantity }) {
-    return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-      .then(() => {
-        send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-      });
+    return send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
   }
 
   static withdraw({ quantity }) {
-    return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-      .then(() => {
-        send("withdraw", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-      });
+    // return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
+    //   .then(() => {
+    return send("withdraw", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
+    // });
   }
 
   //ORDERS
@@ -127,7 +127,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getOrderByKey(orderKey)
         .then((order) => {
-          console.log(order);
           resolve(order);
         })
         .catch(err => {
@@ -140,7 +139,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getOrderByBuyer(account)
         .then((list) => {
-          console.log(list);
           resolve(list);
         })
         .catch(err => {
@@ -178,7 +176,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getAllPlaces()
         .then((list) => {
-          console.log(list);
           resolve(list);
         })
         .catch(err => {
@@ -191,7 +188,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getAssignmentsByUser()
         .then((list) => {
-          console.log(list);
           resolve(list);
         })
         .catch(err => {
@@ -204,7 +200,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getAssignmentByKey()
         .then((assign) => {
-          console.log(assign);
           resolve(assign);
         })
         .catch(err => {
@@ -225,7 +220,6 @@ class ApiService {
     return new Promise((resolve, reject) => {
       this.getAllOffers()
         .then((list) => {
-          console.log(list);
           resolve(list);
         })
         .catch(err => {
@@ -240,16 +234,18 @@ class ApiService {
 
   //Table row
   static async getUserByAccount(account) {
-    const eos = eosConfiguration();
+    console.log("coucoi")
+    console.log(account)
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
-        "table": "user",    // name of the table as specified by the contract abi
-        "limit": 1,
-        "lower_bound": account,
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,
+        table: "user",
+        lower_bound: account,
+        limit: 1
       });
+      console.log(result);
       return result.rows[0];
     } catch (err) {
       return console.error(err);
@@ -257,16 +253,16 @@ class ApiService {
   }
 
   static async getOrderByKey(orderKey) {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
-        "table": "order",    // name of the table as specified by the contract abi
-        "limit": 1,
-        "lower_bound": orderKey,
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        table: "order",    // name of the table as specified by the contract abi
+        limit: 1,
+        lower_bound: orderKey,
       });
+      console.log(result);
       return result.rows[0];
     } catch (err) {
       return console.error(err);
@@ -274,16 +270,18 @@ class ApiService {
   }
 
   static async getOrderByBuyer(account) {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
-        "table": "order",    // name of the table as specified by the contract abi
-        "limit": 10,
-        "lower_bound": account,
-        "index_position": "1",
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        table: "order",    // name of the table as specified by the contract abi
+        lower_bound: account,
+        upper_bound: account,
+        limit: 10,
+        key_type: "i64",
+        index_position: 2,
+
       });
       return result;
     } catch (err) {
@@ -292,14 +290,13 @@ class ApiService {
   }
 
   static async getAllPlaces() {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
-        "table": "place",    // name of the table as specified by the contract abi
-        "limit": 10,
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "place",    // name of the table as specified by the contract abi
+        limit: 10,
       });
       return result;
     } catch (err) {
@@ -308,15 +305,14 @@ class ApiService {
   }
 
   static async getPlace(placeKey) {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
-        "table": "place",    // name of the table as specified by the contract abi
-        "limit": 1,
-        "lower_bound": placeKey,
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "place",    // name of the table as specified by the contract abi
+        limit: 1,
+        lower_bound: placeKey,
       });
       return result.rows[0];
     } catch (err) {
@@ -325,16 +321,15 @@ class ApiService {
   }
 
   static async getAssignmentsByUser(account) {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
-        "table": "assignment",    // name of the table as specified by the contract abi
-        "limit": 10,
-        "lower_bound": account,
-        "index_position": "1",
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "assignment",    // name of the table as specified by the contract abi
+        limit: 10,
+        lower_bound: account,
+        index_position: "1",
       });
       return result;
     } catch (err) {
@@ -343,16 +338,15 @@ class ApiService {
   }
 
   static async getAssignmentByKey(assignmentKey) {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
-        "table": "assignment",    // name of the table as specified by the contract abi
-        "limit": 1,
-        "lower_bound": assignmentKey,
-        "index_position": "1",
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "assignment",    // name of the table as specified by the contract abi
+        limit: 1,
+        lower_bound: assignmentKey,
+        index_position: "1",
       });
       return result.rows[0];
     } catch (err) {
@@ -361,14 +355,13 @@ class ApiService {
   }
 
   static async getAllOffers() {
-    const eos = eosConfiguration();
     try {
-      const result = await eos.getTableRows({
-        "json": true,
-        "code": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        "scope": process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
-        "table": "offer",    // name of the table as specified by the contract abi
-        "limit": 10,
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "offer",    // name of the table as specified by the contract abi
+        limit: 10,
       });
       return result;
     } catch (err) {

@@ -25,7 +25,6 @@ class UpdateProfile extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    // Runs on every keystroke to updateuser the React state
     handleChange(event) {
         const { name, value } = event.target;
         const { form } = this.state;
@@ -52,7 +51,10 @@ class UpdateProfile extends Component {
         // Otherwise, save the error state for displaying the message
         return ApiService.updateUser(form)
             .then(() => {
-                setUser({ username: form.username });
+                ApiService.getCurrentUser()
+                    .then(user => {
+                        setUser({ account: user.account, username: user.username, balance: user.balance });
+                    })
             })
             .catch(err => {
                 this.setState({ error: err.toString() });

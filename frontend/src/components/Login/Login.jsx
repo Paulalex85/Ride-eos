@@ -30,7 +30,6 @@ class Login extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  // Runs on every keystroke to updateuser the React state
   handleChange(event) {
     const { name, value } = event.target;
     const { form } = this.state;
@@ -57,7 +56,11 @@ class Login extends Component {
     // Otherwise, save the error state for displaying the message
     return ApiService.login(form)
       .then(() => {
-        setUser({ account: form.account,username:form.username });
+        ApiService.getCurrentUser()
+          // If the server return an account
+          .then(user => {
+            setUser({ account: user.account, username: user.username, balance: user.balance });
+          })
       })
       .catch(err => {
         this.setState({ error: err.toString() });
@@ -72,44 +75,44 @@ class Login extends Component {
       <div className="Login">
         <div className="title">Login</div>
         <div className="description">Please use the Account Name and Private Key generated in the previous page to log into the game.</div>
-        <form name="form" onSubmit={ this.handleSubmit }>
-            <TextField
-                name="account"
-                value={ form.account }
-                label="Account name"
-                placeholder="All small letters, a-z, 1-5 or dot, max 12 characters"
-                onChange={ this.handleChange }
-                pattern="[\.a-z1-5]{2,12}"
-                required
-            />
-            <TextField
-                name="username"
-                value={ form.username }
-                label="Username"
-                onChange={ this.handleChange }
-                required
-            />
-            <TextField
-                type="password"
-                name="key"
-                value={ form.key }
-                label="Private key"
-                onChange={ this.handleChange }
-                pattern="^.{51,}$"
-                required
-            />
-            <div className="field form-error">
-                { error && <span className="error">{ error }</span> }
-            </div>
-            <div className="bottom">
-                <Button 
-                    type="submit" 
-                    className="green" 
-                    variant='contained'
-                    color='primary'>
-                { "CONFIRM" }
-                </Button>
-            </div>
+        <form name="form" onSubmit={this.handleSubmit}>
+          <TextField
+            name="account"
+            value={form.account}
+            label="Account name"
+            placeholder="All small letters, a-z, 1-5 or dot, max 12 characters"
+            onChange={this.handleChange}
+            pattern="[\.a-z1-5]{2,12}"
+            required
+          />
+          <TextField
+            name="username"
+            value={form.username}
+            label="Username"
+            onChange={this.handleChange}
+            required
+          />
+          <TextField
+            type="password"
+            name="key"
+            value={form.key}
+            label="Private key"
+            onChange={this.handleChange}
+            pattern="^.{51,}$"
+            required
+          />
+          <div className="field form-error">
+            {error && <span className="error">{error}</span>}
+          </div>
+          <div className="bottom">
+            <Button
+              type="submit"
+              className="green"
+              variant='contained'
+              color='primary'>
+              {"CONFIRM"}
+            </Button>
+          </div>
         </form>
         {JSON.stringify(this.testAccounts)}
       </div>

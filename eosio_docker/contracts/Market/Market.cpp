@@ -123,7 +123,6 @@ void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
 
 void Market::endoffer(uint64_t offerKey)
 {
-
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
 

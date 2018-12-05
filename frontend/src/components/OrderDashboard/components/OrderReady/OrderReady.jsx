@@ -19,7 +19,6 @@ class OrderReady extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
-    // Runs on every keystroke to updateuser the React state
     handleClick(event) {
         event.preventDefault();
 

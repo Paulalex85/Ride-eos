@@ -15,7 +15,7 @@ class WithdrawToken extends Component {
         // State for form data and error message
         this.state = {
             form: {
-                quantity: 0.0000,
+                quantity: "0.0000 SYS",
                 error: '',
             },
         }
@@ -25,7 +25,6 @@ class WithdrawToken extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    // Runs on every keystroke to updateuser the React state
     handleChange(event) {
         const { name, value } = event.target;
         const { form } = this.state;

@@ -23,7 +23,6 @@ class ValidateOrder extends Component {
         this.validateAPI = this.validateAPI.bind(this);
     }
 
-    // Runs on every keystroke to updateuser the React state
     handleClick(event) {
         event.preventDefault();
 
