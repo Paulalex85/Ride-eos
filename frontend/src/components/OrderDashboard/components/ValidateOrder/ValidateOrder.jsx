@@ -77,6 +77,9 @@ class ValidateOrder extends Component {
             <div>
                 <Button
                     onClick={this.handleClick}
+                    className="green"
+                    variant='contained'
+                    color='primary'
                 >
                     VALIDATE
                 </Button>
