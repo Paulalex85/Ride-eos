@@ -25,7 +25,7 @@ class OrderDashboard extends Component {
                 setListOrders({ listOrders: list, account: account });
             })
             // To ignore 401 console error
-            .catch(() => { })
+            .catch((err) => { console.error(err) });
     }
 
     render() {

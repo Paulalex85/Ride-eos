@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import { OfferElement } from './components';
-import { OfferAction } from 'actions';
+import { OfferAction, ApplyAction } from 'actions';
 import { ApiService } from 'services';
 
 class OfferDashboard extends Component {
@@ -16,11 +16,16 @@ class OfferDashboard extends Component {
     }
 
     loadOffers() {
-        const { setListOffers } = this.props;
+        const { setListOffers, setListApplies } = this.props;
 
-        return ApiService.getOffers().then(list => {
-            setListOffers({ listOffers: list });
-        }).catch(() => { });
+        ApiService.getOffers().then(offers => {
+            setListOffers({ listOffers: offers })
+        }).catch((err) => { console.error(err) });
+
+        return ApiService.getApplies().then(applies => {
+            const { offers: { listOffers } } = this.props;
+            setListApplies({ listOffers: listOffers, listApplies: applies });
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
@@ -49,6 +54,7 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setListOffers: OfferAction.setListOffers,
+    setListApplies: ApplyAction.setListApplies,
 };
 
 // Export a redux connected component

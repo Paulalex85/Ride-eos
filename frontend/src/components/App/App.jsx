@@ -28,7 +28,7 @@ class App extends Component {
         setUser({ account: user.account, username: user.username, balance: user.balance });
       })
       // To ignore 401 console error
-      .catch(() => { })
+      .catch((err) => { console.error(err) });
   }
 
   render() {

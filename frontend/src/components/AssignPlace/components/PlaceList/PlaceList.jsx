@@ -35,7 +35,7 @@ class AssignPlace extends Component {
                 setListPlaces({ listPlaces: list });
             })
             // To ignore 401 console error
-            .catch(() => { })
+            .catch((err) => { console.error(err) });
     }
 
     setListPlace(index) {

@@ -232,10 +232,20 @@ class ApiService {
     return send("addoffer", { orderKey: orderKey, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }
 
+  static getApplies() {
+    return new Promise((resolve, reject) => {
+      this.getAllApplies()
+        .then((list) => {
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   //Table row
   static async getUserByAccount(account) {
-    console.log("coucoi")
-    console.log(account)
     try {
       const result = await getTableRows({
         json: true,
@@ -361,6 +371,21 @@ class ApiService {
         code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
         scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
         table: "offer",    // name of the table as specified by the contract abi
+        limit: 10,
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getAllApplies() {
+    try {
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "apply",    // name of the table as specified by the contract abi
         limit: 10,
       });
       return result;
