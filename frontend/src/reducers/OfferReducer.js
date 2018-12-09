@@ -40,6 +40,10 @@ export default function (state = initialState, action) {
                 });
             }
             else {
+                for (let i = 0; i < listOffers.length; i++) {
+                    listOffers[i].listApplies = [];
+                }
+
                 for (let i = 0; i < listJsonApplies.rows.length; i++) {
                     const element = listJsonApplies.rows[i];
                     let apply = {
@@ -48,9 +52,10 @@ export default function (state = initialState, action) {
                         offerKey: element.offerKey.toString() || initialState.offerKey,
                     }
 
-                    for (let i = 0; i < listOffers.length; i++) {
-                        if (listOffers[i].offerKey === apply.offerKey) {
-                            listOffers[i].listApplies.push(apply);
+                    for (let j = 0; j < listOffers.length; j++) {
+                        if (listOffers[j].offerKey === apply.offerKey) {
+                            listOffers[j].listApplies.push(apply);
+                            break;
                         }
                     }
 

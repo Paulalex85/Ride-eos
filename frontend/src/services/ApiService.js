@@ -244,6 +244,10 @@ class ApiService {
     });
   }
 
+  static cancelApply(applyKey) {
+    return send("cancelapply", { applyKey: applyKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
+  }
+
   //Table row
   static async getUserByAccount(account) {
     try {
