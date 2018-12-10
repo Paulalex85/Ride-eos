@@ -33,14 +33,14 @@ class ApplyElement extends Component {
     }
 
     render() {
-        const { apply } = this.props;
+        const { apply, user: { account } } = this.props;
 
         return (
             <CardContent>
                 <Typography>Apply key : {apply.applyKey}</Typography>
                 <Typography>Deliver : {apply.deliver}</Typography>
                 {
-                    apply.deliver === localStorage.getItem("userAccount") &&
+                    apply.deliver === account &&
                     <Button variant="contained" color="secondary" onClick={this.handleClick}>
                         Delete
                     <DeleteIcon />

@@ -244,6 +244,10 @@ class ApiService {
     });
   }
 
+  static addApply(account, offerKey) {
+    return send("addapply", { account: account, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
+  }
+
   static cancelApply(applyKey) {
     return send("cancelapply", { applyKey: applyKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }

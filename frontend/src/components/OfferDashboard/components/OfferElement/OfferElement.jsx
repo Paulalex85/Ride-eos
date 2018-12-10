@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import ApplyElement from './component/ApplyElement';
+
+import { ApplyElement, ApplyOffer } from './components';
 
 class OfferElement extends Component {
 
@@ -16,6 +17,7 @@ class OfferElement extends Component {
                 apply={apply}
                 key={apply.applyKey}
             />
+
         ))
 
         return (
@@ -25,6 +27,7 @@ class OfferElement extends Component {
                     <Typography>Order key : {offer.orderKey}</Typography>
                     <Typography>Place key : {offer.placeKey}</Typography>
                     <Typography>State : {offer.stateOffer}</Typography>
+                    <ApplyOffer offer={offer} />
                 </CardContent>
                 {Applies}
             </Card>
