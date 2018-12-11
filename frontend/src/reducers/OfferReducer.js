@@ -13,6 +13,34 @@ const initialState = {
 
 export default function (state = initialState, action) {
     switch (action.type) {
+        case ActionTypes.SET_OFFER: {
+            let listOffers = action.listOffers || initialState.listOffers;
+            console.log("test")
+            console.log(listOffers)
+            let offerJSON = action.rows[0];
+            let offer = {
+                offerKey: offerJSON.offerKey.toString() || initialState.offerKey,
+                orderKey: offerJSON.orderKey.toString() || initialState.orderKey,
+                placeKey: offerJSON.placeKey.toString() || initialState.placeKey,
+                stateOffer: offerJSON.stateOffer.toString() || initialState.stateOffer,
+                listApplies: initialState.listApplies,
+            }
+            if (offer.offerKey !== undefined) {
+                for (let i = 0; i < listOffers.length; i++) {
+                    if (listOffers[i].offerKey === offer.offerKey) {
+                        listOffers[i] = offer;
+                        return Object.assign({}, state, {
+                            listOffers: listOffers
+                        });
+                    }
+                }
+                listOffers.push(offer);
+                return Object.assign({}, state, {
+                    listOffers: listOffers
+                });
+            }
+            break;
+        }
         case ActionTypes.SET_LIST_OFFERS: {
             let listJSON = action.listOffers || initialState.listOffers;
             let listObject = [];

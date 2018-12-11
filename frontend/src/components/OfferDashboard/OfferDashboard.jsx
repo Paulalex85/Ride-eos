@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import { OfferElement } from './components';
-import { OfferAction, ApplyAction } from 'actions';
+import { OfferAction, ApplyAction, OrderAction } from 'actions';
 import { ApiService } from 'services';
 
 class OfferDashboard extends Component {
@@ -15,16 +15,48 @@ class OfferDashboard extends Component {
         this.loadOffers();
     }
 
+    setOrderOfOffers(listKey) {
+        if (listKey.length > 0) {
+            let key = listKey.shift();
+            const { setOrder, orders: { listOrders }, user: { account } } = this.props;
+
+            ApiService.getOrderByKey(key).then((order) => {
+                setOrder({ listOrders: listOrders, order: order, account: account });
+                this.setOrderOfOffers(listKey);
+            }).catch((err) => { console.error(err) });
+        }
+    }
+
+    getListOrderKeyToGet(listOffers, listOrders) {
+        let listKey = [];
+
+        for (let i = 0; i < listOffers.length; i++) {
+            let founded = false;
+            for (let j = 0; j < listOrders.length; j++) {
+                if (listOffers[i].orderKey === listOrders[j].orderKey) {
+                    founded = true;
+                    break;
+                }
+            }
+            if (founded === false) {
+                listKey.push(listOffers[i].orderKey);
+            }
+        }
+        return listKey;
+    }
+
     loadOffers() {
         const { setListOffers, setListApplies } = this.props;
 
-        ApiService.getOffers().then(offers => {
-            setListOffers({ listOffers: offers })
-        }).catch((err) => { console.error(err) });
+        return ApiService.getOffers().then(offers => {
+            setListOffers({ listOffers: offers });
+            ApiService.getApplies().then(applies => {
+                const { offers: { listOffers }, orders: { listOrders } } = this.props;
+                setListApplies({ listOffers: listOffers, listApplies: applies });
 
-        return ApiService.getApplies().then(applies => {
-            const { offers: { listOffers } } = this.props;
-            setListApplies({ listOffers: listOffers, listApplies: applies });
+                let listKey = this.getListOrderKeyToGet(listOffers, listOrders);
+                this.setOrderOfOffers(listKey);
+            })
         }).catch((err) => { console.error(err) });
     }
 
@@ -55,6 +87,7 @@ const mapStateToProps = state => state;
 const mapDispatchToProps = {
     setListOffers: OfferAction.setListOffers,
     setListApplies: ApplyAction.setListApplies,
+    setOrder: OrderAction.setOrder,
 };
 
 // Export a redux connected component

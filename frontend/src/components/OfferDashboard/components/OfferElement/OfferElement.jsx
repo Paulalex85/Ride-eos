@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-import { ApplyElement, ApplyOffer } from './components';
+import { ApplyElement, ApplyOffer, CancelOffer } from './components';
 
 class OfferElement extends Component {
 
@@ -28,6 +28,7 @@ class OfferElement extends Component {
                     <Typography>Place key : {offer.placeKey}</Typography>
                     <Typography>State : {offer.stateOffer}</Typography>
                     <ApplyOffer offer={offer} />
+                    <CancelOffer offer={offer} />
                 </CardContent>
                 {Applies}
             </Card>

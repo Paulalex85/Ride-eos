@@ -228,6 +228,18 @@ class ApiService {
     });
   }
 
+  static getOffer() {
+    return new Promise((resolve, reject) => {
+      this.getAllOffers()
+        .then((list) => {
+          resolve(list);
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
+  }
+
   static addOffer(orderKey, placeKey) {
     return send("addoffer", { orderKey: orderKey, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }
@@ -242,6 +254,10 @@ class ApiService {
           reject(err);
         });
     });
+  }
+
+  static cancelOffer(offerKey) {
+    return send("canceloffer", { offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }
 
   static addApply(account, offerKey) {
@@ -382,6 +398,22 @@ class ApiService {
         limit: 10,
       });
       return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
+  static async getOfferByKey(offerKey) {
+    try {
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        table: "offer",    // name of the table as specified by the contract abi
+        limit: 1,
+        lower_bound: offerKey,
+      });
+      return result.rows[0];
     } catch (err) {
       return console.error(err);
     }

@@ -8,6 +8,14 @@ class OfferAction {
             listOffers,
         }
     }
+
+    static setOffer({ listOffers, offer }) {
+        return {
+            type: ActionTypes.SET_OFFER,
+            listOffers,
+            offer,
+        }
+    }
 }
 
 export default OfferAction;
