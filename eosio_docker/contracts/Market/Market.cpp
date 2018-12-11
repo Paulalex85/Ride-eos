@@ -121,7 +121,7 @@ void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
     });
 }
 
-void Market::endoffer(uint64_t offerKey)
+void Market::endoffer(name deliver, uint64_t offerKey)
 {
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
@@ -131,47 +131,27 @@ void Market::endoffer(uint64_t offerKey)
     auto iteratorOrder = _orders.find(iteratorOffer->orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Order not found");
 
+    auto iteratorUser = _users.find(deliver.value);
+    eosio_assert(iteratorUser != _users.end(), "Deliver not found");
+
     require_auth(iteratorOrder->buyer);
-
-    auto indexApply = _applies.get_index<name("byoffer")>();
-    auto iteratorApply = indexApply.find(offerKey);
-    eosio_assert(iteratorApply != indexApply.end(), "No apply for this offer");
-
-    bool found_one = false;
-    name deliver;
-    asset current_best_asset;
-
-    while (iteratorApply != indexApply.end())
-    {
-        auto iteratorUser = _users.find(iteratorApply->deliver.value);
-        if (iteratorUser != _users.end() && iteratorUser->balance.symbol == eosio::symbol("SYS", 4) && iteratorUser->balance.is_valid())
-        {
-            if (!found_one || iteratorUser->balance > current_best_asset)
-            {
-                deliver = iteratorApply->deliver;
-                current_best_asset = iteratorUser->balance;
-                found_one = true;
-            }
-        }
-        iteratorApply++;
-    }
-
-    eosio_assert(found_one, "No deliver found");
-
-    action(
-        permission_level{iteratorOrder->buyer, name("active")},
-        name("rideor"), name("deliverfound"),
-        std::make_tuple(deliver, iteratorOffer->orderKey))
-        .send();
 
     _offers.modify(iteratorOffer, _self, [&](auto &offer) {
         offer.stateOffer = FOUNDED;
     });
+
+    if (iteratorOrder->state == 0)
+    {
+        action(
+            permission_level{iteratorOrder->buyer, name("active")},
+            name("rideor"), name("deliverfound"),
+            std::make_tuple(deliver, iteratorOffer->orderKey))
+            .send();
+    }
 }
 
 void Market::canceloffer(uint64_t offerKey)
 {
-
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
 

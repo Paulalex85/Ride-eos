@@ -33,7 +33,7 @@ CONTRACT Market : public eosio::contract
 
     ACTION addoffer(uint64_t orderKey, uint64_t placeKey);
 
-    ACTION endoffer(uint64_t offerKey);
+    ACTION endoffer(name deliver, uint64_t offerKey);
 
     ACTION canceloffer(uint64_t offerKey);
 

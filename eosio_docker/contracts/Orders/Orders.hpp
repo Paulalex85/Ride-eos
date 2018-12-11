@@ -6,7 +6,6 @@
 #include "../Users/Users.hpp"
 
 using namespace eosio;
-
 using std::string;
 
 CONTRACT Orders : public eosio::contract

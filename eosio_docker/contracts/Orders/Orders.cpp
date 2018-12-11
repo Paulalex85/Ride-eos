@@ -62,6 +62,9 @@ ACTION Orders::deliverfound(name deliver, uint64_t orderKey)
 
     require_auth(iteratorOrder->buyer);
 
+    auto iteratorUser = _users.find(deliver.value);
+    eosio_assert(iteratorUser != _users.end(), "Deliver not found");
+
     eosio_assert(iteratorOrder->state == NEED_DELIVER, "Should be at the state Need deliver");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
