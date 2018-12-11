@@ -30,19 +30,30 @@ class ApplyOffer extends Component {
 
     render() {
 
-        const { offer, offer: { listApplies }, user: { account } } = this.props;
+        const { offer, offer: { listApplies }, user: { account }, orders: { listOrders } } = this.props;
 
         let alreadyApplied = false;
+        let canApply = true;
         let printButton = false;
-        for (let i = 0; i < listApplies.length; i++) {
-            if (listApplies[i].deliver === account) {
-                alreadyApplied = true;
+
+        for (let i = 0; i < listOrders.length; i++) {
+            if (listOrders[i].orderKey === offer.orderKey && listOrders[i].currentActor === "buyer") {
+                canApply = false;
                 break;
             }
         }
 
-        if (offer.stateOffer === "0" && alreadyApplied === false) {
-            printButton = true;
+        if (canApply === true) {
+            for (let i = 0; i < listApplies.length; i++) {
+                if (listApplies[i].deliver === account) {
+                    alreadyApplied = true;
+                    break;
+                }
+            }
+
+            if (offer.stateOffer === "0" && alreadyApplied === false) {
+                printButton = true;
+            }
         }
         return (
             <div>
