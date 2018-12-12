@@ -17,6 +17,7 @@ docker run --rm --name eosio_rideos_container -d \
 --mount type=bind,src="$(pwd)"/contracts,dst=/opt/eosio/bin/contracts \
 --mount type=bind,src="$(pwd)"/scripts,dst=/opt/eosio/bin/scripts \
 --mount type=bind,src="$(pwd)"/tests,dst=/opt/eosio/bin/tests \
+--mount type=bind,src="$(pwd)"/add_data_script,dst=/opt/eosio/bin/add_data_script \
 --mount type=bind,src="$(pwd)"/data,dst=/mnt/dev/data \
 -w "/opt/eosio/bin/" eosio/eos-dev:v1.4.2 /bin/bash -c "$script"
 

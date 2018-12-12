@@ -17,7 +17,6 @@ cleos push action rideos adduser '["tester","tester"]' -p tester
 cleos push action rideos adduser '["rider","rid"]' -p rider
 cleos push action rideos adduser '["seller","sel"]' -p seller
 cleos push action rideos adduser '["sarabrown","sara"]' -p sarabrown
-cleos push action rideos updateuser '["sarabrown","filsdepute"]' -p sarabrown
 sleep 1
 
 cleos get table rideos rideos user
