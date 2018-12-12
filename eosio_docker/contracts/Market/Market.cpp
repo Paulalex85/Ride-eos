@@ -1,4 +1,6 @@
 #include "Market.hpp"
+#include "../Orders/Orders.hpp"
+#include "../Users/Users.hpp"
 
 //24h
 int DELAY_END_ASSIGN = 86400;
@@ -67,6 +69,7 @@ void Market::newassign(name account, uint64_t placeKey)
     auto iteratorPlace = _places.find(placeKey);
     eosio_assert(iteratorPlace != _places.end(), "Place not found");
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(account.value);
     eosio_assert(iteratorUser != _users.end(), "User not found");
 
@@ -102,7 +105,7 @@ void Market::endassign(uint64_t assignmentKey)
 
 void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
 {
-
+    Orders::order_table _orders(name("rideor"), name("rideor").value);
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Order not found");
 
@@ -128,9 +131,11 @@ void Market::endoffer(name deliver, uint64_t offerKey)
 
     eosio_assert(iteratorOffer->stateOffer == OPEN, "The state of the offer is not open");
 
+    Orders::order_table _orders(name("rideor"), name("rideor").value);
     auto iteratorOrder = _orders.find(iteratorOffer->orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Order not found");
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
 
@@ -157,6 +162,7 @@ void Market::canceloffer(uint64_t offerKey)
 
     eosio_assert(iteratorOffer->stateOffer == OPEN, "The state of the offer is not open");
 
+    Orders::order_table _orders(name("rideor"), name("rideor").value);
     auto iteratorOrder = _orders.find(iteratorOffer->orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Order not found");
 
@@ -171,6 +177,7 @@ void Market::addapply(name account, uint64_t offerKey)
 {
     require_auth(account);
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(account.value);
     eosio_assert(iteratorUser != _users.end(), "User not found");
 

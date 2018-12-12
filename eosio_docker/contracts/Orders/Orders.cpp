@@ -1,4 +1,5 @@
 #include "Orders.hpp"
+#include "../Users/Users.hpp"
 using namespace eosio;
 
 bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
@@ -32,6 +33,7 @@ ACTION Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &pr
     eosio_assert(priceDeliver.is_valid(), "invalid bet");
     eosio_assert(priceDeliver.amount > 0, "must bet positive quantity");
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(buyer.value);
     eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
@@ -62,6 +64,7 @@ ACTION Orders::deliverfound(name deliver, uint64_t orderKey)
 
     require_auth(iteratorOrder->buyer);
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
 
@@ -84,6 +87,7 @@ ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrd
     eosio_assert(priceDeliver.is_valid(), "invalid bet");
     eosio_assert(priceDeliver.amount > 0, "must bet positive quantity");
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(buyer.value);
     eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
@@ -120,6 +124,7 @@ ACTION Orders::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
 
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
+    Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(iteratorOrder->buyer.value);
     eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 

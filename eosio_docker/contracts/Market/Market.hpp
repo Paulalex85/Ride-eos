@@ -3,8 +3,6 @@
 #include <eosiolib/crypto.h>
 #include <eosiolib/asset.hpp>
 
-#include "../Orders/Orders.hpp"
-
 using namespace eosio;
 using std::string;
 
@@ -17,9 +15,7 @@ CONTRACT Market : public eosio::contract
                                                                     _places(receiver, receiver.value),
                                                                     _assignments(receiver, receiver.value),
                                                                     _offers(receiver, receiver.value),
-                                                                    _applies(receiver, receiver.value),
-                                                                    _orders(name("rideor"), name("rideor").value),
-                                                                    _users(name("rideos"), name("rideos").value) {}
+                                                                    _applies(receiver, receiver.value) {}
 
     ACTION addplace(string & country, string & zipCode);
 
@@ -109,8 +105,6 @@ CONTRACT Market : public eosio::contract
         apply_table;
 
   private:
-    Orders::order_table _orders;
-    Users::user_table _users;
     place_table _places;
     assignment_table _assignments;
     offer_table _offers;

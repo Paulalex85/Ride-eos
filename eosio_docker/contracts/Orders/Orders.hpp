@@ -3,19 +3,17 @@
 #include <eosiolib/asset.hpp>
 #include <eosiolib/time.hpp>
 
-#include "../Users/Users.hpp"
-
 using namespace eosio;
 using std::string;
 
 CONTRACT Orders : public eosio::contract
 {
+
     using contract::contract;
 
   public:
     Orders(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
-                                                                    _orders(receiver, receiver.value),
-                                                                    _users(name("rideos"), name("rideos").value) {}
+                                                                    _orders(receiver, receiver.value) {}
 
     ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
 
@@ -106,5 +104,4 @@ CONTRACT Orders : public eosio::contract
 
   private:
     order_table _orders;
-    Users::user_table _users;
 };
