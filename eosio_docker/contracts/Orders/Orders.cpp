@@ -1,5 +1,6 @@
 #include "Orders.hpp"
 #include "../Users/Users.hpp"
+#include "../Market/Market.hpp"
 using namespace eosio;
 
 bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
@@ -74,6 +75,19 @@ ACTION Orders::deliverfound(name deliver, uint64_t orderKey)
         order.state = INITIALIZATION;
         order.deliver = deliver;
     });
+
+    Market::offer_table _offers(name("rideom"), name("rideom").value);
+    auto indexOffer = _offers.get_index<name("byorderkey")>();
+    auto iteratorOffer = indexOffer.find(orderKey);
+
+    if (iteratorOffer != indexOffer.end() && iteratorOffer->stateOffer == 0)
+    {
+        action(
+            permission_level{iteratorOrder->buyer, name("active")},
+            name("rideom"), name("endoffer"),
+            std::make_tuple(deliver, iteratorOffer->offerKey))
+            .send();
+    }
 }
 
 ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder,

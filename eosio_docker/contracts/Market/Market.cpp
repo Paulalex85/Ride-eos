@@ -2,6 +2,8 @@
 #include "../Orders/Orders.hpp"
 #include "../Users/Users.hpp"
 
+using namespace eosio;
+
 //24h
 int DELAY_END_ASSIGN = 86400;
 
