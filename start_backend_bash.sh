@@ -1,0 +1,1 @@
+docker exec -it eosio_rideos_container bash

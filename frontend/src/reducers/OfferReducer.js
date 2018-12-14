@@ -15,9 +15,7 @@ export default function (state = initialState, action) {
     switch (action.type) {
         case ActionTypes.SET_OFFER: {
             let listOffers = action.listOffers || initialState.listOffers;
-            console.log("test")
-            console.log(listOffers)
-            let offerJSON = action.rows[0];
+            let offerJSON = action.offer;
             let offer = {
                 offerKey: offerJSON.offerKey.toString() || initialState.offerKey,
                 orderKey: offerJSON.orderKey.toString() || initialState.orderKey,

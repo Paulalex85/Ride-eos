@@ -228,9 +228,9 @@ class ApiService {
     });
   }
 
-  static getOffer() {
+  static getOffer(offerKey) {
     return new Promise((resolve, reject) => {
-      this.getAllOffers()
+      this.getOfferByKey(offerKey)
         .then((list) => {
           resolve(list);
         })
@@ -254,6 +254,10 @@ class ApiService {
           reject(err);
         });
     });
+  }
+
+  static endOffer(deliver, offerKey) {
+    return send("endoffer", { deliver: deliver, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET);
   }
 
   static cancelOffer(offerKey) {

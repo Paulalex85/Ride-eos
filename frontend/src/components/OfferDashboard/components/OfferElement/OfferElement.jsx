@@ -15,6 +15,7 @@ class OfferElement extends Component {
         const Applies = listApplies.map(apply => (
             <ApplyElement
                 apply={apply}
+                offer={offer}
                 key={apply.applyKey}
             />
 

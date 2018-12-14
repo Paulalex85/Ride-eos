@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// Components
+
 import Button from '@material-ui/core/Button';
-// Services and redux action
+
 import { OfferAction } from 'actions';
 import { ApiService } from 'services';
 
-class CancelOffer extends Component {
+class ChooseDeliver extends Component {
+
     constructor(props) {
         // Inherit constructor
         super(props);
@@ -18,9 +19,9 @@ class CancelOffer extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { offer: { offerKey }, setOffer, offers: { listOffers } } = this.props;
+        const { setOffer, offers: { listOffers }, offer: { offerKey }, apply: { deliver } } = this.props;
 
-        return ApiService.cancelOffer(offerKey).then(() => {
+        ApiService.endOffer(deliver, offerKey).then(() => {
             ApiService.getOffer(offerKey).then(offer => {
                 setOffer({ listOffers: listOffers, offer: offer });
             });
@@ -28,7 +29,6 @@ class CancelOffer extends Component {
     }
 
     render() {
-
         const { offer, orders: { listOrders } } = this.props;
 
         let printButton = false;
@@ -42,15 +42,11 @@ class CancelOffer extends Component {
 
         return (
             <div>
-                {printButton &&
-                    < Button
-                        className="green"
-                        variant='contained'
-                        color='primary'
-                        onClick={this.handleClick}
-                    >
-                        CANCEL OFFER
-                </Button>
+                {
+                    printButton &&
+                    <Button variant="contained" color="secondary" onClick={this.handleClick}>
+                        CHOOSE
+                    </Button>
                 }
             </div>
         )
@@ -66,4 +62,4 @@ const mapDispatchToProps = {
 };
 
 // Export a redux connected component
-export default connect(mapStateToProps, mapDispatchToProps)(CancelOffer);
+export default connect(mapStateToProps, mapDispatchToProps)(ChooseDeliver);
