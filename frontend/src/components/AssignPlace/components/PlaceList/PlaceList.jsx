@@ -72,6 +72,9 @@ class AssignPlace extends Component {
                 <TableCell component="th" scope="row">
                     {place.zipCode}
                 </TableCell>
+                <TableCell component="th" scope="row">
+                    {place.active}
+                </TableCell>
                 <TableCell>
                     <ButtonAssign
                         onAssignClick={this.onClickAssignment}
@@ -88,6 +91,7 @@ class AssignPlace extends Component {
                         <TableRow>
                             <TableCell>Country</TableCell>
                             <TableCell>Zip Code</TableCell>
+                            <TableCell>Active</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>

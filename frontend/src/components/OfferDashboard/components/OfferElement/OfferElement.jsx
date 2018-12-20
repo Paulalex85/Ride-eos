@@ -26,7 +26,6 @@ class OfferElement extends Component {
                 <CardContent>
                     <Typography>Offer key : {offer.offerKey}</Typography>
                     <Typography>Order key : {offer.orderKey}</Typography>
-                    <Typography>Place key : {offer.placeKey}</Typography>
                     <Typography>State : {offer.stateOffer}</Typography>
                     <ApplyOffer offer={offer} />
                     <CancelOffer offer={offer} />

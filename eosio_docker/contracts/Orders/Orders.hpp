@@ -15,11 +15,11 @@ CONTRACT Orders : public eosio::contract
     Orders(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
                                                                     _orders(receiver, receiver.value) {}
 
-    ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
+    ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
 
     ACTION deliverfound(name deliver, uint64_t orderKey);
 
-    ACTION initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay);
+    ACTION initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
 
     ACTION validatebuy(uint64_t orderKey, const capi_checksum256 &hash);
 
@@ -67,6 +67,7 @@ CONTRACT Orders : public eosio::contract
         bool validateDeliver;
         string details;
         uint64_t delay;
+        uint64_t placeKey;
 
         uint64_t primary_key() const { return orderKey; }
         uint64_t get_buyer_key() const { return buyer.value; }

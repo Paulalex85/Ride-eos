@@ -30,6 +30,7 @@ class OrderElement extends Component {
                     <Typography>Deliver validate : {order.validateDeliver}</Typography>
                     <Typography>Details : {order.details}</Typography>
                     <Typography>Delay : {order.delay}</Typography>
+                    <Typography>Place Key : {order.placeKey}</Typography>
                 </CardContent>
                 {order.canValidate &&
                     <ValidateOrder

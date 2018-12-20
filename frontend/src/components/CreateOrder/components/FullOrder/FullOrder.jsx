@@ -25,6 +25,7 @@ class FullOrder extends Component {
                 priceDeliver: "",
                 details: "",
                 delay: "",
+                placeKey: "",
                 error: '',
             },
         }
@@ -110,6 +111,12 @@ class FullOrder extends Component {
                         name="delay"
                         value={form.delay}
                         label="Delay"
+                        onChange={this.handleChange}
+                    />
+                    <TextField
+                        name="placeKey"
+                        value={form.placeKey}
+                        label="Place Key"
                         onChange={this.handleChange}
                     />
                     <div className="field form-error">

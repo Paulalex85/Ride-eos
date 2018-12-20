@@ -5,6 +5,7 @@ const initialState = {
     placeKey: undefined,
     country: "",
     zipCode: "",
+    active: false,
 };
 
 export default function (state = initialState, action) {
@@ -18,6 +19,7 @@ export default function (state = initialState, action) {
                     placeKey: element.placeKey.toString() || initialState.placeKey,
                     country: element.country || initialState.country,
                     zipCode: element.zipCode || initialState.zipCode,
+                    active: element.active || initialState.active,
                 }
                 listObject.push(place);
             }

@@ -24,7 +24,7 @@ bool is_actor(name sender, name buyer, name seller, name deliver)
 }
 
 ACTION Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
-                           std::string &details, uint64_t delay)
+                           std::string &details, uint64_t delay, uint64_t placeKey)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -41,6 +41,11 @@ ACTION Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &pr
     iteratorUser = _users.find(seller.value);
     eosio_assert(iteratorUser != _users.end(), "Seller not found");
 
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
+
     _orders.emplace(_self, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
@@ -55,6 +60,7 @@ ACTION Orders::needdeliver(name buyer, name seller, asset &priceOrder, asset &pr
         order.validateDeliver = false;
         order.details = details;
         order.delay = delay;
+        order.placeKey = placeKey;
     });
 }
 
@@ -91,7 +97,7 @@ ACTION Orders::deliverfound(name deliver, uint64_t orderKey)
 }
 
 ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrder,
-                          asset &priceDeliver, string &details, uint64_t delay)
+                          asset &priceDeliver, string &details, uint64_t delay, uint64_t placeKey)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -111,6 +117,11 @@ ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrd
     iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
 
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
+
     _orders.emplace(_self, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
@@ -126,6 +137,7 @@ ACTION Orders::initialize(name buyer, name seller, name deliver, asset &priceOrd
         order.validateDeliver = false;
         order.details = details;
         order.delay = delay;
+        order.placeKey = placeKey;
     });
 }
 
@@ -143,6 +155,11 @@ ACTION Orders::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
     eosio_assert(iteratorOrder->validateBuyer == false, "Buyer already validate");
+
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     eosio_assert(iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance");
     action(
@@ -174,6 +191,11 @@ ACTION Orders::validatedeli(uint64_t orderKey)
 
     eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
+
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateDeliver = true;
 
@@ -195,6 +217,11 @@ ACTION Orders::validatesell(uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
     eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
+
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;

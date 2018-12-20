@@ -19,15 +19,13 @@ CONTRACT Market : public eosio::contract
 
     ACTION addplace(string & country, string & zipCode);
 
-    ACTION updateplace(uint64_t key, string & country, string & zipCode);
-
-    ACTION deleteplace(uint64_t key);
+    ACTION updateplace(uint64_t key, string & country, string & zipCode, bool active);
 
     ACTION newassign(name account, uint64_t placeKey);
 
     ACTION endassign(uint64_t assignmentKey);
 
-    ACTION addoffer(uint64_t orderKey, uint64_t placeKey);
+    ACTION addoffer(uint64_t orderKey);
 
     ACTION endoffer(name deliver, uint64_t offerKey);
 
@@ -42,6 +40,7 @@ CONTRACT Market : public eosio::contract
         uint64_t placeKey;
         string country;
         string zipCode;
+        bool active;
 
         uint64_t primary_key() const { return placeKey; }
     };
@@ -76,18 +75,14 @@ CONTRACT Market : public eosio::contract
     {
         uint64_t offerKey;
         uint64_t orderKey;
-        uint64_t placeKey;
         uint8_t stateOffer;
 
         uint64_t primary_key() const { return offerKey; }
         uint64_t getOrderKey() const { return orderKey; }
-        uint64_t getPlaceKey() const { return placeKey; }
     };
     typedef multi_index<name("offer"), offer,
                         indexed_by<name("byorderkey"),
-                                   const_mem_fun<offer, uint64_t, &offer::getOrderKey>>,
-                        indexed_by<name("byplacekey"),
-                                   const_mem_fun<offer, uint64_t, &offer::getPlaceKey>>>
+                                   const_mem_fun<offer, uint64_t, &offer::getOrderKey>>>
         offer_table;
 
     TABLE apply

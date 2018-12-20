@@ -15,10 +15,11 @@ void Market::addplace(string &country, string &zipCode)
         place.placeKey = _places.available_primary_key();
         place.country = country;
         place.zipCode = zipCode;
+        place.active = true;
     });
 }
 
-void Market::updateplace(uint64_t key, string &country, string &zipCode)
+void Market::updateplace(uint64_t key, string &country, string &zipCode, bool active)
 {
     require_auth(_self);
 
@@ -28,40 +29,8 @@ void Market::updateplace(uint64_t key, string &country, string &zipCode)
     _places.modify(iteratorPlace, _self, [&](auto &place) {
         place.country = country;
         place.zipCode = zipCode;
+        place.active = active;
     });
-}
-
-void Market::deleteplace(uint64_t key)
-{
-    require_auth(_self);
-
-    auto iteratorPlace = _places.find(key);
-    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
-
-    std::vector<uint64_t> keysForDeletion;
-
-    auto indexAssign = _assignments.get_index<name("byplacekey")>();
-    auto iteratorAssign = indexAssign.find(key);
-
-    while (iteratorAssign != indexAssign.end())
-    {
-        if (iteratorAssign->placeKey == key)
-        {
-            keysForDeletion.push_back(iteratorAssign->assignmentKey);
-        }
-        iteratorAssign++;
-    }
-
-    for (uint64_t keyDelete : keysForDeletion)
-    {
-        auto itr = _assignments.find(keyDelete);
-        if (itr != _assignments.end())
-        {
-            _assignments.erase(itr);
-        }
-    }
-
-    _places.erase(iteratorPlace);
 }
 
 void Market::newassign(name account, uint64_t placeKey)
@@ -70,6 +39,7 @@ void Market::newassign(name account, uint64_t placeKey)
 
     auto iteratorPlace = _places.find(placeKey);
     eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(account.value);
@@ -94,7 +64,6 @@ void Market::newassign(name account, uint64_t placeKey)
 
 void Market::endassign(uint64_t assignmentKey)
 {
-
     auto iteratorAssign = _assignments.find(assignmentKey);
     eosio_assert(iteratorAssign != _assignments.end(), "Assignment not found");
 
@@ -105,7 +74,7 @@ void Market::endassign(uint64_t assignmentKey)
     });
 }
 
-void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
+void Market::addoffer(uint64_t orderKey)
 {
     Orders::order_table _orders(name("rideor"), name("rideor").value);
     auto iteratorOrder = _orders.find(orderKey);
@@ -115,13 +84,13 @@ void Market::addoffer(uint64_t orderKey, uint64_t placeKey)
 
     eosio_assert(iteratorOrder->state == 0, "The state of the order don't need a deliver");
 
-    auto iteratorPlace = _places.find(placeKey);
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
     eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     _offers.emplace(_self, [&](auto &offer) {
         offer.offerKey = _offers.available_primary_key();
         offer.orderKey = orderKey;
-        offer.placeKey = placeKey;
         offer.stateOffer = OPEN;
     });
 }
@@ -140,6 +109,10 @@ void Market::endoffer(name deliver, uint64_t offerKey)
     Users::user_table _users(name("rideos"), name("rideos").value);
     auto iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
+
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     require_auth(iteratorOrder->buyer);
 
@@ -197,7 +170,6 @@ void Market::addapply(name account, uint64_t offerKey)
 
 void Market::cancelapply(uint64_t applyKey)
 {
-
     auto iteratorApply = _applies.find(applyKey);
     eosio_assert(iteratorApply != _applies.end(), "Apply not found");
 
@@ -206,4 +178,4 @@ void Market::cancelapply(uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(Market, (addplace)(updateplace)(deleteplace)(newassign)(endassign)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply));
+EOSIO_DISPATCH(Market, (addplace)(updateplace)(newassign)(endassign)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply));

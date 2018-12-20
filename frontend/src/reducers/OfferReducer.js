@@ -5,7 +5,6 @@ const initialState = {
     listApplies: [],
     offerKey: undefined,
     orderKey: undefined,
-    placeKey: undefined,
     applyKey: undefined,
     deliver: undefined,
     stateOffer: -1,
@@ -19,7 +18,6 @@ export default function (state = initialState, action) {
             let offer = {
                 offerKey: offerJSON.offerKey.toString() || initialState.offerKey,
                 orderKey: offerJSON.orderKey.toString() || initialState.orderKey,
-                placeKey: offerJSON.placeKey.toString() || initialState.placeKey,
                 stateOffer: offerJSON.stateOffer.toString() || initialState.stateOffer,
                 listApplies: initialState.listApplies,
             }
@@ -47,7 +45,6 @@ export default function (state = initialState, action) {
                 let offer = {
                     offerKey: element.offerKey.toString() || initialState.offerKey,
                     orderKey: element.orderKey.toString() || initialState.orderKey,
-                    placeKey: element.placeKey.toString() || initialState.placeKey,
                     stateOffer: element.stateOffer.toString() || initialState.stateOffer,
                     listApplies: initialState.listApplies,
                 }
