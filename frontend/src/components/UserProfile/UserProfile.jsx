@@ -5,6 +5,9 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import { UpdateProfile, DepositToken, WithdrawToken } from './components'
 
+import { UserAction } from 'actions';
+import { ApiService } from 'services';
+
 class UserProfile extends Component {
 
   constructor(props) {
@@ -16,6 +19,8 @@ class UserProfile extends Component {
     }
 
     this.handleClick = this.handleClick.bind(this);
+
+    this.getUser();
   }
 
   handleClick(event) {
@@ -24,6 +29,14 @@ class UserProfile extends Component {
     } else {
       this.setState({ update: true });
     }
+  }
+
+  getUser() {
+    const { setUser } = this.props;
+
+    ApiService.getCurrentUser().then(user => {
+      setUser({ account: user.account, username: user.username, balance: user.balance });
+    }).catch((err) => { console.error(err) });
   }
 
   render() {
@@ -36,9 +49,6 @@ class UserProfile extends Component {
     return (
       <div className="UserProfile">
         <div className="title">Rideos</div>
-        <div className="welcome">
-          <span>Welcome</span>
-        </div>
         <div className="account">
           <span>{account}</span>
         </div>
@@ -66,5 +76,9 @@ class UserProfile extends Component {
 // Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
+const mapDispatchToProps = {
+  setUser: UserAction.setUser,
+};
+
 // Export a redux connected component
-export default connect(mapStateToProps)(UserProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
