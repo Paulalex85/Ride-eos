@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from "react-router";
 // Components
 import Button from '@material-ui/core/Button';
 // Services and redux action
-import { OrderAction } from 'actions';
+import { OrderAction, OfferAction } from 'actions';
 import { ApiService } from 'services';
 
 class CreateOffer extends Component {
     constructor(props) {
         // Inherit constructor
         super(props);
-
-        this.state = {
-            error: ''
-        }
 
         // Bind functions
         this.handleClick = this.handleClick.bind(this);
@@ -22,33 +19,44 @@ class CreateOffer extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { orderKey, setOrder, user: { account }, orders: { listOrders } } = this.props;
+        const { history, order: { orderKey } } = this.props;
 
         ApiService.addOffer(orderKey).then(() => {
-            ApiService.getOrder(orderKey)
-                .then((order) => {
-                    setOrder({ listOrders: listOrders, order: order, account });
-                })
-                .catch(err => {
-                    this.setState({ error: err.toString() });
-                });
-        });
+            history.push("/offers");
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
+        const { order: { orderKey, state, currentActor }, offers: { listOffers } } = this.props;
 
-        const { error } = this.state;
+        let printButton = false;
+
+        if (state === "0" && currentActor === "buyer") {
+            let founded = false;
+            for (let i = 0; i < listOffers.length; i++) {
+                const element = listOffers[i];
+                if (element.orderKey === orderKey) {
+                    founded = true;
+                    break;
+                }
+            }
+            if (founded === false) {
+                printButton = true;
+            }
+        }
 
         return (
             <div>
-                <Button
-                    onClick={this.handleClick}
-                >
-                    ORDER READY
+                {printButton &&
+                    <Button
+                        className="green"
+                        variant='contained'
+                        color='primary'
+                        onClick={this.handleClick}
+                    >
+                        CREATE OFFER
                 </Button>
-                <div className="field form-error">
-                    {error && <span className="error">{error}</span>}
-                </div>
+                }
             </div>
         )
     }
@@ -59,8 +67,9 @@ const mapStateToProps = state => state;
 
 // Map the following action to props
 const mapDispatchToProps = {
-    setOrder: OrderAction.setOrder,
+    setListOrders: OrderAction.setListOrders,
+    setListOffers: OfferAction.setListOffers,
 };
 
 // Export a redux connected component
-export default connect(mapStateToProps, mapDispatchToProps)(CreateOffer);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CreateOffer));

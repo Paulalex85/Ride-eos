@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 
 import ValidateOrder from '../ValidateOrder';
 import OrderReady from '../OrderReady'
+import CreateOffer from '../CreateOffer'
 
 class OrderElement extends Component {
 
@@ -44,6 +45,7 @@ class OrderElement extends Component {
                         orderKey={order.orderKey}
                     />
                 }
+                <CreateOffer order={order} />
             </Card>
         )
     }

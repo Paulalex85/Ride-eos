@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import { OrderElement } from './components';
-import { OrderAction } from 'actions';
+import { OrderAction, OfferAction } from 'actions';
 import { ApiService } from 'services';
 
 class OrderDashboard extends Component {
@@ -16,13 +16,16 @@ class OrderDashboard extends Component {
     }
 
     loadOrders() {
-        const { setListOrders, user: { account } } = this.props;
+        const { setListOffers, setListOrders, user: { account } } = this.props;
 
         // Send a request to API (blockchain) to get the current logged in user
         return ApiService.getOrders(account)
             // If the server return an account
             .then(list => {
                 setListOrders({ listOrders: list, account: account });
+                ApiService.getOffers().then(offers => {
+                    setListOffers({ listOffers: offers });
+                })
             })
             // To ignore 401 console error
             .catch((err) => { console.error(err) });
@@ -54,6 +57,7 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setListOrders: OrderAction.setListOrders,
+    setListOffers: OfferAction.setListOffers,
 };
 
 // Export a redux connected component

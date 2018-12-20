@@ -2,6 +2,7 @@
 
 ./user_accounts.sh
 ./order_perm.sh
+./market_places.sh
 
 keyTester=$(openssl rand -hex 32)
 keySeller=$(openssl rand -hex 32)
