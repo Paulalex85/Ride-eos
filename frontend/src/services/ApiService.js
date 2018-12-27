@@ -6,7 +6,6 @@ function getRPC() {
 
 function eosAPI() {
   const rpc = getRPC();
-  //const { TextDecoder, TextEncoder } = require('text-encoding');
   const signatureProvider = new JsSignatureProvider([localStorage.getItem("privateKey")]);
 
   return new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
@@ -156,11 +155,11 @@ class ApiService {
   }
 
   static validateBuyer(orderKey, hash) {
-    return send("validatebuy", { orderKey: orderKey, commitment: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+    return send("validatebuy", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
   static validateSeller(orderKey, hash) {
-    return send("validatesell", { orderKey: orderKey, commitment: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+    return send("validatesell", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
   static validateDeliver(orderKey) {

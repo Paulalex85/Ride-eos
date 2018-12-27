@@ -4,19 +4,12 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 // Services and redux action
 import { OrderAction } from 'actions';
-import { ApiService } from 'services';
-
-import ecc from 'eosjs-ecc'
-import randomBytes from 'random-bytes'
+import { ApiService, KeyGenerator } from 'services';
 
 class ValidateOrder extends Component {
     constructor(props) {
         // Inherit constructor
         super(props);
-
-        this.state = {
-            error: ''
-        }
 
         // Bind functions
         this.handleClick = this.handleClick.bind(this);
@@ -40,38 +33,34 @@ class ValidateOrder extends Component {
     }
 
     async validateAPI() {
-        let key = ecc.sha256(randomBytes.sync(32));
-        let hash = ecc.sha256(key);
         const { currentActor, orderKey } = this.props;
 
-        switch (currentActor) {
-            case "deliver":
-                await ApiService.validateDeliver(orderKey)
-                    .catch(err => {
-                        this.setState({ error: err.toString() });
-                    });
-                break;
-            case "seller":
-                await ApiService.validateSeller(orderKey, hash)
-                    .catch(err => {
-                        this.setState({ error: err.toString() });
-                    });
-                break;
-            case "buyer":
-                await ApiService.validateBuyer(orderKey, hash)
-                    .catch(err => {
-                        this.setState({ error: err.toString() });
-                    });
-                break;
+        if (currentActor === "deliver") {
 
-            default:
-                break;
+            await ApiService.validateDeliver(orderKey)
+                .catch((err) => { console.error(err) });
+
+        } else if (currentActor === "seller") {
+
+            let key = KeyGenerator.generateKey();
+            let hash = KeyGenerator.generateHash(key);
+            KeyGenerator.storeKey(orderKey, key, hash);
+
+            await ApiService.validateSeller(orderKey, hash)
+                .catch((err) => { console.error(err) });
+
+        } else if (currentActor === "buyer") {
+
+            let key = KeyGenerator.generateKey();
+            let hash = KeyGenerator.generateHash(key);
+            KeyGenerator.storeKey(orderKey, key, hash);
+
+            await ApiService.validateBuyer(orderKey, hash)
+                .catch((err) => { console.error(err) });
         }
     }
 
     render() {
-
-        const { error } = this.state;
 
         return (
             <div>
@@ -83,9 +72,6 @@ class ValidateOrder extends Component {
                 >
                     VALIDATE
                 </Button>
-                <div className="field form-error">
-                    {error && <span className="error">{error}</span>}
-                </div>
             </div>
         )
     }
