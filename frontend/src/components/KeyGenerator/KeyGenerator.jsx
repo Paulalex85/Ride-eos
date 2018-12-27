@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-//import randomBytes from 'random-bytes';
+
 import Button from '@material-ui/core/Button';
-import ecc from 'eosjs-ecc'
-import sha from 'sha.js';
+
+import ecc from 'eosjs-ecc';
+import randomstring from 'randomstring';
 
 class KeyGenerator extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.handleGenerator = this.handleGenerator.bind(this);
     }
@@ -13,21 +14,22 @@ class KeyGenerator extends Component {
     state = {
         hash: '',
         key: '',
-        hashBis: '',
     }
 
-    handleGenerator(){
-        //let key = ecc.sha256(randomBytes.sync(32));
-        let key = "62697465";
+    handleGenerator() {
+        let key = randomstring.generate({
+            length: 64,
+            charset: 'hex'
+        });
+
         this.setState({
             key: key,
-            hash: ecc.sha256(Buffer.from(key,'hex')),
-            hashBis: sha('sha256').update(key).digest('hex')
+            hash: ecc.sha256(new Buffer(key, 'hex'))
         });
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div>
                 <Button
                     variant='contained'
@@ -35,9 +37,8 @@ class KeyGenerator extends Component {
                     onClick={this.handleGenerator}>
                     Generate Key
                 </Button><br />
-                Key : {this.state.key}<br />
+                Key : {this.state.key}<br /><br />
                 Hash : {this.state.hash}<br />
-                HashBis : {this.state.hashBis}
             </div>
         );
     }

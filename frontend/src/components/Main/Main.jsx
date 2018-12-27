@@ -10,6 +10,7 @@ import OrderDashboard from '../OrderDashboard';
 import UserProfile from '../UserProfile';
 import CreateOrder from '../CreateOrder';
 import OfferDashboard from '../OfferDashboard';
+import KeyGenerator from '../KeyGenerator'
 
 import "./Main.css";
 
@@ -27,7 +28,7 @@ class Main extends Component {
                         <li><NavLink to="/offers">Offers</NavLink></li>
                     </ul>
                     <div className="content">
-                        {/* <Route exact path="/" component={} /> */}
+                        <Route exact path="/" component={KeyGenerator} />
                         <Route path="/profile" component={UserProfile} />
                         <Route path="/createOrder" component={CreateOrder} />
                         <Route path="/orders" component={OrderDashboard} />
