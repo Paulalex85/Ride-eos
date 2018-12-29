@@ -11,10 +11,6 @@ class OrderReady extends Component {
         // Inherit constructor
         super(props);
 
-        this.state = {
-            error: ''
-        }
-
         // Bind functions
         this.handleClick = this.handleClick.bind(this);
     }
@@ -25,30 +21,31 @@ class OrderReady extends Component {
         const { orderKey, setOrder, user: { account }, orders: { listOrders } } = this.props;
 
         ApiService.orderReady(orderKey).then(() => {
-            ApiService.getOrder(orderKey)
-                .then((order) => {
-                    setOrder({ listOrders: listOrders, order: order, account });
-                })
-                .catch(err => {
-                    this.setState({ error: err.toString() });
-                });
-        });
+            ApiService.getOrder(orderKey).then((order) => {
+                setOrder({ listOrders: listOrders, order: order, account });
+            })
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
 
-        const { error } = this.state;
+        const { order } = this.props;
+
+        let isPrint = false;
+
+        if (order.state === "2" && order.currentActor === "seller") {
+            isPrint = true;
+        }
 
         return (
             <div>
-                <Button
-                    onClick={this.handleClick}
-                >
-                    ORDER READY
+                {isPrint &&
+                    <Button
+                        onClick={this.handleClick}
+                    >
+                        ORDER READY
                 </Button>
-                <div className="field form-error">
-                    {error && <span className="error">{error}</span>}
-                </div>
+                }
             </div>
         )
     }

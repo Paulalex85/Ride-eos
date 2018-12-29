@@ -18,7 +18,6 @@ const initialState = {
     delay: 0,
     placeKey: undefined,
     currentActor: "",
-    canValidate: false,
 };
 
 export default function (state = initialState, action) {
@@ -46,7 +45,6 @@ export default function (state = initialState, action) {
                     placeKey: element.placeKey.toString() || initialState.placeKey,
                 }
                 order.currentActor = setCurrentActor(order, action.account);
-                order.canValidate = setCanValidate(order);
                 listObject.push(order);
             }
             return Object.assign({}, state, {
@@ -72,7 +70,6 @@ export default function (state = initialState, action) {
                 placeKey: action.order.placeKey.toString() || initialState.placeKey,
             }
             order.currentActor = setCurrentActor(order, action.account);
-            order.canValidate = setCanValidate(order);
 
             if (action.listOrders === []) {
                 return Object.assign({}, state, {
@@ -111,29 +108,4 @@ function setCurrentActor(order, account) {
     } else {
         return "";
     }
-}
-
-function setCanValidate(order) {
-    if (order.state === "1") {
-        if (order.currentActor === "seller") {
-            if (order.validateSeller === "0") {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (order.currentActor === "deliver") {
-            if (order.validateDeliver === "0") {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (order.currentActor === "buyer") {
-            if (order.validateBuyer === "0") {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-    return false
 }

@@ -5,9 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-import ValidateOrder from '../ValidateOrder';
-import OrderReady from '../OrderReady'
-import CreateOffer from '../CreateOffer'
+import { ValidateOrder, OrderReady, CreateOffer } from 'components';
 
 class OrderElement extends Component {
 
@@ -33,18 +31,9 @@ class OrderElement extends Component {
                     <Typography>Delay : {order.delay}</Typography>
                     <Typography>Place Key : {order.placeKey}</Typography>
                 </CardContent>
-                {order.canValidate &&
-                    <ValidateOrder
-                        orderKey={order.orderKey}
-                        currentActor={order.currentActor}
-                    />
-                }
-                {order.state === "2" &&
-                    order.currentActor === "seller" &&
-                    <OrderReady
-                        orderKey={order.orderKey}
-                    />
-                }
+
+                <ValidateOrder order={order} />
+                <OrderReady order={order} />
                 <CreateOffer order={order} />
             </Card>
         )

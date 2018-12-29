@@ -22,18 +22,14 @@ class ValidateOrder extends Component {
         const { orderKey, setOrder, user: { account }, orders: { listOrders } } = this.props;
 
         this.validateAPI().then(() => {
-            ApiService.getOrder(orderKey)
-                .then((order) => {
-                    setOrder({ listOrders: listOrders, order: order, account });
-                })
-                .catch(err => {
-                    this.setState({ error: err.toString() });
-                });
-        });
+            ApiService.getOrder(orderKey).then((order) => {
+                setOrder({ listOrders: listOrders, order: order, account });
+            })
+        }).catch((err) => { console.error(err) });
     }
 
     async validateAPI() {
-        const { currentActor, orderKey } = this.props;
+        const { order: { currentActor, orderKey } } = this.props;
 
         if (currentActor === "deliver") {
 
@@ -60,18 +56,49 @@ class ValidateOrder extends Component {
         }
     }
 
+    setCanValidate() {
+        const { order } = this.props;
+
+        if (order.state === "1") {
+            if (order.currentActor === "seller") {
+                if (order.validateSeller === "0") {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (order.currentActor === "deliver") {
+                if (order.validateDeliver === "0") {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (order.currentActor === "buyer") {
+                if (order.validateBuyer === "0") {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false
+    }
+
     render() {
+
+        let canValidate = this.setCanValidate();
 
         return (
             <div>
-                <Button
-                    onClick={this.handleClick}
-                    className="green"
-                    variant='contained'
-                    color='primary'
-                >
-                    VALIDATE
+                {canValidate &&
+                    <Button
+                        onClick={this.handleClick}
+                        className="green"
+                        variant='contained'
+                        color='primary'
+                    >
+                        VALIDATE
                 </Button>
+                }
             </div>
         )
     }
