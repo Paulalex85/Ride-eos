@@ -7,14 +7,16 @@
 keyTester=$(openssl rand -hex 32)
 keySeller=$(openssl rand -hex 32)
 
+echo "key tester $keyTester"
+echo "key seller $keySeller"
+
 hashTester=$(echo -n $keyTester | xxd -r -p | sha256sum -b | awk '{print $1}')
 hashSeller=$(echo -n $keySeller | xxd -r -p | sha256sum -b | awk '{print $1}')
 
 cleos push action rideor needdeliver '["tester", "seller", "50.0000 SYS", "20.0000 SYS","order 1",0,0]' -p tester
 
 cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0,0]' -p tester
-
-cleos push action rideor initialize '["sarabrown", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 3",0,0]' -p sarabrown
+sleep 1
 
 cleos push action rideor initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 4",0,0]' -p tester
 cleos push action rideor validatebuy '["2", "'$hashTester'"]' -p tester

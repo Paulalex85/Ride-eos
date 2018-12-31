@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cleos push action eosio.token create '["eosio.token","1000000.0000 SYS"]' -p eosio.token@active
-cleos push action eosio.token issue '{"to":"tester","quantity":"500.0000 SYS","memo":""}' -p eosio.token
+cleos push action eosio.token issue '{"to":"tester","quantity":"50000.0000 SYS","memo":""}' -p eosio.token
 cleos push action eosio.token issue '{"to":"rider","quantity":"500.0000 SYS","memo":""}' -p eosio.token
 cleos push action eosio.token issue '{"to":"seller","quantity":"500.0000 SYS","memo":""}' -p eosio.token
 cleos push action eosio.token issue '{"to":"sarabrown","quantity":"500.0000 SYS","memo":""}' -p eosio.token
@@ -18,5 +18,7 @@ cleos push action rideos adduser '["rider","rid"]' -p rider
 cleos push action rideos adduser '["seller","sel"]' -p seller
 cleos push action rideos adduser '["sarabrown","sara"]' -p sarabrown
 sleep 1
+
+cleos push action rideos deposit '["tester", "10000.0000 SYS"]' -p tester
 
 cleos get table rideos rideos user

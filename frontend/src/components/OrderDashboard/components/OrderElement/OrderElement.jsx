@@ -5,7 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-import { ValidateOrder, OrderReady, CreateOffer } from 'components';
+import { ValidateOrder, OrderReady, CreateOffer, OrderTaken } from './components';
 
 class OrderElement extends Component {
 
@@ -35,6 +35,7 @@ class OrderElement extends Component {
                 <ValidateOrder order={order} />
                 <OrderReady order={order} />
                 <CreateOffer order={order} />
+                <OrderTaken order={order} />
             </Card>
         )
     }

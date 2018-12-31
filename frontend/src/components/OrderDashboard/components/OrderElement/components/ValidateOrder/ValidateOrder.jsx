@@ -40,7 +40,7 @@ class ValidateOrder extends Component {
 
             let key = KeyGenerator.generateKey();
             let hash = KeyGenerator.generateHash(key);
-            KeyGenerator.storeKey(orderKey, key, hash);
+            KeyGenerator.storeKey(orderKey, key, hash, "seller");
 
             await ApiService.validateSeller(orderKey, hash)
                 .catch((err) => { console.error(err) });
@@ -49,7 +49,7 @@ class ValidateOrder extends Component {
 
             let key = KeyGenerator.generateKey();
             let hash = KeyGenerator.generateHash(key);
-            KeyGenerator.storeKey(orderKey, key, hash);
+            KeyGenerator.storeKey(orderKey, key, hash, "buyer");
 
             await ApiService.validateBuyer(orderKey, hash)
                 .catch((err) => { console.error(err) });
