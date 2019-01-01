@@ -19,7 +19,7 @@ class ValidateOrder extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { orderKey, setOrder, user: { account }, orders: { listOrders } } = this.props;
+        const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders } } = this.props;
 
         this.validateAPI().then(() => {
             ApiService.getOrder(orderKey).then((order) => {
