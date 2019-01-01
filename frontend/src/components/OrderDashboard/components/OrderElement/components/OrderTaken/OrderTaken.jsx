@@ -64,7 +64,10 @@ class OrderTaken extends Component {
                             label="Key"
                             onChange={this.handleChange}
                         />
-                        <Button onClick={this.handleClick} >
+                        <Button className="green"
+                            variant='contained'
+                            color='primary'
+                            onClick={this.handleClick} >
                             ORDER TAKEN
                         </Button>
                     </div>

@@ -18,7 +18,7 @@ class OrderReady extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { orderKey, setOrder, user: { account }, orders: { listOrders } } = this.props;
+        const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders } } = this.props;
 
         ApiService.orderReady(orderKey).then(() => {
             ApiService.getOrder(orderKey).then((order) => {
@@ -42,6 +42,9 @@ class OrderReady extends Component {
                 {isPrint &&
                     <Button
                         onClick={this.handleClick}
+                        className="green"
+                        variant='contained'
+                        color='primary'
                     >
                         ORDER READY
                 </Button>
