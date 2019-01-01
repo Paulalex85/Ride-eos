@@ -174,6 +174,10 @@ class ApiService {
     return send("ordertaken", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
+  static orderDelivered(orderKey, source) {
+    return send("orderdelive", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
   //MARKET
   static getPlaces() {
     return new Promise((resolve, reject) => {
