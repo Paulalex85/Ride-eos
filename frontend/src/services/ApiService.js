@@ -182,6 +182,10 @@ class ApiService {
     return send("initcancel", { orderKey: orderKey, account: account }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
   }
 
+  static delayCancel(orderKey) {
+    return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
+  }
+
   //MARKET
   static getPlaces() {
     return new Promise((resolve, reject) => {

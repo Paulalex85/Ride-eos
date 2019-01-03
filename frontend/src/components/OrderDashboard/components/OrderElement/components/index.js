@@ -4,6 +4,7 @@ import ValidateOrder from './ValidateOrder'
 import OrderTaken from './OrderTaken'
 import OrderDelivered from './OrderDelivered'
 import InitializeCancel from './InitializeCancel'
+import DelayCancel from './DelayCancel'
 
 export {
     CreateOffer,
@@ -11,5 +12,6 @@ export {
     ValidateOrder,
     OrderTaken,
     OrderDelivered,
-    InitializeCancel
+    InitializeCancel,
+    DelayCancel
 }
