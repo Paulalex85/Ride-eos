@@ -7,7 +7,8 @@ import AssignPlace from './AssignPlace';
 import Main from './Main';
 import KeyGenerator from './KeyGenerator';
 import CreateOrder from './CreateOrder';
-import OfferDashboard from './OfferDashboard'
+import OfferDashboard from './OfferDashboard';
+import Scatter from './Scatter'
 
 export {
   App,
@@ -19,5 +20,6 @@ export {
   Main,
   KeyGenerator,
   CreateOrder,
-  OfferDashboard
+  OfferDashboard,
+  Scatter
 }

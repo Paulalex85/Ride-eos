@@ -64,6 +64,11 @@ async function getTableRows({
 }
 
 class ApiService {
+  static getInfo() {
+    const eos = eosAPI();
+    console.log(eos)
+  }
+
   //USERS
   static getCurrentUser() {
     return new Promise((resolve, reject) => {

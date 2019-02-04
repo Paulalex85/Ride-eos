@@ -3,7 +3,8 @@ import UserReducer from './UserReducer';
 import OrderReducer from './OrderReducer';
 import PlaceReducer from './PlaceReducer';
 import AssignmentsReducer from './AssignmentsReducer';
-import OfferReducer from './OfferReducer'
+import OfferReducer from './OfferReducer';
+import ScatterReducer from './ScatterReducer';
 
 export default combineReducers({
   user: UserReducer,
@@ -11,4 +12,5 @@ export default combineReducers({
   places: PlaceReducer,
   assignments: AssignmentsReducer,
   offers: OfferReducer,
+  scatter: ScatterReducer
 })

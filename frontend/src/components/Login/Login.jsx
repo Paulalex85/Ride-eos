@@ -7,16 +7,16 @@ import TextField from '@material-ui/core/TextField';
 import { UserAction } from 'actions';
 import { ApiService } from 'services';
 
+import Scatter from '../Scatter';
+
 
 class Login extends Component {
 
   constructor(props) {
-    // Inherit constructor
     super(props);
 
     this.testAccounts = require('./accounts.json');
 
-    // State for form data and error message
     this.state = {
       form: {
         account: '',
@@ -25,7 +25,7 @@ class Login extends Component {
         error: '',
       },
     }
-    // Bind functions
+
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -112,6 +112,7 @@ class Login extends Component {
               color='primary'>
               {"CONFIRM"}
             </Button>
+            <Scatter />
           </div>
         </form>
         {JSON.stringify(this.testAccounts)}
