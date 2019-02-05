@@ -42,12 +42,18 @@ class Scatter extends Component {
                 console.log(account)
 
                 setScatter({ scatter: ScatterJS.scatter });
-
-                ApiServiceScatter.adduser(account.name, account.name, ScatterJS.scatter).then(() => {
-                    ApiService.getUserByAccount(account.name).then(user => {
+                ApiService.getUserByAccount(account.name).then(user => {
+                    if (user === undefined) {
+                        ApiServiceScatter.adduser(account.name, account.name, ScatterJS.scatter).then(() => {
+                            ApiService.getUserByAccount(account.name).then(user => {
+                                setUser({ account: user.account, username: user.username, balance: user.balance });
+                            })
+                        });
+                    } else {
                         setUser({ account: user.account, username: user.username, balance: user.balance });
-                    })
+                    }
                 });
+
             });
         }).catch(error => {
             console.error(error);
