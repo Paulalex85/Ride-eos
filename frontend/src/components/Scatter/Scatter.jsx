@@ -44,7 +44,7 @@ class Scatter extends Component {
                 setScatter({ scatter: ScatterJS.scatter });
                 ApiService.getUserByAccount(account.name).then(user => {
                     if (user === undefined) {
-                        ApiServiceScatter.adduser(account.name, account.name, ScatterJS.scatter).then(() => {
+                        ApiServiceScatter.adduser(account.name, ScatterJS.scatter).then(() => {
                             ApiService.getUserByAccount(account.name).then(user => {
                                 setUser({ account: user.account, username: user.username, balance: user.balance });
                             })

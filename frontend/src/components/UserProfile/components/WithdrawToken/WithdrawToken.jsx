@@ -5,22 +5,18 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 // Services and redux action
 import { UserAction } from 'actions';
-import { ApiService } from 'services';
+import { ApiService, ApiServiceScatter } from 'services';
 
 class WithdrawToken extends Component {
     constructor(props) {
-        // Inherit constructor
         super(props);
 
-        // State for form data and error message
         this.state = {
             form: {
-                quantity: "0.0000 SYS",
-                error: '',
+                quantity: "0.0000 SYS"
             },
         }
 
-        // Bind functions
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -33,24 +29,19 @@ class WithdrawToken extends Component {
             form: {
                 ...form,
                 [name]: value,
-                error: '',
             },
         });
     }
 
-    // Handle form submission to call api
     handleSubmit(event) {
-        // Stop the default form submit browser behaviour
         event.preventDefault();
-        // Extract `form` state
-        const { form } = this.state;
-        // Extract `setUser` of `UserAction`
-        const { setUser, user: { account } } = this.props;
-        // Send a login transaction to the blockchain by calling the ApiService,
-        // If it successes, save the account to redux store
-        // Otherwise, save the error state for displaying the message
-        return ApiService.withdraw(form)
-            .then(() => {
+        const { form: { quantity } } = this.state;
+        const { setUser, user: { account }, scatter: { scatter } } = this.props;
+
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
+        ApiServiceScatter.updatePermission(accountScatter, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).then(() => {
+            ApiServiceScatter.withdraw(quantity, scatter).then(() => {
                 ApiService.getUserByAccount(account).then(user => {
                     setUser({
                         account: user.account,
@@ -59,14 +50,11 @@ class WithdrawToken extends Component {
                     });
                 });
             })
-            .catch(err => {
-                this.setState({ error: err.toString() });
-            });
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
-        // Extract data from state
-        const { form, error } = this.state;
+        const { form } = this.state;
 
         return (
             <div className="Withdraw">
@@ -78,9 +66,6 @@ class WithdrawToken extends Component {
                         label="Quantity"
                         onChange={this.handleChange}
                     />
-                    <div className="field form-error">
-                        {error && <span className="error">{error}</span>}
-                    </div>
                     <div className="bottom">
                         <Button
                             type="submit"
@@ -96,13 +81,10 @@ class WithdrawToken extends Component {
     }
 }
 
-// Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
-// Map the following action to props
 const mapDispatchToProps = {
     setUser: UserAction.setUser,
 };
 
-// Export a redux connected component
 export default connect(mapStateToProps, mapDispatchToProps)(WithdrawToken);

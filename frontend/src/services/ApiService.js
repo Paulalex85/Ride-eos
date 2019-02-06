@@ -46,7 +46,7 @@ async function getTableRows({
   upper_bound = "",
   index_position = 1,
   key_type = "",
-  limit = 10 }: any): Promise<any> {
+  limit = 10 }) {
   const rpc = getRPC();
   return await rpc.fetch(
     "/v1/chain/get_table_rows", {
@@ -67,63 +67,6 @@ class ApiService {
   static getInfo() {
     const eos = eosAPI();
     console.log(eos)
-  }
-
-  //USERS
-  static getCurrentUser() {
-    return new Promise((resolve, reject) => {
-      if (!localStorage.getItem("userAccount")) {
-        return reject();
-      }
-      this.getUserByAccount(localStorage.getItem("userAccount"))
-        .then((row) => {
-          if (row === undefined) {
-            console.log("Utilisateur inconnu");
-            localStorage.removeItem("userAccount");
-            localStorage.removeItem("privateKey");
-            reject();
-          } else {
-            resolve(row);
-          }
-        })
-        .catch(err => {
-          console.log("erreur");
-          localStorage.removeItem("userAccount");
-          localStorage.removeItem("privateKey");
-          reject(err);
-        });
-    });
-  }
-
-  static login({ account, username, key }) {
-    return new Promise((resolve, reject) => {
-      localStorage.setItem("userAccount", account);
-      localStorage.setItem("privateKey", key);
-      send("adduser", { account: account, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-        .then(() => {
-          resolve();
-        })
-        .catch(err => {
-          localStorage.removeItem("userAccount");
-          localStorage.removeItem("privateKey");
-          reject(err);
-        });
-    });
-  }
-
-  static updateUser({ username }) {
-    return send("updateuser", { account: localStorage.getItem("userAccount"), username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
-  }
-
-  static deposit({ quantity }) {
-    return send("deposit", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
-  }
-
-  static withdraw({ quantity }) {
-    // return auth(process.env.REACT_APP_EOSIO_CONTRACT_USERS)
-    //   .then(() => {
-    return send("withdraw", { account: localStorage.getItem("userAccount"), quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS);
-    // });
   }
 
   //ORDERS

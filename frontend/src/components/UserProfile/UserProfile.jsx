@@ -32,20 +32,18 @@ class UserProfile extends Component {
   }
 
   getUser() {
-    const { setUser } = this.props;
+    const { setUser, scatter: { scatter } } = this.props;
 
-    ApiService.getCurrentUser().then(user => {
+    const account = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
+    ApiService.getUserByAccount(account.name).then(user => {
       setUser({ account: user.account, username: user.username, balance: user.balance });
     }).catch((err) => { console.error(err) });
   }
 
   render() {
-    // Extract data and event functions from props
     const { user: { account, username, balance } } = this.props;
 
-    // Display welcome message,
-    //         buttons for login,
-    //         username and balance
     return (
       <div className="UserProfile">
         <div className="title">Rideos</div>
@@ -73,12 +71,10 @@ class UserProfile extends Component {
   }
 }
 
-// Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
   setUser: UserAction.setUser,
 };
 
-// Export a redux connected component
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);
