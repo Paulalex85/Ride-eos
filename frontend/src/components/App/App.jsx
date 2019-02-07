@@ -1,10 +1,12 @@
 // React core
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
+import ScatterJS from 'scatterjs-core';
 // Components
 import { Main, Login } from 'components';
 
-import { UserAction } from 'actions';
+import { UserAction, ScatterAction } from 'actions';
 import { ApiService } from 'services';
 
 class App extends Component {
@@ -17,14 +19,36 @@ class App extends Component {
   }
 
   getCurrentUser() {
-    const { setUser, scatter: { scatter } } = this.props;
+    const { setUser, setScatter, scatter: { scatter } } = this.props;
+
+    const network = ScatterJS.Network.fromJson({
+      blockchain: 'eos',
+      host: '127.0.0.1',
+      port: 8888,
+      protocol: 'http',
+      chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
+    });
 
     if (scatter !== undefined) {
+      console.log("scatter ok")
       const account = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
       ApiService.getUserByAccount(account.name).then(user => {
         setUser({ account: user.account, username: user.username, balance: user.balance });
       }).catch((err) => { console.error(err) });
+    }
+    else {
+      ScatterJS.connect('Rideos', { network }).then(connected => {
+        if (connected) {
+          console.log("connected")
+          const account = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
+          setScatter({ scatter: ScatterJS.scatter });
+          console.log(account)
+          ApiService.getUserByAccount(account.name).then(user => {
+            setUser({ account: user.account, username: user.username, balance: user.balance });
+          }).catch((err) => { console.error(err) });
+        }
+      });
     }
   }
 
@@ -44,6 +68,7 @@ class App extends Component {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
+  setScatter: ScatterAction.setScatter,
   setUser: UserAction.setUser,
 };
 
