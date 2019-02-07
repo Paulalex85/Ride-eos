@@ -10,7 +10,8 @@ import OrderDashboard from '../OrderDashboard';
 import UserProfile from '../UserProfile';
 import CreateOrder from '../CreateOrder';
 import OfferDashboard from '../OfferDashboard';
-import KeyGenerator from '../KeyGenerator'
+import KeyGenerator from '../KeyGenerator';
+import Logout from '../Logout';
 
 import "./Main.css";
 
@@ -26,6 +27,7 @@ class Main extends Component {
                         <li><NavLink to="/orders">Orders</NavLink></li>
                         <li><NavLink to="/assign">Assign Place</NavLink></li>
                         <li><NavLink to="/offers">Offers</NavLink></li>
+                        <li><NavLink to="/logout">Logout</NavLink></li>
                     </ul>
                     <div className="content">
                         <Route exact path="/" component={KeyGenerator} />
@@ -34,6 +36,7 @@ class Main extends Component {
                         <Route path="/orders" component={OrderDashboard} />
                         <Route path="/assign" component={AssignPlace} />
                         <Route path="/offers" component={OfferDashboard} />
+                        <Route path="/logout" component={Logout} />
                     </div>
                 </div>
             </BrowserRouter>

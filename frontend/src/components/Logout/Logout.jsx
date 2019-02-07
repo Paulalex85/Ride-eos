@@ -1,50 +1,39 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
+import { withRouter } from "react-router";
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
-import { UserAction } from 'actions';
+import { UserAction, ScatterAction } from 'actions';
 
 class Logout extends Component {
     constructor(props) {
-        // Inherit constructor
         super(props);
 
-        // Bind functions
-        this.handleClick = this.handleClick.bind(this);
+        this.logout();
     }
 
-    handleClick(event) {
-        event.preventDefault();
+    logout() {
+        const { history, setUser, setScatter, scatter: { scatter } } = this.props;
 
-        const { setUser } = this.props;
+        setUser({ account: '', username: '', balance: '0.0000 SYS' });
 
-        setUser({ account: '', username: '' });
+        scatter.forgetIdentity();
+        setScatter({ scatter: undefined });
 
-        localStorage.removeItem("userAccount");
-        localStorage.removeItem("privateKey");
+        history.push("/");
     }
 
     render() {
-
         return (
-            <Button
-                onClick={this.handleClick}
-                className="green"
-                variant='contained'
-                color='primary'
-            >
-                LOGOUT
-                </Button>
+            <div>
+            </div>
         )
     }
 }
-// Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
-// Map the following action to props
 const mapDispatchToProps = {
     setUser: UserAction.setUser,
+    setScatter: ScatterAction.setScatter,
 };
 
-// Export a redux connected component
-export default connect(mapStateToProps, mapDispatchToProps)(Logout);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Logout));

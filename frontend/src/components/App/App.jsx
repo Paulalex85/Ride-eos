@@ -19,7 +19,7 @@ class App extends Component {
   getCurrentUser() {
     const { setUser, scatter: { scatter } } = this.props;
 
-    if (scatter) {
+    if (scatter !== undefined) {
       const account = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
       ApiService.getUserByAccount(account.name).then(user => {

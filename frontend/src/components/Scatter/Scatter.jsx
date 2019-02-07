@@ -6,8 +6,7 @@ import Button from '@material-ui/core/Button';
 import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs2';
 
-import { ScatterAction } from 'actions';
-import { UserAction } from 'actions';
+import { UserAction, ScatterAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 
 class Scatter extends Component {
@@ -39,11 +38,10 @@ class Scatter extends Component {
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
                 const account = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
-                console.log(account)
 
                 setScatter({ scatter: ScatterJS.scatter });
                 ApiService.getUserByAccount(account.name).then(user => {
-                    if (user === undefined) {
+                    if (user === undefined || user.account !== account.name) {
                         ApiServiceScatter.adduser(account.name, ScatterJS.scatter).then(() => {
                             ApiService.getUserByAccount(account.name).then(user => {
                                 setUser({ account: user.account, username: user.username, balance: user.balance });
