@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import ScatterJS from 'scatterjs-core';
+import ScatterEOS from 'scatterjs-plugin-eosjs2';
 // Components
 import { Main, Login } from 'components';
 
@@ -29,6 +30,8 @@ class App extends Component {
       chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
     });
 
+    ScatterJS.plugins(new ScatterEOS());
+
     if (scatter !== undefined) {
       console.log("scatter ok")
       const account = scatter.identity.accounts.find(x => x.blockchain === 'eos');
@@ -41,9 +44,11 @@ class App extends Component {
       ScatterJS.connect('Rideos', { network }).then(connected => {
         if (connected) {
           console.log("connected")
+
           const account = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
           setScatter({ scatter: ScatterJS.scatter });
           console.log(account)
+
           ApiService.getUserByAccount(account.name).then(user => {
             setUser({ account: user.account, username: user.username, balance: user.balance });
           }).catch((err) => { console.error(err) });
