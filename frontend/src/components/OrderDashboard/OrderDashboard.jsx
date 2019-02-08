@@ -18,17 +18,12 @@ class OrderDashboard extends Component {
     loadOrders() {
         const { setListOffers, setListOrders, user: { account } } = this.props;
 
-        // Send a request to API (blockchain) to get the current logged in user
-        return ApiService.getOrders(account)
-            // If the server return an account
-            .then(list => {
-                setListOrders({ listOrders: list, account: account });
-                ApiService.getOffers().then(offers => {
-                    setListOffers({ listOffers: offers });
-                })
+        return ApiService.getOrderByBuyer(account).then(list => {
+            setListOrders({ listOrders: list, account: account });
+            ApiService.getOffers().then(offers => {
+                setListOffers({ listOffers: offers });
             })
-            // To ignore 401 console error
-            .catch((err) => { console.error(err) });
+        }).catch((err) => { console.error(err) });
     }
 
     render() {

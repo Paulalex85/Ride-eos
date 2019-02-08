@@ -5,18 +5,16 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 // Services and redux action
 import { OrderAction } from 'actions';
-import { ApiService } from 'services';
+import { ApiService, ApiServiceScatter } from 'services';
 
 class OrderTaken extends Component {
     constructor(props) {
-        // Inherit constructor
         super(props);
 
         this.state = {
             key: ""
         }
 
-        // Bind functions
         this.handleClick = this.handleClick.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
@@ -34,10 +32,10 @@ class OrderTaken extends Component {
 
         const { key } = this.state;
 
-        const { setOrder, order: { orderKey }, orders: { listOrders }, user: { account } } = this.props;
+        const { setOrder, order: { orderKey }, orders: { listOrders }, user: { account }, scatter: { scatter } } = this.props;
 
-        ApiService.orderTaken(orderKey, key).then(() => {
-            ApiService.getOrder(orderKey).then((order) => {
+        return ApiServiceScatter.orderTaken(orderKey, key, scatter).then(() => {
+            ApiService.getOrderByKey(orderKey).then((order) => {
                 setOrder({ listOrders: listOrders, order: order, account });
             })
         }).catch((err) => { console.error(err) });
@@ -77,13 +75,10 @@ class OrderTaken extends Component {
     }
 }
 
-// Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
-// Map the following action to props
 const mapDispatchToProps = {
     setOrder: OrderAction.setOrder,
 };
 
-// Export a redux connected component
 export default connect(mapStateToProps, mapDispatchToProps)(OrderTaken);
