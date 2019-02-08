@@ -7,15 +7,13 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 // Services and redux action
-import { ApiService } from 'services';
+import { ApiServiceScatter } from 'services';
 
 
 class NeedDeliver extends Component {
     constructor(props) {
-        // Inherit constructor
         super(props);
 
-        // State for form data and error message
         this.state = {
             form: {
                 buyer: "",
@@ -25,11 +23,9 @@ class NeedDeliver extends Component {
                 details: "",
                 delay: "",
                 placeKey: "",
-                error: '',
             },
         }
 
-        // Bind functions
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -42,29 +38,23 @@ class NeedDeliver extends Component {
             form: {
                 ...form,
                 [name]: value,
-                error: '',
             },
         });
     }
 
-    // Handle form submission to call api
     handleSubmit(event) {
-        // Stop the default form submit browser behaviour
         event.preventDefault();
-        // Extract `form` state
-        const { form } = this.state;
-        const { history } = this.props;
 
-        return ApiService.needDeliver(form).then(() => {
+        const { form } = this.state;
+        const { history, scatter: { scatter } } = this.props;
+
+        ApiServiceScatter.needDeliver(form, scatter).then(() => {
             history.push("/orders");
-        })
-            .catch(err => {
-                this.setState({ error: err.toString() });
-            });
+        }).catch((err) => { console.error(err) });
     }
 
     render() {
-        const { form, error } = this.state;
+        const { form } = this.state;
 
 
         return (
@@ -112,9 +102,6 @@ class NeedDeliver extends Component {
                         label="Place Key"
                         onChange={this.handleChange}
                     />
-                    <div className="field form-error">
-                        {error && <span className="error">{error}</span>}
-                    </div>
                     <Button
                         type="submit"
                         className="green"

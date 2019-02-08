@@ -27,6 +27,7 @@ function getAccountFromScatter(scatter) {
     return scatter.identity.accounts.find(x => x.blockchain === 'eos');
 }
 
+
 async function send(actionName, actionData, contractDestination, scatter) {
 
     const eos = eosAPI(scatter);
@@ -80,6 +81,49 @@ class ApiServiceScatter {
     static withdraw(quantity, scatter) {
         const account = getAccountFromScatter(scatter);
         return send("withdraw", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    }
+
+    //ORDERS
+
+    static needDeliver({ buyer, seller, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {
+        return send("needdeliver", { buyer: buyer, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {
+        return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static validateBuyer(orderKey, hash, scatter) {
+        return send("validatebuy", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static validateSeller(orderKey, hash, scatter) {
+        return send("validatesell", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static validateDeliver(orderKey, scatter) {
+        return send("validatedeli", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static orderReady(orderKey, scatter) {
+        return send("orderready", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static orderTaken(orderKey, source, scatter) {
+        return send("ordertaken", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static orderDelivered(orderKey, source, scatter) {
+        return send("orderdelive", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static initCancel(orderKey, scatter) {
+        const account = getAccountFromScatter(scatter);
+        return send("initcancel", { orderKey: orderKey, account: account.name }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
+    }
+
+    static delayCancel(orderKey, scatter) {
+        return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
     }
 }
 

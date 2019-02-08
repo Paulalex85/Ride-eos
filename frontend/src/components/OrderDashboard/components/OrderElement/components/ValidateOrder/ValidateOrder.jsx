@@ -4,14 +4,12 @@ import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 // Services and redux action
 import { OrderAction } from 'actions';
-import { ApiService, KeyGenerator } from 'services';
+import { ApiService, ApiServiceScatter, KeyGenerator } from 'services';
 
 class ValidateOrder extends Component {
     constructor(props) {
-        // Inherit constructor
         super(props);
 
-        // Bind functions
         this.handleClick = this.handleClick.bind(this);
         this.validateAPI = this.validateAPI.bind(this);
     }
@@ -22,18 +20,18 @@ class ValidateOrder extends Component {
         const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders } } = this.props;
 
         this.validateAPI().then(() => {
-            ApiService.getOrder(orderKey).then((order) => {
+            ApiService.getOrderByKey(orderKey).then((order) => {
                 setOrder({ listOrders: listOrders, order: order, account });
             })
         }).catch((err) => { console.error(err) });
     }
 
     async validateAPI() {
-        const { order: { currentActor, orderKey } } = this.props;
+        const { order: { currentActor, orderKey }, scatter: { scatter } } = this.props;
 
         if (currentActor === "deliver") {
 
-            await ApiService.validateDeliver(orderKey)
+            await ApiServiceScatter.validateDeliver(orderKey, scatter)
                 .catch((err) => { console.error(err) });
 
         } else if (currentActor === "seller") {
@@ -42,7 +40,7 @@ class ValidateOrder extends Component {
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "seller");
 
-            await ApiService.validateSeller(orderKey, hash)
+            await ApiServiceScatter.validateSeller(orderKey, hash, scatter)
                 .catch((err) => { console.error(err) });
 
         } else if (currentActor === "buyer") {
@@ -50,9 +48,10 @@ class ValidateOrder extends Component {
             let key = KeyGenerator.generateKey();
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "buyer");
+            const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
-            await ApiService.validateBuyer(orderKey, hash)
-                .catch((err) => { console.error(err) });
+            await ApiServiceScatter.updatePermission(accountScatter, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateBuyer(orderKey, hash, scatter).catch((err) => { console.error(err) });
         }
     }
 
@@ -104,13 +103,10 @@ class ValidateOrder extends Component {
     }
 }
 
-// Map all state to component props (for redux to connect)
 const mapStateToProps = state => state;
 
-// Map the following action to props
 const mapDispatchToProps = {
     setOrder: OrderAction.setOrder,
 };
 
-// Export a redux connected component
 export default connect(mapStateToProps, mapDispatchToProps)(ValidateOrder);

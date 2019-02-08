@@ -69,71 +69,6 @@ class ApiService {
     console.log(eos)
   }
 
-  //ORDERS
-  static getOrder(orderKey) {
-    return new Promise((resolve, reject) => {
-      this.getOrderByKey(orderKey)
-        .then((order) => {
-          resolve(order);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  static getOrders({ account }) {
-    return new Promise((resolve, reject) => {
-      this.getOrderByBuyer(account)
-        .then((list) => {
-          resolve(list);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  static needDeliver({ buyer, seller, priceOrder, priceDeliver, details, delay, placeKey }) {
-    return send("needdeliver", { buyer: buyer, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay, placeKey }) {
-    return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static validateBuyer(orderKey, hash) {
-    return send("validatebuy", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static validateSeller(orderKey, hash) {
-    return send("validatesell", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static validateDeliver(orderKey) {
-    return send("validatedeli", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static orderReady(orderKey) {
-    return send("orderready", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static orderTaken(orderKey, source) {
-    return send("ordertaken", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static orderDelivered(orderKey, source) {
-    return send("orderdelive", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static initCancel(orderKey, account) {
-    return send("initcancel", { orderKey: orderKey, account: account }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
-  static delayCancel(orderKey) {
-    return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS);
-  }
-
   //MARKET
   static getPlaces() {
     return new Promise((resolve, reject) => {
@@ -277,8 +212,8 @@ class ApiService {
         code: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
         scope: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
         table: "order",    // name of the table as specified by the contract abi
-        lower_bound: account,
-        upper_bound: account,
+        //lower_bound: account,
+        //upper_bound: account,
         limit: 10,
         key_type: "i64",
         index_position: 2,
