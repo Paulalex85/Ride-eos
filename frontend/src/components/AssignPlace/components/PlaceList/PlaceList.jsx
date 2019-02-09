@@ -28,14 +28,9 @@ class AssignPlace extends Component {
     loadPlaces() {
         const { setListPlaces } = this.props;
 
-        // Send a request to API (blockchain) to get the current logged in user
-        return ApiService.getPlaces()
-            // If the server return an account
-            .then(list => {
-                setListPlaces({ listPlaces: list });
-            })
-            // To ignore 401 console error
-            .catch((err) => { console.error(err) });
+        return ApiService.getAllPlaces().then(list => {
+            setListPlaces({ listPlaces: list });
+        }).catch((err) => { console.error(err) });
     }
 
     setListPlace(index) {
@@ -50,10 +45,10 @@ class AssignPlace extends Component {
 
     onClickAssignment(placeKey) {
 
-        const { setListAssignment, user: { account } } = this.props;
+        const { setListAssignment, scatter: { scatter } } = this.props;
 
-        return ApiService.newAssign(account, placeKey).then(() => {
-            ApiService.getAssignments().then(listAPI => {
+        return ApiService.newAssign(placeKey, scatter).then(() => {
+            ApiService.getAssignmentsByUser().then(listAPI => {
                 setListAssignment({ listAssignments: listAPI });
                 this.setListPlace(0);
             }).catch((err) => { console.error(err) });

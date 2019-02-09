@@ -19,9 +19,9 @@ class CreateOffer extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { history, order: { orderKey } } = this.props;
+        const { history, order: { orderKey }, scatter: { scatter } } = this.props;
 
-        ApiService.addOffer(orderKey).then(() => {
+        ApiService.addOffer(orderKey, scatter).then(() => {
             history.push("/offers");
         }).catch((err) => { console.error(err) });
     }

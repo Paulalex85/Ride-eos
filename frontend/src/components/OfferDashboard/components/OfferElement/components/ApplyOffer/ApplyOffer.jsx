@@ -18,10 +18,10 @@ class ApplyOffer extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { setListApplies, offer: { offerKey }, user: { account } } = this.props;
+        const { setListApplies, offer: { offerKey }, scatter: { scatter } } = this.props;
 
-        ApiService.addApply(account, offerKey).then(() => {
-            ApiService.getApplies().then(applies => {
+        ApiService.addApply(offerKey, scatter).then(() => {
+            ApiService.getAllApplies().then(applies => {
                 const { offers: { listOffers } } = this.props;
                 setListApplies({ listOffers: listOffers, listApplies: applies });
             })

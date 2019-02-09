@@ -18,10 +18,10 @@ class CancelOffer extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { offer: { offerKey }, setOffer, offers: { listOffers } } = this.props;
+        const { offer: { offerKey }, setOffer, offers: { listOffers }, scatter: { scatter } } = this.props;
 
-        return ApiService.cancelOffer(offerKey).then(() => {
-            ApiService.getOffer(offerKey).then(offer => {
+        return ApiService.cancelOffer(offerKey, scatter).then(() => {
+            ApiService.getOfferByKey(offerKey).then(offer => {
                 setOffer({ listOffers: listOffers, offer: offer });
             });
         }).catch((err) => { console.error(err) });

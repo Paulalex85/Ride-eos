@@ -48,9 +48,9 @@ class OfferDashboard extends Component {
     loadOffers() {
         const { setListOffers, setListApplies } = this.props;
 
-        return ApiService.getOffers().then(offers => {
+        return ApiService.getAllOffers().then(offers => {
             setListOffers({ listOffers: offers });
-            ApiService.getApplies().then(applies => {
+            ApiService.getAllApplies().then(applies => {
                 const { offers: { listOffers }, orders: { listOrders } } = this.props;
                 setListApplies({ listOffers: listOffers, listApplies: applies });
 

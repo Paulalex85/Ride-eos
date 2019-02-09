@@ -125,6 +125,38 @@ class ApiServiceScatter {
     static delayCancel(orderKey, scatter) {
         return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter);
     }
+
+    //MARKET
+    static newAssign(placeKey, scatter) {
+        const account = getAccountFromScatter(scatter);
+        return send("newassign", { account: account.name, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static endAssign(assignmentKey, scatter) {
+        return send("endassign", { assignmentKey: assignmentKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static addOffer(orderKey, scatter) {
+        return send("addoffer", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static endOffer(deliver, offerKey, scatter) {
+        return send("endoffer", { deliver: deliver, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static cancelOffer(offerKey, scatter) {
+        return send("canceloffer", { offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static addApply(offerKey, scatter) {
+        const account = getAccountFromScatter(scatter);
+        return send("addapply", { account: account.name, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
+    static cancelApply(applyKey, scatter) {
+        return send("cancelapply", { applyKey: applyKey }, process.env.REACT_APP_EOSIO_CONTRACT_MARKET, scatter);
+    }
+
 }
 
 export default ApiServiceScatter;

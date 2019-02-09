@@ -38,19 +38,17 @@ class AssignmentUser extends Component {
     loadAssignments() {
         const { setListAssignment } = this.props;
 
-        // Send a request to API (blockchain) to get the current logged in user
-        return ApiService.getAssignments().then(listAPI => {
+        return ApiService.getAssignmentsByUser().then(listAPI => {
             setListAssignment({ listAssignments: listAPI });
             this.setListPlace(0);
         }).catch((err) => { console.error(err) });
     }
 
     clickLeaveButton(assignmentKey) {
-        const { setAssignment, assignments: { listAssignments } } = this.props;
+        const { setAssignment, assignments: { listAssignments }, scatter: { scatter } } = this.props;
 
-        return ApiService.endAssign(assignmentKey).then(() => {
-            ApiService.getAssignment().then(assign => {
-                console.log("bite")
+        return ApiService.endAssign(assignmentKey, scatter).then(() => {
+            ApiService.getAssignmentByKey().then(assign => {
                 console.log(assign)
                 setAssignment({ listAssignments: listAssignments, assignment: assign });
             }).catch((err) => { console.error(err) });
@@ -58,7 +56,6 @@ class AssignmentUser extends Component {
     }
 
     render() {
-        // Extract data and event functions from props
         const { assignments: { listAssignments } } = this.props;
 
         const Assignments = listAssignments.map(assign => (

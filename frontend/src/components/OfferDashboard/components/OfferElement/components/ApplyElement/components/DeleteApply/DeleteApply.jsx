@@ -20,10 +20,10 @@ class DeleteApply extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { setListApplies, apply: { applyKey } } = this.props;
+        const { setListApplies, apply: { applyKey }, scatter: { scatter } } = this.props;
 
-        ApiService.cancelApply(applyKey).then(() => {
-            ApiService.getApplies().then(applies => {
+        ApiService.cancelApply(applyKey, scatter).then(() => {
+            ApiService.getAllApplies().then(applies => {
                 const { offers: { listOffers } } = this.props;
                 setListApplies({ listOffers: listOffers, listApplies: applies });
             })

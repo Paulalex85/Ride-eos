@@ -20,7 +20,7 @@ class OrderDashboard extends Component {
 
         return ApiService.getOrderByBuyer(account).then(list => {
             setListOrders({ listOrders: list, account: account });
-            ApiService.getOffers().then(offers => {
+            ApiService.getAllOffers().then(offers => {
                 setListOffers({ listOffers: offers });
             })
         }).catch((err) => { console.error(err) });

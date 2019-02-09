@@ -19,10 +19,10 @@ class ChooseDeliver extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { setOffer, offers: { listOffers }, offer: { offerKey }, apply: { deliver } } = this.props;
+        const { setOffer, offers: { listOffers }, offer: { offerKey }, apply: { deliver }, scatter: { scatter } } = this.props;
 
-        ApiService.endOffer(deliver, offerKey).then(() => {
-            ApiService.getOffer(offerKey).then(offer => {
+        ApiService.endOffer(deliver, offerKey, scatter).then(() => {
+            ApiService.getOfferByKey(offerKey).then(offer => {
                 setOffer({ listOffers: listOffers, offer: offer });
             });
         }).catch((err) => { console.error(err) });
