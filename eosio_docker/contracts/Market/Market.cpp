@@ -7,19 +7,19 @@ using namespace eosio;
 //24h
 int DELAY_END_ASSIGN = 86400;
 
-void Market::addplace(string &country, string &zipCode)
+void Market::addplace(uint64_t parentKey, string &name)
 {
     require_auth(_self);
 
     _places.emplace(_self, [&](auto &place) {
         place.placeKey = _places.available_primary_key();
-        place.country = country;
-        place.zipCode = zipCode;
+        place.parentKey = parentKey;
+        place.name = name;
         place.active = true;
     });
 }
 
-void Market::updateplace(uint64_t key, string &country, string &zipCode, bool active)
+void Market::updateplace(uint64_t key, uint64_t parentKey, string &name, bool active)
 {
     require_auth(_self);
 
@@ -27,8 +27,8 @@ void Market::updateplace(uint64_t key, string &country, string &zipCode, bool ac
     eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
 
     _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.country = country;
-        place.zipCode = zipCode;
+        place.parentKey = parentKey;
+        place.name = name;
         place.active = active;
     });
 }

@@ -17,9 +17,9 @@ CONTRACT Market : public eosio::contract
                                                                     _offers(receiver, receiver.value),
                                                                     _applies(receiver, receiver.value) {}
 
-    ACTION addplace(string & country, string & zipCode);
+    ACTION addplace(uint64_t parentKey, string & name);
 
-    ACTION updateplace(uint64_t key, string & country, string & zipCode, bool active);
+    ACTION updateplace(uint64_t key, uint64_t parentKey, string & name, bool active);
 
     ACTION newassign(name account, uint64_t placeKey);
 
@@ -38,8 +38,8 @@ CONTRACT Market : public eosio::contract
     TABLE place
     {
         uint64_t placeKey;
-        string country;
-        string zipCode;
+        uint64_t parentKey;
+        string name;
         bool active;
 
         uint64_t primary_key() const { return placeKey; }
