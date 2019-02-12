@@ -12,7 +12,8 @@ CONTRACT Users : public eosio::contract
 public:
   // constructor
   Users(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
-                                                                 _users(receiver, receiver.value) {}
+                                                                 _users(receiver, receiver.value),
+                                                                 _stackpower(receiver, receiver.value) {}
 
   ACTION adduser(name account, string & username);
 
@@ -26,6 +27,10 @@ public:
 
   ACTION receive(const name account, const name from, const asset &quantity);
 
+  ACTION stackpow(const name account, const asset &quantity, const uint64_t placeKey);
+
+  ACTION unstackpow(const name account, const asset &quantity, const uint64_t placeKey);
+
   //@abi table user i64
   TABLE user
   {
@@ -38,6 +43,19 @@ public:
 
   typedef multi_index<name("user"), user> user_table;
 
+  //@abi table stackpower i64
+  TABLE stackpower
+  {
+    uint64_t idStackPower;
+    name account;
+    asset balance;
+    uint64_t placeKey;
+
+    uint64_t primary_key() const { return idStackPower; }
+  };
+
+  typedef multi_index<name("stackpower"), stackpower> stackpower_table;
+
   // accessor for external contracts to easily send inline actions to your contract
   using adduser_action = action_wrapper<"adduser"_n, &Users::adduser>;
   using updateuser_action = action_wrapper<"updateuser"_n, &Users::updateuser>;
@@ -48,4 +66,5 @@ public:
 
 private:
   user_table _users;
+  stackpower_table _stackpower;
 };

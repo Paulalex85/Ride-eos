@@ -1,4 +1,5 @@
 #include "Users.hpp"
+#include "../Market/Market.hpp"
 using namespace eosio;
 
 ACTION Users::adduser(name account, string &username)
@@ -108,4 +109,38 @@ ACTION Users::receive(const name account, const name from, const asset &quantity
     });
 }
 
-EOSIO_DISPATCH(Users, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive))
+ACTION Users::stackpow(const name account, const asset &quantity, const uint64_t placeKey)
+{
+    require_auth(account);
+
+    eosio_assert(quantity.is_valid(), "invalid quantity");
+    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
+    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+
+    auto iteratorUser = _users.find(account.value);
+    eosio_assert(iteratorUser != _users.end(), "Address for account not found");
+
+    Market::place_table _places(name("rideom"), name("rideom").value);
+    auto iteratorPlace = _places.find(placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Place not found");
+    eosio_assert(iteratorPlace->active == true, "Place is not active");
+
+    eosio_assert(iteratorUser->balance >= quantity, "Insufficient balance");
+
+    _users.modify(iteratorUser, _self, [&](auto &user) {
+        user.balance -= quantity;
+    });
+
+    _stackpower.emplace(_self, [&](auto &stackpower) {
+        stackpower.idStackPower = _stackpower.available_primary_key();
+        stackpower.account = account;
+        stackpower.balance = quantity;
+        stackpower.placeKey = placeKey;
+    });
+}
+
+ACTION Users::unstackpow(const name account, const asset &quantity, const uint64_t placeKey)
+{
+}
+
+EOSIO_DISPATCH(Users, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unstackpow))
