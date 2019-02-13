@@ -138,7 +138,7 @@ ACTION Users::stackpow(const name account, const asset &quantity, const uint64_t
 
     while (iteratorStack != indexStack.end())
     {
-        if (iteratorStack->placeKey == placeKey)
+        if (iteratorStack->placeKey == placeKey && iteratorStack->account == account)
         {
             indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
                 stackpower.balance += quantity;
