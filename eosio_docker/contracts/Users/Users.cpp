@@ -131,12 +131,36 @@ ACTION Users::stackpow(const name account, const asset &quantity, const uint64_t
         user.balance -= quantity;
     });
 
-    _stackpower.emplace(_self, [&](auto &stackpower) {
-        stackpower.idStackPower = _stackpower.available_primary_key();
-        stackpower.account = account;
-        stackpower.balance = quantity;
-        stackpower.placeKey = placeKey;
-    });
+    auto indexStack = _stackpower.get_index<name("byaccount")>();
+    auto iteratorStack = indexStack.find(account.value);
+
+    bool found = false;
+
+    while (iteratorStack != indexStack.end())
+    {
+        if (iteratorStack->placeKey == placeKey)
+        {
+            indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
+                stackpower.balance += quantity;
+            });
+            found = true;
+            break;
+        }
+        else
+        {
+            iteratorStack++;
+        }
+    }
+
+    if (!found)
+    {
+        _stackpower.emplace(_self, [&](auto &stackpower) {
+            stackpower.idStackPower = _stackpower.available_primary_key();
+            stackpower.account = account;
+            stackpower.balance = quantity;
+            stackpower.placeKey = placeKey;
+        });
+    }
 }
 
 ACTION Users::unstackpow(const name account, const asset &quantity, const uint64_t placeKey)

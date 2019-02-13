@@ -52,9 +52,12 @@ public:
     uint64_t placeKey;
 
     uint64_t primary_key() const { return idStackPower; }
+    uint64_t get_account() const { return account.value; }
   };
-
-  typedef multi_index<name("stackpower"), stackpower> stackpower_table;
+  typedef multi_index<name("stackpower"), stackpower,
+                      indexed_by<name("byaccount"),
+                                 const_mem_fun<stackpower, uint64_t, &stackpower::get_account>>>
+      stackpower_table;
 
   // accessor for external contracts to easily send inline actions to your contract
   using adduser_action = action_wrapper<"adduser"_n, &Users::adduser>;
@@ -63,6 +66,7 @@ public:
   using withdraw_action = action_wrapper<"withdraw"_n, &Users::withdraw>;
   using pay_action = action_wrapper<"pay"_n, &Users::pay>;
   using receive_action = action_wrapper<"receive"_n, &Users::receive>;
+  using stackpow_action = action_wrapper<"stackpow"_n, &Users::stackpow>;
 
 private:
   user_table _users;
