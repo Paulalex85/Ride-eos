@@ -163,8 +163,37 @@ ACTION Users::stackpow(const name account, const asset &quantity, const uint64_t
     }
 }
 
-ACTION Users::unstackpow(const name account, const asset &quantity, const uint64_t placeKey)
+ACTION Users::unstackpow(const name account, const asset &quantity, const uint64_t stackKey)
 {
+    require_auth(account);
+
+    eosio_assert(quantity.is_valid(), "invalid quantity");
+    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
+    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+
+    auto iteratorUser = _users.find(account.value);
+    eosio_assert(iteratorUser != _users.end(), "Address for account not found");
+
+    auto iteratorStackpower = _stackpower.find(stackKey);
+    eosio_assert(iteratorStackpower != _stackpower.end(), "Address for stackpower not found");
+
+    eosio_assert(iteratorStackpower->balance >= quantity, "The amount should be less or equal than the balance");
+    eosio_assert(iteratorStackpower->account == account, "The user is not the same");
+
+    if (iteratorStackpower->balance == quantity)
+    {
+        _stackpower.erase(iteratorStackpower);
+    }
+    else
+    {
+        _stackpower.modify(iteratorStackpower, _self, [&](auto &stackpower) {
+            stackpower.balance -= quantity;
+        });
+    }
+
+    _users.modify(iteratorUser, _self, [&](auto &user) {
+        user.balance += quantity;
+    });
 }
 
 EOSIO_DISPATCH(Users, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unstackpow))

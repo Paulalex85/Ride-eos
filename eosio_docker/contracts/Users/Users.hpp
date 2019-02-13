@@ -29,7 +29,7 @@ public:
 
   ACTION stackpow(const name account, const asset &quantity, const uint64_t placeKey);
 
-  ACTION unstackpow(const name account, const asset &quantity, const uint64_t placeKey);
+  ACTION unstackpow(const name account, const asset &quantity, const uint64_t stackKey);
 
   //@abi table user i64
   TABLE user
