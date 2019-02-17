@@ -47,8 +47,8 @@ cleos wallet import -n rideoswallet --private-key 5K7mtrinTFrVTduSxizUc5hjXJEtTj
 
 # create account for rideos with above wallet's public keys
 cleos create account eosio rideos EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B
-cleos create account eosio rideor EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9 EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9
-cleos create account eosio rideom EOS5btzHW33f9zbhkwjJTYsoyRzXUNstx1Da9X2nTzk8BQztxoP3H EOS5btzHW33f9zbhkwjJTYsoyRzXUNstx1Da9X2nTzk8BQztxoP3H
+# cleos create account eosio rideor EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9 EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9
+# cleos create account eosio rideom EOS5btzHW33f9zbhkwjJTYsoyRzXUNstx1Da9X2nTzk8BQztxoP3H EOS5btzHW33f9zbhkwjJTYsoyRzXUNstx1Da9X2nTzk8BQztxoP3H
 cleos create account eosio eosio.token EOS6kYgMTCh1iqpq9XGNQbEi8Q6k5GujefN9DSs55dcjVyFAq7B6b EOS6kYgMTCh1iqpq9XGNQbEi8Q6k5GujefN9DSs55dcjVyFAq7B6b
 
 echo "=== create user accounts ==="
@@ -61,9 +61,10 @@ echo "=== deploy smart contract ==="
 # $2 account holder name of the smart contract
 # $3 wallet that holds the keys for the account
 # $4 password for unlocking the wallet
-deploy_contract.sh Users rideos rideoswallet $(cat rideos_wallet_password.txt)
-deploy_contract.sh Orders rideor rideoswallet $(cat rideos_wallet_password.txt)
-deploy_contract.sh Market rideom rideoswallet $(cat rideos_wallet_password.txt)
+ deploy_contract.sh rideos rideos rideoswallet $(cat rideos_wallet_password.txt)
+# deploy_contract.sh Users rideos rideoswallet $(cat rideos_wallet_password.txt)
+# deploy_contract.sh Orders rideor rideoswallet $(cat rideos_wallet_password.txt)
+# deploy_contract.sh Market rideom rideoswallet $(cat rideos_wallet_password.txt)
 cleos set contract eosio.token /contracts/eosio.token
 
 #echo "=== create mock data for contract ==="

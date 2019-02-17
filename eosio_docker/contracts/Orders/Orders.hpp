@@ -8,7 +8,6 @@ using std::string;
 
 CONTRACT Orders : public eosio::contract
 {
-
     using contract::contract;
 
   public:
