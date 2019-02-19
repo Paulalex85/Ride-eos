@@ -4,7 +4,7 @@
 ./user_accounts.sh
 ./market_perm.sh
 
-cleos push action rideom newassign '["tester", "0"]' -p tester
-cleos push action rideom newassign '["tester", "1"]' -p tester
+cleos push action rideos newassign '["tester", "0"]' -p tester
+cleos push action rideos newassign '["tester", "1"]' -p tester
 
-cleos get table rideom rideom assignment
+cleos get table rideos rideos assignment

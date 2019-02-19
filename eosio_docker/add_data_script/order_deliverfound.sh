@@ -1,7 +1,7 @@
 ./market_apply.sh
 ./order_perm.sh
 
-cleos push action rideor deliverfound '["rider", "0"]' -p tester
+cleos push action rideos deliverfound '["rider", "0"]' -p tester
 
-cleos get table rideom rideom offer
-cleos get table rideor rideor order
+cleos get table rideos rideos offer
+cleos get table rideos rideos order

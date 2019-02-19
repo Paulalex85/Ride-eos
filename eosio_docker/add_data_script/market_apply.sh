@@ -2,6 +2,6 @@
 
 ./market_offer.sh
 
-cleos push action rideom addapply '["rider", "0"]' -p rider
+cleos push action rideos addapply '["rider", "0"]' -p rider
 
-cleos get table rideom rideom apply
+cleos get table rideos rideos apply

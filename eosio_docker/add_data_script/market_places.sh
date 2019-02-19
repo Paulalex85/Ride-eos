@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-cleos push action rideom addplace '["0", "World"]' -p rideom
-cleos push action rideom addplace '["0", "France"]' -p rideom
-cleos push action rideom addplace '["1", "Loire Atlantiquse"]' -p rideom
-cleos push action rideom addplace '["1", "Vendee"]' -p rideom
+cleos push action rideos addplace '["0", "World"]' -p rideos
+cleos push action rideos addplace '["0", "France"]' -p rideos
+cleos push action rideos addplace '["1", "Loire Atlantiquse"]' -p rideos
+cleos push action rideos addplace '["1", "Vendee"]' -p rideos
 
-cleos get table rideom rideom place
+cleos get table rideos rideos place
