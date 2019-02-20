@@ -71,7 +71,7 @@ void rideos::withdraw(const name account, const asset &quantity)
         .send();
 }
 
-void rideos::pay(const name account, const name receiver, const asset &quantity)
+void rideos::pay(const name account, const asset &quantity)
 {
     require_auth(account);
 
@@ -82,16 +82,11 @@ void rideos::pay(const name account, const name receiver, const asset &quantity)
     auto iterator = _users.find(account.value);
     eosio_assert(iterator != _users.end(), "Address for account not found");
 
+    eosio_assert(iterator->balance >= quantity, "insufficient balance");
+
     _users.modify(iterator, _self, [&](auto &user) {
-        eosio_assert(user.balance >= quantity, "insufficient balance");
         user.balance -= quantity;
     });
-
-    action(
-        permission_level{_self, name("active")},
-        name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, receiver, quantity, std::string("")))
-        .send();
 }
 
 void rideos::receive(const name account, const name from, const asset &quantity)
@@ -347,11 +342,8 @@ void rideos::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     eosio_assert(iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance");
-    action(
-        permission_level{iteratorOrder->buyer, name("active")},
-        name("rideos"), name("pay"),
-        std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
-        .send();
+
+    pay(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateBuyer = true;

@@ -30,7 +30,7 @@ CONTRACT rideos : public eosio::contract
 
     ACTION withdraw(const name account, const asset &quantity);
 
-    ACTION pay(const name accountUser, const name receiver, const asset &quantity);
+    ACTION pay(const name account, const asset &quantity);
 
     ACTION receive(const name account, const name from, const asset &quantity);
 
