@@ -18,7 +18,6 @@ CONTRACT rideos : public eosio::contract
                                                                     _stackpower(receiver, receiver.value),
                                                                     _orders(receiver, receiver.value),
                                                                     _places(receiver, receiver.value),
-                                                                    _assignments(receiver, receiver.value),
                                                                     _offers(receiver, receiver.value),
                                                                     _applies(receiver, receiver.value) {}
 
@@ -36,7 +35,7 @@ CONTRACT rideos : public eosio::contract
 
     ACTION stackpow(const name account, const asset &quantity, const uint64_t placeKey);
 
-    ACTION unstackpow(const name account, const asset &quantity, const uint64_t stackKey);
+    ACTION unlockpow(const name account, const asset &quantity, const uint64_t stackKey);
 
     ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
 
@@ -63,10 +62,6 @@ CONTRACT rideos : public eosio::contract
     ACTION addplace(uint64_t parentKey, string & name);
 
     ACTION updateplace(uint64_t key, uint64_t parentKey, string & name, bool active);
-
-    ACTION newassign(name account, uint64_t placeKey);
-
-    ACTION endassign(uint64_t assignmentKey);
 
     ACTION addoffer(uint64_t orderKey);
 
@@ -97,6 +92,7 @@ CONTRACT rideos : public eosio::contract
         name account;
         asset balance;
         uint64_t placeKey;
+        time_point_sec endAssignment;
 
         uint64_t primary_key() const { return idStackPower; }
         uint64_t get_account() const { return account.value; }
@@ -170,24 +166,6 @@ CONTRACT rideos : public eosio::contract
     };
     typedef multi_index<name("place"), place> place_table;
 
-    TABLE assignment
-    {
-        uint64_t assignmentKey;
-        uint64_t placeKey;
-        name account;
-        time_point_sec endAssignment;
-
-        uint64_t primary_key() const { return assignmentKey; }
-        uint64_t get_account() const { return account.value; }
-        uint64_t get_place_key() const { return placeKey; }
-    };
-    typedef multi_index<name("assignment"), assignment,
-                        indexed_by<name("byuserkey"),
-                                   const_mem_fun<assignment, uint64_t, &assignment::get_account>>,
-                        indexed_by<name("byplacekey"),
-                                   const_mem_fun<assignment, uint64_t, &assignment::get_place_key>>>
-        assignment_table;
-
     enum offer_state : uint8_t
     {
         OPEN = 0,
@@ -223,32 +201,11 @@ CONTRACT rideos : public eosio::contract
                                    const_mem_fun<apply, uint64_t, &apply::get_offer>>>
         apply_table;
 
-    // accessor for external contracts to easily send inline actions to your contract
-    //   using adduser_action = action_wrapper<"adduser"_n, &rideos::adduser>;
-    //   using updateuser_action = action_wrapper<"updateuser"_n, &rideos::updateuser>;
-    //   using deposit_action = action_wrapper<"deposit"_n, &rideos::deposit>;
-    //   using withdraw_action = action_wrapper<"withdraw"_n, &rideos::withdraw>;
-    //   using pay_action = action_wrapper<"pay"_n, &rideos::pay>;
-    //   using receive_action = action_wrapper<"receive"_n, &rideos::receive>;
-    //   using stackpow_action = action_wrapper<"stackpow"_n, &rideos::stackpow>;
-    // using needdeliver_action = action_wrapper<"needdeliver"_n, &Orders::needdeliver>;
-    // using deliverfound_action = action_wrapper<"deliverfound"_n, &Orders::deliverfound>;
-    // using initialize_action = action_wrapper<"initialize"_n, &Orders::initialize>;
-    // using validatebuy_action = action_wrapper<"validatebuy"_n, &Orders::validatebuy>;
-    // using validatedeli_action = action_wrapper<"validatedeli"_n, &Orders::validatedeli>;
-    // using validatesell_action = action_wrapper<"validatesell"_n, &Orders::validatesell>;
-    // using orderready_action = action_wrapper<"orderready"_n, &Orders::orderready>;
-    // using ordertaken_action = action_wrapper<"ordertaken"_n, &Orders::ordertaken>;
-    // using orderdelive_action = action_wrapper<"orderdelive"_n, &Orders::orderdelive>;
-    // using initcancel_action = action_wrapper<"initcancel"_n, &Orders::initcancel>;
-    // using delaycancel_action = action_wrapper<"delaycancel"_n, &Orders::delaycancel>;
-
   private:
     user_table _users;
     stackpower_table _stackpower;
     order_table _orders;
     place_table _places;
-    assignment_table _assignments;
     offer_table _offers;
     apply_table _applies;
 };

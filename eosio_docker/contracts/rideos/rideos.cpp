@@ -133,7 +133,7 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
 
     while (iteratorStack != indexStack.end())
     {
-        if (iteratorStack->placeKey == placeKey && iteratorStack->account == account)
+        if (iteratorStack->placeKey == placeKey && iteratorStack->account == account && iteratorStack->endAssignment == time_point_sec(0))
         {
             indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
                 stackpower.balance += quantity;
@@ -158,7 +158,7 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
     }
 }
 
-void rideos::unstackpow(const name account, const asset &quantity, const uint64_t stackKey)
+void rideos::unlockpow(const name account, const asset &quantity, const uint64_t stackKey)
 {
     require_auth(account);
 
@@ -175,20 +175,27 @@ void rideos::unstackpow(const name account, const asset &quantity, const uint64_
     eosio_assert(iteratorStackpower->balance >= quantity, "The amount should be less or equal than the balance");
     eosio_assert(iteratorStackpower->account == account, "The user is not the same");
 
+    eosio_assert(iteratorStackpower->endAssignment == time_point_sec(0), "The stack is already unlocked");
+
     if (iteratorStackpower->balance == quantity)
     {
-        _stackpower.erase(iteratorStackpower);
+        _stackpower.modify(iteratorStackpower, _self, [&](auto &stackpower) {
+            stackpower.endAssignment = time_point_sec(now() + DELAY_END_ASSIGN);
+        });
     }
     else
     {
         _stackpower.modify(iteratorStackpower, _self, [&](auto &stackpower) {
-            stackpower.balance -= quantity;
+            stackpower.endAssignment = time_point_sec(now() + DELAY_END_ASSIGN);
+            stackpower.balance = quantity;
+        });
+        _stackpower.emplace(_self, [&](auto &stackpower) {
+            stackpower.idStackPower = _stackpower.available_primary_key();
+            stackpower.account = account;
+            stackpower.balance = iteratorStackpower->balance - quantity;
+            stackpower.placeKey = iteratorStackpower->placeKey;
         });
     }
-
-    _users.modify(iteratorUser, _self, [&](auto &user) {
-        user.balance += quantity;
-    });
 }
 
 bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
@@ -560,46 +567,6 @@ void rideos::updateplace(uint64_t key, uint64_t parentKey, string &name, bool ac
     });
 }
 
-void rideos::newassign(name account, uint64_t placeKey)
-{
-    require_auth(account);
-
-    auto iteratorPlace = _places.find(placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
-
-    auto iteratorUser = _users.find(account.value);
-    eosio_assert(iteratorUser != _users.end(), "User not found");
-
-    auto indexAssign = _assignments.get_index<name("byuserkey")>();
-    auto iteratorAssign = indexAssign.find(account.value);
-
-    while (iteratorAssign != indexAssign.end())
-    {
-        eosio_assert(iteratorAssign->endAssignment != time_point_sec(0), "Already a current assignment");
-        eosio_assert(iteratorAssign->endAssignment < time_point_sec(now()), "The end of the last assign isn't passed");
-        iteratorAssign++;
-    }
-
-    _assignments.emplace(_self, [&](auto &assign) {
-        assign.assignmentKey = _assignments.available_primary_key();
-        assign.account = account;
-        assign.placeKey = iteratorPlace->primary_key();
-    });
-}
-
-void rideos::endassign(uint64_t assignmentKey)
-{
-    auto iteratorAssign = _assignments.find(assignmentKey);
-    eosio_assert(iteratorAssign != _assignments.end(), "Assignment not found");
-
-    require_auth(iteratorAssign->account);
-
-    _assignments.modify(iteratorAssign, _self, [&](auto &assign) {
-        assign.endAssignment = time_point_sec(now() + DELAY_END_ASSIGN);
-    });
-}
-
 void rideos::addoffer(uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
@@ -699,4 +666,4 @@ void rideos::cancelapply(uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(newassign)(endassign)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))
