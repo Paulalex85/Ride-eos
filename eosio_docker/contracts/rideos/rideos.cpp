@@ -2,6 +2,28 @@
 using namespace eosio;
 
 int DELAY_END_ASSIGN = 86400;
+// Only for testing
+// int DELAY_END_ASSIGN = 5;
+
+bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
+{
+    return memcmp((void *)&a, (const void *)&b, sizeof(capi_checksum256)) == 0;
+}
+
+bool is_zero(const capi_checksum256 &a)
+{
+    const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&a);
+    return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
+}
+
+bool is_actor(name sender, name buyer, name seller, name deliver)
+{
+    if (sender.value == buyer.value || sender.value == seller.value || sender.value == deliver.value)
+    {
+        return true;
+    }
+    return false;
+}
 
 void rideos::adduser(name account, string &username)
 {
@@ -150,7 +172,7 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
     if (!found)
     {
         _stackpower.emplace(_self, [&](auto &stackpower) {
-            stackpower.idStackPower = _stackpower.available_primary_key();
+            stackpower.stackKey = _stackpower.available_primary_key();
             stackpower.account = account;
             stackpower.balance = quantity;
             stackpower.placeKey = placeKey;
@@ -191,7 +213,7 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
             stackpower.balance = quantity;
         });
         _stackpower.emplace(_self, [&](auto &stackpower) {
-            stackpower.idStackPower = _stackpower.available_primary_key();
+            stackpower.stackKey = _stackpower.available_primary_key();
             stackpower.account = account;
             stackpower.balance = keepStacked;
             stackpower.placeKey = iteratorStackpower->placeKey;
@@ -199,24 +221,25 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
     }
 }
 
-bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
+void rideos::unstackpow(const name account, const uint64_t stackKey)
 {
-    return memcmp((void *)&a, (const void *)&b, sizeof(capi_checksum256)) == 0;
-}
+    require_auth(account);
 
-bool is_zero(const capi_checksum256 &a)
-{
-    const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&a);
-    return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
-}
+    auto iteratorUser = _users.find(account.value);
+    eosio_assert(iteratorUser != _users.end(), "Address for account not found");
 
-bool is_actor(name sender, name buyer, name seller, name deliver)
-{
-    if (sender.value == buyer.value || sender.value == seller.value || sender.value == deliver.value)
-    {
-        return true;
-    }
-    return false;
+    auto iteratorStackpower = _stackpower.find(stackKey);
+    eosio_assert(iteratorStackpower != _stackpower.end(), "Address for stackpower not found");
+
+    eosio_assert(iteratorStackpower->account == account, "The user is not the same");
+    eosio_assert(iteratorStackpower->endAssignment < time_point_sec(now()), "The stack is not ready to unstack");
+    eosio_assert(iteratorStackpower->endAssignment != time_point_sec(0), "The stack is already unlocked");
+
+    _users.modify(iteratorUser, _self, [&](auto &user) {
+        user.balance += iteratorStackpower->balance;
+    });
+
+    _stackpower.erase(iteratorStackpower);
 }
 
 void rideos::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
@@ -667,4 +690,4 @@ void rideos::cancelapply(uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))

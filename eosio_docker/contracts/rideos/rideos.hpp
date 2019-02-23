@@ -37,6 +37,8 @@ CONTRACT rideos : public eosio::contract
 
     ACTION unlockpow(const name account, const asset &quantity, const uint64_t stackKey);
 
+    ACTION unstackpow(const name account, const uint64_t stackKey);
+
     ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
 
     ACTION deliverfound(name deliver, uint64_t orderKey);
@@ -88,13 +90,13 @@ CONTRACT rideos : public eosio::contract
     //@abi table stackpower i64
     TABLE stackpower
     {
-        uint64_t idStackPower;
+        uint64_t stackKey;
         name account;
         asset balance;
         uint64_t placeKey;
         time_point_sec endAssignment;
 
-        uint64_t primary_key() const { return idStackPower; }
+        uint64_t primary_key() const { return stackKey; }
         uint64_t get_account() const { return account.value; }
     };
     typedef multi_index<name("stackpower"), stackpower,
