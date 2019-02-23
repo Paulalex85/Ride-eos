@@ -185,6 +185,7 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
     }
     else
     {
+        asset keepStacked = iteratorStackpower->balance - quantity;
         _stackpower.modify(iteratorStackpower, _self, [&](auto &stackpower) {
             stackpower.endAssignment = time_point_sec(now() + DELAY_END_ASSIGN);
             stackpower.balance = quantity;
@@ -192,7 +193,7 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
         _stackpower.emplace(_self, [&](auto &stackpower) {
             stackpower.idStackPower = _stackpower.available_primary_key();
             stackpower.account = account;
-            stackpower.balance = iteratorStackpower->balance - quantity;
+            stackpower.balance = keepStacked;
             stackpower.placeKey = iteratorStackpower->placeKey;
         });
     }
