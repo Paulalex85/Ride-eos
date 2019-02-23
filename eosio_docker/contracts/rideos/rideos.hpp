@@ -164,6 +164,7 @@ CONTRACT rideos : public eosio::contract
         string name;
         bool active;
         asset balance;
+        asset childSumBalance;
 
         uint64_t primary_key() const { return placeKey; }
     };

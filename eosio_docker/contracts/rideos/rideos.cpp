@@ -183,6 +183,29 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
     _places.modify(iteratorPlace, _self, [&](auto &place) {
         place.balance += quantity;
     });
+
+    bool hasNext = true;
+    do
+    {
+        if (iteratorPlace->parentKey == iteratorPlace->placeKey)
+        {
+            hasNext = false;
+        }
+        else
+        {
+            iteratorPlace = _places.find(iteratorPlace->parentKey);
+            if (iteratorPlace != _places.end() && iteratorPlace->active == true)
+            {
+                _places.modify(iteratorPlace, _self, [&](auto &place) {
+                    place.childSumBalance += quantity;
+                });
+            }
+            else
+            {
+                hasNext = false;
+            }
+        }
+    } while (hasNext);
 }
 
 void rideos::unlockpow(const name account, const asset &quantity, const uint64_t stackKey)
@@ -588,6 +611,7 @@ void rideos::addplace(uint64_t parentKey, string &name)
         place.name = name;
         place.active = true;
         place.balance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
+        place.childSumBalance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
     });
 }
 
