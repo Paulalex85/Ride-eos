@@ -130,6 +130,7 @@ CONTRACT rideos : public eosio::contract
         capi_checksum256 deliveryverification;
         asset priceOrder;
         asset priceDeliver;
+        asset powerNeeded;
         bool validateBuyer;
         bool validateSeller;
         bool validateDeliver;

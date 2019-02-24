@@ -315,6 +315,7 @@ void rideos::needdeliver(name buyer, name seller, asset &priceOrder, asset &pric
         order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
+        order.powerNeeded = eosio::asset((iteratorPlace->balance.amount + iteratorPlace->childSumBalance.amount) / (iteratorPlace->nbDelivery + 1), symbol(symbol_code("SYS"), 4));
         order.validateBuyer = false;
         order.validateSeller = false;
         order.validateDeliver = false;
@@ -388,6 +389,7 @@ void rideos::initialize(name buyer, name seller, name deliver, asset &priceOrder
         order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
+        order.powerNeeded = eosio::asset((iteratorPlace->balance.amount + iteratorPlace->childSumBalance.amount) / (iteratorPlace->nbDelivery + 1), symbol(symbol_code("SYS"), 4));
         order.validateBuyer = false;
         order.validateSeller = false;
         order.validateDeliver = false;
