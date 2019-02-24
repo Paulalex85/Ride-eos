@@ -247,6 +247,21 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
     _places.modify(iteratorPlace, _self, [&](auto &place) {
         place.balance -= quantity;
     });
+
+    while (iteratorPlace->parentKey != iteratorPlace->placeKey)
+    {
+        iteratorPlace = _places.find(iteratorPlace->parentKey);
+        if (iteratorPlace != _places.end())
+        {
+            _places.modify(iteratorPlace, _self, [&](auto &place) {
+                place.childSumBalance -= quantity;
+            });
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 
 void rideos::unstackpow(const name account, const uint64_t stackKey)

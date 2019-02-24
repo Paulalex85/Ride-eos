@@ -2,11 +2,11 @@
 
 # make sure everything is clean and well setup
 echo "[quick_start.sh] First time setup"
-./first_time_setup.sh
+sudo ./first_time_setup.sh
 
 # start blockchain and put in background
 echo "[quick_start.sh] Starting eosio docker"
-./start_eosio_docker.sh --nolog
+./start_eosio_docker.sh
 
 # wait until eosio blockchain to be started
 until $(curl --output /dev/null \
@@ -20,5 +20,5 @@ do
 done
 
 #start frontend react app
-echo "[quick_start.sh] Starting frontend react app"
-./start_frontend.sh
+# echo "[quick_start.sh] Starting frontend react app"
+# ./start_frontend.sh
