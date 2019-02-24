@@ -617,6 +617,7 @@ void rideos::addplace(uint64_t parentKey, string &name)
         place.parentKey = parentKey;
         place.name = name;
         place.active = true;
+        place.nbDelivery = 0;
         place.balance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
         place.childSumBalance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
     });

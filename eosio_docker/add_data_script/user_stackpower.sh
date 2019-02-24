@@ -25,4 +25,3 @@ cleos push action rideos unstackpow '["tester", "3"]' -p tester
 
 cleos get table rideos rideos user
 cleos get table rideos rideos stackpower
-

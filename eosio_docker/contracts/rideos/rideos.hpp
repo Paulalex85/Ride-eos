@@ -19,7 +19,8 @@ CONTRACT rideos : public eosio::contract
                                                                     _orders(receiver, receiver.value),
                                                                     _places(receiver, receiver.value),
                                                                     _offers(receiver, receiver.value),
-                                                                    _applies(receiver, receiver.value) {}
+                                                                    _applies(receiver, receiver.value),
+                                                                    _deliveries(receiver, receiver.value) {}
 
     ACTION adduser(name account, string & username);
 
@@ -165,10 +166,25 @@ CONTRACT rideos : public eosio::contract
         bool active;
         asset balance;
         asset childSumBalance;
+        uint64_t nbDelivery;
 
         uint64_t primary_key() const { return placeKey; }
     };
     typedef multi_index<name("place"), place> place_table;
+
+    TABLE deliveries
+    {
+        uint64_t deliveKey;
+        uint64_t placeKey;
+        time_point_sec endDate;
+
+        uint64_t primary_key() const { return deliveKey; }
+        uint64_t get_place() const { return placeKey; }
+    };
+    typedef multi_index<name("deliveries"), deliveries,
+                        indexed_by<name("byplace"),
+                                   const_mem_fun<deliveries, uint64_t, &deliveries::get_place>>>
+        deliveries_table;
 
     enum offer_state : uint8_t
     {
@@ -212,4 +228,5 @@ CONTRACT rideos : public eosio::contract
     place_table _places;
     offer_table _offers;
     apply_table _applies;
+    deliveries_table _deliveries;
 };
