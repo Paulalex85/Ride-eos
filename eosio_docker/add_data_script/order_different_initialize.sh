@@ -36,4 +36,14 @@ cleos push action rideos validatesell '["4", "'$hashSeller'"]' -p seller
 cleos push action rideos orderready '["4"]' -p seller
 cleos push action rideos ordertaken '["4","'$keySeller'"]' -p rider
 
+cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 7",0,0]' -p tester
+cleos push action rideos validatebuy '["5", "'$hashTester'"]' -p tester
+cleos push action rideos validatedeli '["5"]' -p rider
+cleos push action rideos validatesell '["5", "'$hashSeller'"]' -p seller
+cleos push action rideos orderready '["5"]' -p seller
+cleos push action rideos ordertaken '["5","'$keySeller'"]' -p rider
+cleos push action rideos orderdelive '["5","'$keyTester'"]' -p rider
+
 cleos get table rideos rideos order
+cleos get table rideos rideos place
+cleos get table rideos rideos deliveries

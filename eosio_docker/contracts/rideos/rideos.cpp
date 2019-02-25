@@ -2,6 +2,7 @@
 using namespace eosio;
 
 int DELAY_END_ASSIGN = 86400;
+int DELAY_POWER_NEEDED = 86400;
 // Only for testing
 // int DELAY_END_ASSIGN = 5;
 
@@ -533,12 +534,6 @@ void rideos::orderdelive(uint64_t orderKey, const capi_checksum256 &source)
 
     action(
         permission_level{_self, name("active")},
-        name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
-        .send();
-
-    action(
-        permission_level{_self, name("active")},
         name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->seller, _self, iteratorOrder->priceOrder))
         .send();
@@ -548,6 +543,19 @@ void rideos::orderdelive(uint64_t orderKey, const capi_checksum256 &source)
         name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver))
         .send();
+
+    _deliveries.emplace(_self, [&](auto &deliveries) {
+        deliveries.deliveKey = _deliveries.available_primary_key();
+        deliveries.placeKey = iteratorOrder->placeKey;
+        deliveries.endDate = eosio::time_point_sec(now() + DELAY_POWER_NEEDED);
+    });
+
+    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
+
+    _places.modify(iteratorPlace, _self, [&](auto &place) {
+        place.nbDelivery += 1;
+    });
 }
 
 void rideos::initcancel(uint64_t orderKey, name account)
