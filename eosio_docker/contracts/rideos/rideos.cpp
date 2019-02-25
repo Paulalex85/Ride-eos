@@ -746,4 +746,20 @@ void rideos::cancelapply(uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))
+void rideos::deletedelive(uint64_t deliveKey)
+{
+    auto iteratorDelivery = _deliveries.find(deliveKey);
+    eosio_assert(iteratorDelivery != _deliveries.end(), "Deliveries not found");
+
+    eosio_assert(iteratorDelivery->endDate < time_point_sec(now()), "Delivery not ready to be deleted");
+
+    auto iteratorPlace = _places.find(iteratorDelivery->placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
+
+    _places.modify(iteratorPlace, _self, [&](auto &place) {
+        place.nbDelivery -= 1;
+    });
+
+    _deliveries.erase(iteratorDelivery);
+}
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply)(deletedelive))
