@@ -129,7 +129,7 @@ void rideos::receive(const name account, const name from, const asset &quantity)
     });
 }
 
-void rideos::stackpow(const name account, const asset &quantity, const uint64_t placeKey)
+void rideos::stackpow(const name account, const asset &quantity)
 {
     require_auth(account);
 
@@ -139,10 +139,6 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
 
     auto iteratorUser = _users.find(account.value);
     eosio_assert(iteratorUser != _users.end(), "Address for account not found");
-
-    auto iteratorPlace = _places.find(placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     eosio_assert(iteratorUser->balance >= quantity, "Insufficient balance");
 
@@ -157,7 +153,7 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
 
     while (iteratorStack != indexStack.end())
     {
-        if (iteratorStack->placeKey == placeKey && iteratorStack->account == account && iteratorStack->endAssignment == time_point_sec(0))
+        if (iteratorStack->account == account && iteratorStack->endAssignment == time_point_sec(0))
         {
             indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
                 stackpower.balance += quantity;
@@ -178,27 +174,7 @@ void rideos::stackpow(const name account, const asset &quantity, const uint64_t 
             stackpower.stackKey = _stackpower.available_primary_key();
             stackpower.account = account;
             stackpower.balance = quantity;
-            stackpower.placeKey = placeKey;
         });
-    }
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.balance += quantity;
-    });
-
-    while (iteratorPlace->parentKey != iteratorPlace->placeKey)
-    {
-        iteratorPlace = _places.find(iteratorPlace->parentKey);
-        if (iteratorPlace != _places.end() && iteratorPlace->active == true)
-        {
-            _places.modify(iteratorPlace, _self, [&](auto &place) {
-                place.childSumBalance += quantity;
-            });
-        }
-        else
-        {
-            break;
-        }
     }
 }
 
@@ -238,31 +214,7 @@ void rideos::unlockpow(const name account, const asset &quantity, const uint64_t
             stackpower.stackKey = _stackpower.available_primary_key();
             stackpower.account = account;
             stackpower.balance = keepStacked;
-            stackpower.placeKey = iteratorStackpower->placeKey;
         });
-    }
-
-    auto iteratorPlace = _places.find(iteratorStackpower->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.balance -= quantity;
-    });
-
-    while (iteratorPlace->parentKey != iteratorPlace->placeKey)
-    {
-        iteratorPlace = _places.find(iteratorPlace->parentKey);
-        if (iteratorPlace != _places.end())
-        {
-            _places.modify(iteratorPlace, _self, [&](auto &place) {
-                place.childSumBalance -= quantity;
-            });
-        }
-        else
-        {
-            break;
-        }
     }
 }
 
@@ -288,7 +240,7 @@ void rideos::unstackpow(const name account, const uint64_t stackKey)
 }
 
 void rideos::needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver,
-                         const std::string &details, const uint64_t delay, const uint64_t placeKey)
+                         const std::string &details, const uint64_t delay)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -304,10 +256,6 @@ void rideos::needdeliver(const name buyer, const name seller, const asset &price
     iteratorUser = _users.find(seller.value);
     eosio_assert(iteratorUser != _users.end(), "Seller not found");
 
-    auto iteratorPlace = _places.find(placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
-
     _orders.emplace(_self, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
@@ -317,13 +265,11 @@ void rideos::needdeliver(const name buyer, const name seller, const asset &price
         order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
-        order.powerNeeded = eosio::asset((iteratorPlace->balance.amount + iteratorPlace->childSumBalance.amount) / (iteratorPlace->nbDelivery + 1), symbol(symbol_code("SYS"), 4));
         order.validateBuyer = false;
         order.validateSeller = false;
         order.validateDeliver = false;
         order.details = details;
         order.delay = delay;
-        order.placeKey = placeKey;
     });
 }
 
@@ -358,7 +304,7 @@ void rideos::deliverfound(const name deliver, const uint64_t orderKey)
 }
 
 void rideos::initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder,
-                        const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey)
+                        const asset &priceDeliver, const string &details, const uint64_t delay)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -377,10 +323,6 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
     iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
 
-    auto iteratorPlace = _places.find(placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
-
     _orders.emplace(_self, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
@@ -391,13 +333,11 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
         order.dateDelay = time_point_sec(now());
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
-        order.powerNeeded = eosio::asset((iteratorPlace->balance.amount + iteratorPlace->childSumBalance.amount) / (iteratorPlace->nbDelivery + 1), symbol(symbol_code("SYS"), 4));
         order.validateBuyer = false;
         order.validateSeller = false;
         order.validateDeliver = false;
         order.details = details;
         order.delay = delay;
-        order.placeKey = placeKey;
     });
 }
 
@@ -414,10 +354,6 @@ void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorUser != _users.end(), "Buyer not found");
 
     eosio_assert(iteratorOrder->validateBuyer == false, "Buyer already validate");
-
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     eosio_assert(iteratorUser->balance >= iteratorOrder->priceOrder + iteratorOrder->priceDeliver, "insufficient balance");
 
@@ -446,10 +382,6 @@ void rideos::validatedeli(const uint64_t orderKey)
 
     eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
-
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateDeliver = true;
 
@@ -471,10 +403,6 @@ void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
     eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
-
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;
@@ -544,19 +472,6 @@ void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source
         name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver))
         .send();
-
-    _deliveries.emplace(_self, [&](auto &deliveries) {
-        deliveries.deliveKey = _deliveries.available_primary_key();
-        deliveries.placeKey = iteratorOrder->placeKey;
-        deliveries.endDate = eosio::time_point_sec(now() + DELAY_POWER_NEEDED);
-    });
-
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.nbDelivery += 1;
-    });
 }
 
 void rideos::initcancel(const uint64_t orderKey, const name account)
@@ -619,35 +534,6 @@ void rideos::delaycancel(const uint64_t orderKey)
     });
 }
 
-void rideos::addplace(const uint64_t parentKey, const string &name)
-{
-    require_auth(_self);
-
-    _places.emplace(_self, [&](auto &place) {
-        place.placeKey = _places.available_primary_key();
-        place.parentKey = parentKey;
-        place.name = name;
-        place.active = true;
-        place.nbDelivery = 0;
-        place.balance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
-        place.childSumBalance = eosio::asset(0, symbol(symbol_code("SYS"), 4));
-    });
-}
-
-void rideos::updateplace(const uint64_t key, const uint64_t parentKey, const string &name, const bool active)
-{
-    require_auth(_self);
-
-    auto iteratorPlace = _places.find(key);
-    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.parentKey = parentKey;
-        place.name = name;
-        place.active = active;
-    });
-}
-
 void rideos::addoffer(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
@@ -656,10 +542,6 @@ void rideos::addoffer(const uint64_t orderKey)
     require_auth(iteratorOrder->buyer);
 
     eosio_assert(iteratorOrder->state == 0, "The state of the order don't need a deliver");
-
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     _offers.emplace(_self, [&](auto &offer) {
         offer.offerKey = _offers.available_primary_key();
@@ -680,10 +562,6 @@ void rideos::endoffer(const name deliver, const uint64_t offerKey)
 
     auto iteratorUser = _users.find(deliver.value);
     eosio_assert(iteratorUser != _users.end(), "Deliver not found");
-
-    auto iteratorPlace = _places.find(iteratorOrder->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Place not found");
-    eosio_assert(iteratorPlace->active == true, "Place is not active");
 
     require_auth(iteratorOrder->buyer);
 
@@ -747,49 +625,4 @@ void rideos::cancelapply(const uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-void rideos::deletedelive(const uint64_t deliveKey)
-{
-    auto iteratorDelivery = _deliveries.find(deliveKey);
-    eosio_assert(iteratorDelivery != _deliveries.end(), "Deliveries not found");
-
-    eosio_assert(iteratorDelivery->endDate < time_point_sec(now()), "Delivery not ready to be deleted");
-
-    auto iteratorPlace = _places.find(iteratorDelivery->placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.nbDelivery -= 1;
-    });
-
-    _deliveries.erase(iteratorDelivery);
-}
-
-void rideos::cleandelive(const uint64_t placeKey)
-{
-    auto indexDeliveries = _deliveries.get_index<name("byplace")>();
-    auto iteratorDeliveries = indexDeliveries.find(placeKey);
-
-    auto iteratorPlace = _places.find(placeKey);
-    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
-
-    uint8_t nbDeleted = 0;
-
-    while (iteratorDeliveries != indexDeliveries.end() && nbDeleted < 255)
-    {
-        if (iteratorDeliveries->endDate < time_point_sec(now()))
-        {
-            nbDeleted++;
-            iteratorDeliveries = indexDeliveries.erase(iteratorDeliveries);
-        }
-        else
-        {
-            iteratorDeliveries++;
-        }
-    }
-
-    _places.modify(iteratorPlace, _self, [&](auto &place) {
-        place.nbDelivery -= nbDeleted;
-    });
-}
-
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply)(deletedelive)(cleandelive))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))

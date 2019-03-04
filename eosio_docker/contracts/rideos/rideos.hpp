@@ -17,10 +17,8 @@ CONTRACT rideos : public eosio::contract
                                                                     _users(receiver, receiver.value),
                                                                     _stackpower(receiver, receiver.value),
                                                                     _orders(receiver, receiver.value),
-                                                                    _places(receiver, receiver.value),
                                                                     _offers(receiver, receiver.value),
-                                                                    _applies(receiver, receiver.value),
-                                                                    _deliveries(receiver, receiver.value) {}
+                                                                    _applies(receiver, receiver.value) {}
 
     ACTION adduser(const name account, const string &username);
 
@@ -34,17 +32,17 @@ CONTRACT rideos : public eosio::contract
 
     ACTION receive(const name account, const name from, const asset &quantity);
 
-    ACTION stackpow(const name account, const asset &quantity, const uint64_t placeKey);
+    ACTION stackpow(const name account, const asset &quantity);
 
     ACTION unlockpow(const name account, const asset &quantity, const uint64_t stackKey);
 
     ACTION unstackpow(const name account, const uint64_t stackKey);
 
-    ACTION needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey);
+    ACTION needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
     ACTION deliverfound(const name deliver, const uint64_t orderKey);
 
-    ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey);
+    ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
     ACTION validatebuy(const uint64_t orderKey, const capi_checksum256 &hash);
 
@@ -62,10 +60,6 @@ CONTRACT rideos : public eosio::contract
 
     ACTION delaycancel(const uint64_t orderKey);
 
-    ACTION addplace(const uint64_t parentKey, const string &name);
-
-    ACTION updateplace(const uint64_t key, const uint64_t parentKey, const string &name, const bool active);
-
     ACTION addoffer(const uint64_t orderKey);
 
     ACTION endoffer(const name deliver, const uint64_t offerKey);
@@ -75,10 +69,6 @@ CONTRACT rideos : public eosio::contract
     ACTION addapply(const name account, const uint64_t offerKey);
 
     ACTION cancelapply(const uint64_t applyKey);
-
-    ACTION deletedelive(const uint64_t deliveKey);
-
-    ACTION cleandelive(const uint64_t placeKey);
 
     //@abi table user i64
     TABLE user
@@ -98,7 +88,6 @@ CONTRACT rideos : public eosio::contract
         uint64_t stackKey;
         name account;
         asset balance;
-        uint64_t placeKey;
         time_point_sec endAssignment;
 
         uint64_t primary_key() const { return stackKey; }
@@ -134,13 +123,11 @@ CONTRACT rideos : public eosio::contract
         capi_checksum256 deliveryverification;
         asset priceOrder;
         asset priceDeliver;
-        asset powerNeeded;
         bool validateBuyer;
         bool validateSeller;
         bool validateDeliver;
         string details;
         uint64_t delay;
-        uint64_t placeKey;
 
         uint64_t primary_key() const { return orderKey; }
         uint64_t get_buyer_key() const { return buyer.value; }
@@ -162,34 +149,6 @@ CONTRACT rideos : public eosio::contract
                         indexed_by<name("bydeliverkey"),
                                    const_mem_fun<order, uint64_t, &order::get_deliver_key>>>
         order_table;
-
-    TABLE place
-    {
-        uint64_t placeKey;
-        uint64_t parentKey;
-        string name;
-        bool active;
-        asset balance;
-        asset childSumBalance;
-        uint64_t nbDelivery;
-
-        uint64_t primary_key() const { return placeKey; }
-    };
-    typedef multi_index<name("place"), place> place_table;
-
-    TABLE deliveries
-    {
-        uint64_t deliveKey;
-        uint64_t placeKey;
-        time_point_sec endDate;
-
-        uint64_t primary_key() const { return deliveKey; }
-        uint64_t get_place() const { return placeKey; }
-    };
-    typedef multi_index<name("deliveries"), deliveries,
-                        indexed_by<name("byplace"),
-                                   const_mem_fun<deliveries, uint64_t, &deliveries::get_place>>>
-        deliveries_table;
 
     enum offer_state : uint8_t
     {
@@ -230,8 +189,6 @@ CONTRACT rideos : public eosio::contract
     user_table _users;
     stackpower_table _stackpower;
     order_table _orders;
-    place_table _places;
     offer_table _offers;
     apply_table _applies;
-    deliveries_table _deliveries;
 };
