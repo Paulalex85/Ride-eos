@@ -27,6 +27,40 @@ bool is_actor(const name sender, const name buyer, const name seller, const name
     return false;
 }
 
+void rideos::find_stackpower_and_increase(const name account, const asset &quantity)
+{
+    auto indexStack = _stackpower.get_index<name("byaccount")>();
+    auto iteratorStack = indexStack.find(account.value);
+
+    bool found = false;
+
+    while (iteratorStack != indexStack.end())
+    {
+        if (iteratorStack->account == account && iteratorStack->endAssignment == time_point_sec(0))
+        {
+            indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
+                stackpower.balance += quantity;
+            });
+
+            found = true;
+            break;
+        }
+        else
+        {
+            iteratorStack++;
+        }
+    }
+
+    if (!found)
+    {
+        _stackpower.emplace(_self, [&](auto &stackpower) {
+            stackpower.stackKey = _stackpower.available_primary_key();
+            stackpower.account = account;
+            stackpower.balance = quantity;
+        });
+    }
+}
+
 void rideos::adduser(const name account, const string &username)
 {
     require_auth(account);
@@ -146,36 +180,7 @@ void rideos::stackpow(const name account, const asset &quantity)
         user.balance -= quantity;
     });
 
-    auto indexStack = _stackpower.get_index<name("byaccount")>();
-    auto iteratorStack = indexStack.find(account.value);
-
-    bool found = false;
-
-    while (iteratorStack != indexStack.end())
-    {
-        if (iteratorStack->account == account && iteratorStack->endAssignment == time_point_sec(0))
-        {
-            indexStack.modify(iteratorStack, _self, [&](auto &stackpower) {
-                stackpower.balance += quantity;
-            });
-
-            found = true;
-            break;
-        }
-        else
-        {
-            iteratorStack++;
-        }
-    }
-
-    if (!found)
-    {
-        _stackpower.emplace(_self, [&](auto &stackpower) {
-            stackpower.stackKey = _stackpower.available_primary_key();
-            stackpower.account = account;
-            stackpower.balance = quantity;
-        });
-    }
+    find_stackpower_and_increase(account, quantity);
 }
 
 void rideos::unlockpow(const name account, const asset &quantity, const uint64_t stackKey)
@@ -371,7 +376,7 @@ void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
     });
 }
 
-void rideos::validatedeli(const uint64_t orderKey)
+void rideos::validatedeli(const uint64_t orderKey, const uint64_t stackKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -381,6 +386,17 @@ void rideos::validatedeli(const uint64_t orderKey)
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
     eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
+
+    auto iteratorStack = _stackpower.find(stackKey);
+    eosio_assert(iteratorStack != _stackpower.end(), "Address for stackpower not found");
+
+    eosio_assert(iteratorStack->account == iteratorOrder->deliver, "The user is not the same of the stackpower");
+    eosio_assert(iteratorStack->endAssignment == time_point_sec(0), "The stack is not available");
+    eosio_assert(iteratorStack->balance >= iteratorOrder->priceDeliver, "insufficient balance");
+
+    _stackpower.modify(iteratorStack, _self, [&](auto &stackpower) {
+        stackpower.balance -= iteratorOrder->priceDeliver;
+    });
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateDeliver = true;
@@ -393,7 +409,7 @@ void rideos::validatedeli(const uint64_t orderKey)
     });
 }
 
-void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
+void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash, const uint64_t stackKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -403,6 +419,17 @@ void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
     eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
     eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
+
+    auto iteratorStack = _stackpower.find(stackKey);
+    eosio_assert(iteratorStack != _stackpower.end(), "Address for stackpower not found");
+
+    eosio_assert(iteratorStack->account == iteratorOrder->seller, "The user is not the same of the stackpower");
+    eosio_assert(iteratorStack->endAssignment == time_point_sec(0), "The stack is not available");
+    eosio_assert(iteratorStack->balance >= iteratorOrder->priceOrder, "insufficient balance");
+
+    _stackpower.modify(iteratorStack, _self, [&](auto &stackpower) {
+        stackpower.balance -= iteratorOrder->priceOrder;
+    });
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;
@@ -472,6 +499,9 @@ void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source
         name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver))
         .send();
+
+    find_stackpower_and_increase(iteratorOrder->seller, iteratorOrder->priceOrder);
+    find_stackpower_and_increase(iteratorOrder->deliver, iteratorOrder->priceDeliver);
 }
 
 void rideos::initcancel(const uint64_t orderKey, const name account)
@@ -498,6 +528,16 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
             name("rideos"), name("receive"),
             std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
             .send();
+    }
+
+    if (iteratorOrder->validateSeller)
+    {
+        find_stackpower_and_increase(iteratorOrder->seller, iteratorOrder->priceOrder);
+    }
+
+    if (iteratorOrder->validateDeliver)
+    {
+        find_stackpower_and_increase(iteratorOrder->deliver, iteratorOrder->priceDeliver);
     }
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
@@ -528,6 +568,9 @@ void rideos::delaycancel(const uint64_t orderKey)
         name("rideos"), name("receive"),
         std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
         .send();
+
+    find_stackpower_and_increase(iteratorOrder->seller, iteratorOrder->priceOrder);
+    find_stackpower_and_increase(iteratorOrder->deliver, iteratorOrder->priceDeliver);
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_CANCEL;

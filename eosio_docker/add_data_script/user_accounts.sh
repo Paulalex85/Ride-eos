@@ -20,5 +20,7 @@ cleos push action rideos adduser '["sarabrown","sara"]' -p sarabrown
 sleep 1
 
 cleos push action rideos deposit '["tester", "10000.0000 SYS"]' -p tester
+cleos push action rideos deposit '["rider", "100.0000 SYS"]' -p rider
+cleos push action rideos deposit '["seller", "100.0000 SYS"]' -p seller
 
 cleos get table rideos rideos user

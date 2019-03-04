@@ -2,7 +2,7 @@
 
 ./user_accounts.sh
 ./order_perm.sh
-./market_places.sh
+./user_stackpower.sh
 
 keyTester=$(openssl rand -hex 32)
 keySeller=$(openssl rand -hex 32)
@@ -13,37 +13,18 @@ echo "key seller $keySeller"
 hashTester=$(echo -n $keyTester | xxd -r -p | sha256sum -b | awk '{print $1}')
 hashSeller=$(echo -n $keySeller | xxd -r -p | sha256sum -b | awk '{print $1}')
 
-cleos push action rideos needdeliver '["tester", "seller", "50.0000 SYS", "20.0000 SYS","order 1",0,0]' -p tester
+cleos push action rideos needdeliver '["tester", "seller", "50.0000 SYS", "20.0000 SYS","order 1",0]' -p tester
 
-cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0,0]' -p tester
+cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0]' -p tester
+cleos push action rideos validatebuy '["1", "'$hashTester'"]' -p tester
+cleos push action rideos validatedeli '["1","1"]' -p rider
+cleos push action rideos validatesell '["1", "'$hashSeller'","0"]' -p seller
+cleos get table rideos rideos stackpower
 sleep 1
 
-cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 4",0,0]' -p tester
-cleos push action rideos validatebuy '["2", "'$hashTester'"]' -p tester
-cleos push action rideos validatedeli '["2"]' -p rider
-cleos push action rideos validatesell '["2", "'$hashSeller'"]' -p seller
-
-cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 5",0,0]' -p tester
-cleos push action rideos validatebuy '["3", "'$hashTester'"]' -p tester
-cleos push action rideos validatedeli '["3"]' -p rider
-cleos push action rideos validatesell '["3", "'$hashSeller'"]' -p seller
-cleos push action rideos orderready '["3"]' -p seller
-
-cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 6",0,0]' -p tester
-cleos push action rideos validatebuy '["4", "'$hashTester'"]' -p tester
-cleos push action rideos validatedeli '["4"]' -p rider
-cleos push action rideos validatesell '["4", "'$hashSeller'"]' -p seller
-cleos push action rideos orderready '["4"]' -p seller
-cleos push action rideos ordertaken '["4","'$keySeller'"]' -p rider
-
-cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 7",0,0]' -p tester
-cleos push action rideos validatebuy '["5", "'$hashTester'"]' -p tester
-cleos push action rideos validatedeli '["5"]' -p rider
-cleos push action rideos validatesell '["5", "'$hashSeller'"]' -p seller
-cleos push action rideos orderready '["5"]' -p seller
-cleos push action rideos ordertaken '["5","'$keySeller'"]' -p rider
-cleos push action rideos orderdelive '["5","'$keyTester'"]' -p rider
+cleos push action rideos orderready '["1"]' -p seller
+cleos push action rideos ordertaken '["1","'$keySeller'"]' -p rider
+cleos push action rideos orderdelive '["1","'$keyTester'"]' -p rider
 
 cleos get table rideos rideos order
-cleos get table rideos rideos place
-cleos get table rideos rideos deliveries
+cleos get table rideos rideos stackpower

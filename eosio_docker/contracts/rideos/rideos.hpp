@@ -20,6 +20,8 @@ CONTRACT rideos : public eosio::contract
                                                                     _offers(receiver, receiver.value),
                                                                     _applies(receiver, receiver.value) {}
 
+    void find_stackpower_and_increase(const name account, const asset &quantity);
+
     ACTION adduser(const name account, const string &username);
 
     ACTION updateuser(const name account, const string &username);
@@ -46,9 +48,9 @@ CONTRACT rideos : public eosio::contract
 
     ACTION validatebuy(const uint64_t orderKey, const capi_checksum256 &hash);
 
-    ACTION validatedeli(const uint64_t orderKey);
+    ACTION validatedeli(const uint64_t orderKey, const uint64_t stackKey);
 
-    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash);
+    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash, const uint64_t stackKey);
 
     ACTION orderready(const uint64_t orderKey);
 
