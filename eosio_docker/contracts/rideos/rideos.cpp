@@ -1,10 +1,11 @@
 #include "rideos.hpp"
 using namespace eosio;
 
-int DELAY_END_ASSIGN = 86400;
-int DELAY_POWER_NEEDED = 86400;
+// int DELAY_END_ASSIGN = 86400;
+// int DELAY_POWER_NEEDED = 86400;
 // Only for testing
-// int DELAY_END_ASSIGN = 5;
+int DELAY_END_ASSIGN = 5;
+int DELAY_POWER_NEEDED = 5;
 
 bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
 {
@@ -762,4 +763,33 @@ void rideos::deletedelive(uint64_t deliveKey)
 
     _deliveries.erase(iteratorDelivery);
 }
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply)(deletedelive))
+
+void rideos::cleandelive(uint64_t placeKey)
+{
+    auto indexDeliveries = _deliveries.get_index<name("byplace")>();
+    auto iteratorDeliveries = indexDeliveries.find(placeKey);
+
+    auto iteratorPlace = _places.find(placeKey);
+    eosio_assert(iteratorPlace != _places.end(), "Address for place not found");
+
+    uint8_t nbDeleted = 0;
+
+    while (iteratorDeliveries != indexDeliveries.end() && nbDeleted < 255)
+    {
+        if (iteratorDeliveries->endDate < time_point_sec(now()))
+        {
+            nbDeleted++;
+            iteratorDeliveries = indexDeliveries.erase(iteratorDeliveries);
+        }
+        else
+        {
+            iteratorDeliveries++;
+        }
+    }
+
+    _places.modify(iteratorPlace, _self, [&](auto &place) {
+        place.nbDelivery -= nbDeleted;
+    });
+}
+
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addplace)(updateplace)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply)(deletedelive)(cleandelive))

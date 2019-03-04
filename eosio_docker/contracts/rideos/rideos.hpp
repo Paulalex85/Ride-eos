@@ -78,6 +78,8 @@ CONTRACT rideos : public eosio::contract
 
     ACTION deletedelive(uint64_t deliveKey);
 
+    ACTION cleandelive(uint64_t placeKey);
+
     //@abi table user i64
     TABLE user
     {
