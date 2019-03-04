@@ -22,9 +22,9 @@ CONTRACT rideos : public eosio::contract
                                                                     _applies(receiver, receiver.value),
                                                                     _deliveries(receiver, receiver.value) {}
 
-    ACTION adduser(name account, string & username);
+    ACTION adduser(const name account, const string &username);
 
-    ACTION updateuser(name account, string & username);
+    ACTION updateuser(const name account, const string &username);
 
     ACTION deposit(const name account, const asset &quantity);
 
@@ -40,45 +40,45 @@ CONTRACT rideos : public eosio::contract
 
     ACTION unstackpow(const name account, const uint64_t stackKey);
 
-    ACTION needdeliver(name buyer, name seller, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
+    ACTION needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey);
 
-    ACTION deliverfound(name deliver, uint64_t orderKey);
+    ACTION deliverfound(const name deliver, const uint64_t orderKey);
 
-    ACTION initialize(name buyer, name seller, name deliver, asset & priceOrder, asset & priceDeliver, string & details, uint64_t delay, uint64_t placeKey);
+    ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey);
 
-    ACTION validatebuy(uint64_t orderKey, const capi_checksum256 &hash);
+    ACTION validatebuy(const uint64_t orderKey, const capi_checksum256 &hash);
 
-    ACTION validatedeli(uint64_t orderKey);
+    ACTION validatedeli(const uint64_t orderKey);
 
-    ACTION validatesell(uint64_t orderKey, const capi_checksum256 &hash);
+    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash);
 
-    ACTION orderready(uint64_t orderKey);
+    ACTION orderready(const uint64_t orderKey);
 
-    ACTION ordertaken(uint64_t orderKey, const capi_checksum256 &source);
+    ACTION ordertaken(const uint64_t orderKey, const capi_checksum256 &source);
 
-    ACTION orderdelive(uint64_t orderKey, const capi_checksum256 &source);
+    ACTION orderdelive(const uint64_t orderKey, const capi_checksum256 &source);
 
-    ACTION initcancel(uint64_t orderKey, name account);
+    ACTION initcancel(const uint64_t orderKey, const name account);
 
-    ACTION delaycancel(uint64_t orderKey);
+    ACTION delaycancel(const uint64_t orderKey);
 
-    ACTION addplace(uint64_t parentKey, string & name);
+    ACTION addplace(const uint64_t parentKey, const string &name);
 
-    ACTION updateplace(uint64_t key, uint64_t parentKey, string & name, bool active);
+    ACTION updateplace(const uint64_t key, const uint64_t parentKey, const string &name, const bool active);
 
-    ACTION addoffer(uint64_t orderKey);
+    ACTION addoffer(const uint64_t orderKey);
 
-    ACTION endoffer(name deliver, uint64_t offerKey);
+    ACTION endoffer(const name deliver, const uint64_t offerKey);
 
-    ACTION canceloffer(uint64_t offerKey);
+    ACTION canceloffer(const uint64_t offerKey);
 
-    ACTION addapply(name account, uint64_t offerKey);
+    ACTION addapply(const name account, const uint64_t offerKey);
 
-    ACTION cancelapply(uint64_t applyKey);
+    ACTION cancelapply(const uint64_t applyKey);
 
-    ACTION deletedelive(uint64_t deliveKey);
+    ACTION deletedelive(const uint64_t deliveKey);
 
-    ACTION cleandelive(uint64_t placeKey);
+    ACTION cleandelive(const uint64_t placeKey);
 
     //@abi table user i64
     TABLE user

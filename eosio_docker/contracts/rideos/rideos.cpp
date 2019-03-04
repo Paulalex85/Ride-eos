@@ -18,7 +18,7 @@ bool is_zero(const capi_checksum256 &a)
     return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
 }
 
-bool is_actor(name sender, name buyer, name seller, name deliver)
+bool is_actor(const name sender, const name buyer, const name seller, const name deliver)
 {
     if (sender.value == buyer.value || sender.value == seller.value || sender.value == deliver.value)
     {
@@ -27,7 +27,7 @@ bool is_actor(name sender, name buyer, name seller, name deliver)
     return false;
 }
 
-void rideos::adduser(name account, string &username)
+void rideos::adduser(const name account, const string &username)
 {
     require_auth(account);
 
@@ -41,7 +41,7 @@ void rideos::adduser(name account, string &username)
     });
 }
 
-void rideos::updateuser(name account, string &username)
+void rideos::updateuser(const name account, const string &username)
 {
     require_auth(account);
 
@@ -287,8 +287,8 @@ void rideos::unstackpow(const name account, const uint64_t stackKey)
     _stackpower.erase(iteratorStackpower);
 }
 
-void rideos::needdeliver(name buyer, name seller, asset &priceOrder, asset &priceDeliver,
-                         std::string &details, uint64_t delay, uint64_t placeKey)
+void rideos::needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver,
+                         const std::string &details, const uint64_t delay, const uint64_t placeKey)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -327,7 +327,7 @@ void rideos::needdeliver(name buyer, name seller, asset &priceOrder, asset &pric
     });
 }
 
-void rideos::deliverfound(name deliver, uint64_t orderKey)
+void rideos::deliverfound(const name deliver, const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -357,8 +357,8 @@ void rideos::deliverfound(name deliver, uint64_t orderKey)
     }
 }
 
-void rideos::initialize(name buyer, name seller, name deliver, asset &priceOrder,
-                        asset &priceDeliver, string &details, uint64_t delay, uint64_t placeKey)
+void rideos::initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder,
+                        const asset &priceDeliver, const string &details, const uint64_t delay, const uint64_t placeKey)
 {
     eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     eosio_assert(priceOrder.is_valid(), "invalid bet");
@@ -401,7 +401,7 @@ void rideos::initialize(name buyer, name seller, name deliver, asset &priceOrder
     });
 }
 
-void rideos::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
+void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -435,7 +435,7 @@ void rideos::validatebuy(uint64_t orderKey, const capi_checksum256 &hash)
     });
 }
 
-void rideos::validatedeli(uint64_t orderKey)
+void rideos::validatedeli(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -461,7 +461,7 @@ void rideos::validatedeli(uint64_t orderKey)
     });
 }
 
-void rideos::validatesell(uint64_t orderKey, const capi_checksum256 &hash)
+void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -488,7 +488,7 @@ void rideos::validatesell(uint64_t orderKey, const capi_checksum256 &hash)
     });
 }
 
-void rideos::orderready(uint64_t orderKey)
+void rideos::orderready(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -502,7 +502,7 @@ void rideos::orderready(uint64_t orderKey)
     });
 }
 
-void rideos::ordertaken(uint64_t orderKey, const capi_checksum256 &source)
+void rideos::ordertaken(const uint64_t orderKey, const capi_checksum256 &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -518,7 +518,7 @@ void rideos::ordertaken(uint64_t orderKey, const capi_checksum256 &source)
     });
 }
 
-void rideos::orderdelive(uint64_t orderKey, const capi_checksum256 &source)
+void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -559,7 +559,7 @@ void rideos::orderdelive(uint64_t orderKey, const capi_checksum256 &source)
     });
 }
 
-void rideos::initcancel(uint64_t orderKey, name account)
+void rideos::initcancel(const uint64_t orderKey, const name account)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -590,7 +590,7 @@ void rideos::initcancel(uint64_t orderKey, name account)
     });
 }
 
-void rideos::delaycancel(uint64_t orderKey)
+void rideos::delaycancel(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
@@ -619,7 +619,7 @@ void rideos::delaycancel(uint64_t orderKey)
     });
 }
 
-void rideos::addplace(uint64_t parentKey, string &name)
+void rideos::addplace(const uint64_t parentKey, const string &name)
 {
     require_auth(_self);
 
@@ -634,7 +634,7 @@ void rideos::addplace(uint64_t parentKey, string &name)
     });
 }
 
-void rideos::updateplace(uint64_t key, uint64_t parentKey, string &name, bool active)
+void rideos::updateplace(const uint64_t key, const uint64_t parentKey, const string &name, const bool active)
 {
     require_auth(_self);
 
@@ -648,7 +648,7 @@ void rideos::updateplace(uint64_t key, uint64_t parentKey, string &name, bool ac
     });
 }
 
-void rideos::addoffer(uint64_t orderKey)
+void rideos::addoffer(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Order not found");
@@ -668,7 +668,7 @@ void rideos::addoffer(uint64_t orderKey)
     });
 }
 
-void rideos::endoffer(name deliver, uint64_t offerKey)
+void rideos::endoffer(const name deliver, const uint64_t offerKey)
 {
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
@@ -701,7 +701,7 @@ void rideos::endoffer(name deliver, uint64_t offerKey)
     }
 }
 
-void rideos::canceloffer(uint64_t offerKey)
+void rideos::canceloffer(const uint64_t offerKey)
 {
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
@@ -718,7 +718,7 @@ void rideos::canceloffer(uint64_t offerKey)
     });
 }
 
-void rideos::addapply(name account, uint64_t offerKey)
+void rideos::addapply(const name account, const uint64_t offerKey)
 {
     require_auth(account);
 
@@ -737,7 +737,7 @@ void rideos::addapply(name account, uint64_t offerKey)
     });
 }
 
-void rideos::cancelapply(uint64_t applyKey)
+void rideos::cancelapply(const uint64_t applyKey)
 {
     auto iteratorApply = _applies.find(applyKey);
     eosio_assert(iteratorApply != _applies.end(), "Apply not found");
@@ -747,7 +747,7 @@ void rideos::cancelapply(uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-void rideos::deletedelive(uint64_t deliveKey)
+void rideos::deletedelive(const uint64_t deliveKey)
 {
     auto iteratorDelivery = _deliveries.find(deliveKey);
     eosio_assert(iteratorDelivery != _deliveries.end(), "Deliveries not found");
@@ -764,7 +764,7 @@ void rideos::deletedelive(uint64_t deliveKey)
     _deliveries.erase(iteratorDelivery);
 }
 
-void rideos::cleandelive(uint64_t placeKey)
+void rideos::cleandelive(const uint64_t placeKey)
 {
     auto indexDeliveries = _deliveries.get_index<name("byplace")>();
     auto iteratorDeliveries = indexDeliveries.find(placeKey);
