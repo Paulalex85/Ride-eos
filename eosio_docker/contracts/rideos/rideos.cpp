@@ -87,6 +87,34 @@ void rideos::updateuser(const name account, const string &username)
     });
 }
 
+void rideos::deleteuser(const name account)
+{
+    require_auth(account);
+
+    auto iterator = _users.find(account.value);
+    eosio_assert(iterator != _users.end(), "Address for account not found");
+
+    eosio_assert(iterator->balance.amount == 0, "Balance should be empty");
+
+    auto indexStack = _stackpower.get_index<name("byaccount")>();
+    auto iteratorStack = indexStack.find(account.value);
+    eosio_assert(iteratorStack == indexStack.end(), "Delete Stackpower first");
+
+    auto indexOrdersBuyer = _orders.get_index<name("bybuyerkey")>();
+    auto iteratorOrderBuyer = indexOrdersBuyer.find(account.value);
+    eosio_assert(iteratorOrderBuyer == indexOrdersBuyer.end(), "Delete Order first");
+
+    auto indexOrdersSeller = _orders.get_index<name("bysellerkey")>();
+    auto iteratorOrderSeller = indexOrdersSeller.find(account.value);
+    eosio_assert(iteratorOrderSeller == indexOrdersSeller.end(), "Delete Order first");
+
+    auto indexOrdersDeliver = _orders.get_index<name("bydeliverkey")>();
+    auto iteratorOrderDeliver = indexOrdersDeliver.find(account.value);
+    eosio_assert(iteratorOrderDeliver == indexOrdersDeliver.end(), "Delete Order first");
+
+    _users.erase(iterator);
+}
+
 void rideos::deposit(const name account, const asset &quantity)
 {
     eosio_assert(quantity.is_valid(), "invalid quantity");
@@ -707,4 +735,4 @@ void rideos::cancelapply(const uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deleteuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))

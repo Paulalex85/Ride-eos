@@ -26,6 +26,8 @@ CONTRACT rideos : public eosio::contract
 
     ACTION updateuser(const name account, const string &username);
 
+    ACTION deleteuser(const name account);
+
     ACTION deposit(const name account, const asset &quantity);
 
     ACTION withdraw(const name account, const asset &quantity);
