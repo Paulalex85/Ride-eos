@@ -62,6 +62,8 @@ CONTRACT rideos : public eosio::contract
 
     ACTION delaycancel(const uint64_t orderKey);
 
+    ACTION deleteorder(const uint64_t orderKey);
+
     ACTION addoffer(const uint64_t orderKey);
 
     ACTION endoffer(const name deliver, const uint64_t offerKey);

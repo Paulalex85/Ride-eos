@@ -577,6 +577,12 @@ void rideos::delaycancel(const uint64_t orderKey)
     });
 }
 
+void rideos::deleteorder(const uint64_t orderKey)
+{
+    auto iteratorOrder = _orders.find(orderKey);
+    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+}
+
 void rideos::addoffer(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
@@ -644,6 +650,11 @@ void rideos::deleteoffer(const uint64_t offerKey)
     auto iteratorOffer = _offers.find(offerKey);
     eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
 
+    auto indexApply = _applies.get_index<name("byoffer")>();
+    auto iteratorApply = indexApply.find(offerKey);
+
+    eosio_assert(iteratorApply == indexApply.end(), "Delete applies first");
+
     if (iteratorOffer->stateOffer == 1 || iteratorOffer->stateOffer == 2)
     {
         _offers.erase(iteratorOffer);
@@ -684,4 +695,4 @@ void rideos::cancelapply(const uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))
