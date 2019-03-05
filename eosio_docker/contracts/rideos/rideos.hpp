@@ -68,6 +68,8 @@ CONTRACT rideos : public eosio::contract
 
     ACTION canceloffer(const uint64_t offerKey);
 
+    ACTION deleteoffer(const uint64_t offerKey);
+
     ACTION addapply(const name account, const uint64_t offerKey);
 
     ACTION cancelapply(const uint64_t applyKey);

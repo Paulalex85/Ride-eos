@@ -639,6 +639,17 @@ void rideos::canceloffer(const uint64_t offerKey)
     });
 }
 
+void rideos::deleteoffer(const uint64_t offerKey)
+{
+    auto iteratorOffer = _offers.find(offerKey);
+    eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
+
+    if (iteratorOffer->stateOffer == 1 || iteratorOffer->stateOffer == 2)
+    {
+        _offers.erase(iteratorOffer);
+    }
+}
+
 void rideos::addapply(const name account, const uint64_t offerKey)
 {
     require_auth(account);
@@ -673,4 +684,4 @@ void rideos::cancelapply(const uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addoffer)(endoffer)(canceloffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))
