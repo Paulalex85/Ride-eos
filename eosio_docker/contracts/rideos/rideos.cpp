@@ -663,7 +663,12 @@ void rideos::cancelapply(const uint64_t applyKey)
     auto iteratorApply = _applies.find(applyKey);
     eosio_assert(iteratorApply != _applies.end(), "Apply not found");
 
-    require_auth(iteratorApply->deliver);
+    auto iteratorOffer = _offers.find(iteratorApply->offerKey);
+    eosio_assert(iteratorOffer != _offers.end(), "Offer not found");
+    if (iteratorOffer->stateOffer == 0)
+    {
+        require_auth(iteratorApply->deliver);
+    }
 
     _applies.erase(iteratorApply);
 }
