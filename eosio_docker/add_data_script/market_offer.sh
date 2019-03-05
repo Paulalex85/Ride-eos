@@ -10,6 +10,7 @@ cleos get table rideos rideos offer
 cleos get table rideos rideos order
 sleep 1
 
+cleos push action rideos deleteorder '["0"]' -p seller
 cleos push action rideos deleteoffer '["0"]' -p seller
 sleep 1
 
@@ -25,3 +26,11 @@ sleep 1
 cleos push action rideos deleteoffer '["0"]' -p seller
 cleos get table rideos rideos apply
 cleos get table rideos rideos offer
+
+cleos push action rideos initcancel '["0","seller"]' -p seller
+cleos get table rideos rideos order
+sleep 1
+
+cleos push action rideos deleteorder '["0"]' -p seller
+cleos get table rideos rideos order
+sleep 1

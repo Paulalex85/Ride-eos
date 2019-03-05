@@ -513,7 +513,9 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
 
     eosio_assert(is_actor(account, iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not in the contract");
 
-    eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
+    bool isState = iteratorOrder->state == INITIALIZATION || iteratorOrder->state == NEED_DELIVER;
+
+    eosio_assert(isState, "The order is not in the state of initialization or need deliver");
 
     if (iteratorOrder->validateBuyer)
     {
@@ -581,6 +583,16 @@ void rideos::deleteorder(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+
+    auto indexOffer = _offers.get_index<name("byorderkey")>();
+    auto iteratorOffer = indexOffer.find(orderKey);
+
+    eosio_assert(iteratorOffer == indexOffer.end(), "Delete offers first");
+
+    if (iteratorOrder->state == 5 || iteratorOrder->state == 98 || iteratorOrder->state == 99)
+    {
+        _orders.erase(iteratorOrder);
+    }
 }
 
 void rideos::addoffer(const uint64_t orderKey)
