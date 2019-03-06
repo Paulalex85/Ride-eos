@@ -61,6 +61,20 @@ void rideos::find_stackpower_and_increase(const name account, const asset &quant
     }
 }
 
+void rideos::add_balance(const name account, const asset &quantity)
+{
+    eosio_assert(quantity.is_valid(), "invalid quantity");
+    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
+    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+
+    auto iterator = _users.find(account.value);
+    eosio_assert(iterator != _users.end(), "Address for account not found");
+
+    _users.modify(iterator, _self, [&](auto &user) {
+        user.balance += quantity;
+    });
+}
+
 void rideos::adduser(const name account, const string &username)
 {
     require_auth(account);
@@ -175,22 +189,6 @@ void rideos::pay(const name account, const asset &quantity)
     });
 }
 
-void rideos::receive(const name account, const name from, const asset &quantity)
-{
-    require_auth(from);
-
-    eosio_assert(quantity.is_valid(), "invalid quantity");
-    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
-    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
-
-    auto iterator = _users.find(account.value);
-    eosio_assert(iterator != _users.end(), "Address for account not found");
-
-    _users.modify(iterator, _self, [&](auto &user) {
-        user.balance += quantity;
-    });
-}
-
 void rideos::stackpow(const name account, const asset &quantity)
 {
     require_auth(account);
@@ -255,9 +253,6 @@ void rideos::unstackpow(const name account, const uint64_t stackKey)
 {
     require_auth(account);
 
-    auto iteratorUser = _users.find(account.value);
-    eosio_assert(iteratorUser != _users.end(), "Address for account not found");
-
     auto iteratorStackpower = _stackpower.find(stackKey);
     eosio_assert(iteratorStackpower != _stackpower.end(), "Address for stackpower not found");
 
@@ -265,9 +260,7 @@ void rideos::unstackpow(const name account, const uint64_t stackKey)
     eosio_assert(iteratorStackpower->endAssignment < time_point_sec(now()), "The stack is not ready to unstack");
     eosio_assert(iteratorStackpower->endAssignment != time_point_sec(0), "The stack is already unlocked");
 
-    _users.modify(iteratorUser, _self, [&](auto &user) {
-        user.balance += iteratorStackpower->balance;
-    });
+    add_balance(account, iteratorStackpower->balance);
 
     _stackpower.erase(iteratorStackpower);
 }
@@ -516,17 +509,8 @@ void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source
         order.state = ORDER_END;
     });
 
-    action(
-        permission_level{_self, name("active")},
-        name("rideos"), name("receive"),
-        std::make_tuple(iteratorOrder->seller, _self, iteratorOrder->priceOrder))
-        .send();
-
-    action(
-        permission_level{_self, name("active")},
-        name("rideos"), name("receive"),
-        std::make_tuple(iteratorOrder->deliver, _self, iteratorOrder->priceDeliver))
-        .send();
+    add_balance(iteratorOrder->seller, iteratorOrder->priceOrder);
+    add_balance(iteratorOrder->deliver, iteratorOrder->priceDeliver);
 
     find_stackpower_and_increase(iteratorOrder->seller, iteratorOrder->priceOrder);
     find_stackpower_and_increase(iteratorOrder->deliver, iteratorOrder->priceDeliver);
@@ -547,17 +531,7 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
 
     if (iteratorOrder->validateBuyer)
     {
-        action(
-            permission_level{_self, name("active")},
-            name("eosio.token"), name("transfer"),
-            std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
-            .send();
-
-        action(
-            permission_level{_self, name("active")},
-            name("rideos"), name("receive"),
-            std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
-            .send();
+        add_balance(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
     }
 
     if (iteratorOrder->validateSeller)
@@ -587,17 +561,7 @@ void rideos::delaycancel(const uint64_t orderKey)
 
     eosio_assert(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
 
-    action(
-        permission_level{_self, name("active")},
-        name("eosio.token"), name("transfer"),
-        std::make_tuple(_self, name("rideos"), iteratorOrder->priceOrder + iteratorOrder->priceDeliver, std::string("")))
-        .send();
-
-    action(
-        permission_level{_self, name("active")},
-        name("rideos"), name("receive"),
-        std::make_tuple(iteratorOrder->buyer, _self, iteratorOrder->priceOrder + iteratorOrder->priceDeliver))
-        .send();
+    add_balance(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
     find_stackpower_and_increase(iteratorOrder->seller, iteratorOrder->priceOrder);
     find_stackpower_and_increase(iteratorOrder->deliver, iteratorOrder->priceDeliver);
@@ -735,4 +699,4 @@ void rideos::cancelapply(const uint64_t applyKey)
     _applies.erase(iteratorApply);
 }
 
-EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deleteuser)(deposit)(withdraw)(pay)(receive)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))
+EOSIO_DISPATCH(rideos, (adduser)(updateuser)(deleteuser)(deposit)(withdraw)(pay)(stackpow)(unlockpow)(unstackpow)(needdeliver)(deliverfound)(initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder)(addoffer)(endoffer)(canceloffer)(deleteoffer)(addapply)(cancelapply))

@@ -22,6 +22,8 @@ CONTRACT rideos : public eosio::contract
 
     void find_stackpower_and_increase(const name account, const asset &quantity);
 
+    void add_balance(const name account, const asset &quantity);
+
     ACTION adduser(const name account, const string &username);
 
     ACTION updateuser(const name account, const string &username);
@@ -33,8 +35,6 @@ CONTRACT rideos : public eosio::contract
     ACTION withdraw(const name account, const asset &quantity);
 
     ACTION pay(const name account, const asset &quantity);
-
-    ACTION receive(const name account, const name from, const asset &quantity);
 
     ACTION stackpow(const name account, const asset &quantity);
 
