@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Button from '@material-ui/core/Button';
-
 import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs2';
 
@@ -14,10 +12,10 @@ class Scatter extends Component {
     constructor(props) {
         super(props);
 
-        this.handleClick = this.handleClick.bind(this);
+        this.login();
     }
 
-    handleClick() {
+    login() {
         const { setScatter, setUser } = this.props;
 
         const network = ScatterJS.Network.fromJson({
@@ -61,12 +59,6 @@ class Scatter extends Component {
     render() {
         return (
             <div>
-                <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={this.handleClick}>
-                    Scatter
-                </Button>
             </div >
         );
     }
