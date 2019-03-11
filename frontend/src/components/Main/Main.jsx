@@ -17,8 +17,6 @@ import UserProfile from '../UserProfile';
 import CreateOrder from '../CreateOrder';
 import OfferDashboard from '../OfferDashboard';
 import KeyGenerator from '../KeyGenerator';
-import Logout from '../Logout';
-import Scatter from '../Scatter';
 import { Menu } from './components';
 
 
@@ -76,13 +74,11 @@ class Main extends Component {
                     <Menu />
                     <div className="content">
                         <Route exact path="/" component={KeyGenerator} />
-                        <Route path="/login" component={Scatter} />
                         <Route path="/profile" component={UserProfile} />
                         <Route path="/createOrder" component={CreateOrder} />
                         <Route path="/orders" component={OrderDashboard} />
                         <Route path="/assign" component={AssignPlace} />
                         <Route path="/offers" component={OfferDashboard} />
-                        <Route path="/logout" component={Logout} />
                     </div>
                 </div>
             </BrowserRouter>

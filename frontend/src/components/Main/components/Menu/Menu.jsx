@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
-import { ButtonLogged, ButtonLogin } from './components'
+import { ButtonLogged, Scatter } from './components'
 import { Navbar } from 'react-bootstrap'
 
 class Menu extends Component {
@@ -18,7 +18,7 @@ class Menu extends Component {
                     {
                         account ?
                             (<ButtonLogged />) :
-                            (<ButtonLogin />)
+                            (<Scatter />)
                     }
                 </Navbar.Collapse>
             </Navbar>

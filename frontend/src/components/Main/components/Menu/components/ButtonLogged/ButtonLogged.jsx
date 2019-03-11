@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Nav } from 'react-bootstrap';
 
+import { Logout } from './components'
+
 class ButtonLogged extends Component {
 
     render() {
@@ -11,9 +13,7 @@ class ButtonLogged extends Component {
                 <Nav.Link href="/orders">Orders</Nav.Link>
                 <Nav.Link href="/assign">Assign Place</Nav.Link>
                 <Nav.Link href="/offers">Offers</Nav.Link>
-                <Nav.Link href="/logout">
-                    Logout
-                </Nav.Link>
+                <Logout />
             </Nav>
         )
     }

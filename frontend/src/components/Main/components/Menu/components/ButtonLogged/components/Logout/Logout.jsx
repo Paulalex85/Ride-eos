@@ -4,14 +4,16 @@ import { connect } from 'react-redux';
 // Components
 import { UserAction, ScatterAction } from 'actions';
 
+import { Nav } from 'react-bootstrap';
+
 class Logout extends Component {
     constructor(props) {
         super(props);
 
-        this.logout();
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    logout() {
+    handleClick() {
         const { history, setUser, setScatter, scatter: { scatter } } = this.props;
 
         setUser({ account: '', username: '', balance: '0.0000 SYS' });
@@ -24,8 +26,9 @@ class Logout extends Component {
 
     render() {
         return (
-            <div>
-            </div>
+            <Nav.Link onClick={this.handleClick}>
+                Logout
+            </Nav.Link>
         )
     }
 }

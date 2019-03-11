@@ -1,7 +1,7 @@
 import ButtonLogged from './ButtonLogged'
-import ButtonLogin from './ButtonLogin'
+import Scatter from './Scatter'
 
 export {
     ButtonLogged,
-    ButtonLogin
+    Scatter
 }

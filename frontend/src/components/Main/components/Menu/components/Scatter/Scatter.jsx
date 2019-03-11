@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs2';
 
+import { Nav } from 'react-bootstrap';
+
 import { UserAction, ScatterAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 
@@ -12,10 +14,10 @@ class Scatter extends Component {
     constructor(props) {
         super(props);
 
-        this.login();
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    login() {
+    handleClick() {
         const { setScatter, setUser } = this.props;
 
         const network = ScatterJS.Network.fromJson({
@@ -58,8 +60,11 @@ class Scatter extends Component {
 
     render() {
         return (
-            <div>
-            </div >
+            <Nav className="ml-auto" >
+                <Nav.Link onClick={this.handleClick}>
+                    Login with Scatter
+                </Nav.Link>
+            </Nav>
         );
     }
 
