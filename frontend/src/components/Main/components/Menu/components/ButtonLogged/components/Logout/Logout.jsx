@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router";
 import { connect } from 'react-redux';
+import { LinkContainer } from "react-router-bootstrap";
 // Components
 import { UserAction, ScatterAction } from 'actions';
 
@@ -26,9 +27,11 @@ class Logout extends Component {
 
     render() {
         return (
-            <Nav.Link onClick={this.handleClick}>
-                Logout
-            </Nav.Link>
+            <LinkContainer to="/">
+                <Nav.Link onClick={this.handleClick}>
+                    Logout
+                </Nav.Link>
+            </LinkContainer>
         )
     }
 }

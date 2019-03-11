@@ -19,8 +19,6 @@ class UserProfile extends Component {
     }
 
     this.handleClick = this.handleClick.bind(this);
-
-    this.getUser();
   }
 
   handleClick(event) {
@@ -29,16 +27,6 @@ class UserProfile extends Component {
     } else {
       this.setState({ update: true });
     }
-  }
-
-  getUser() {
-    const { setUser, scatter: { scatter } } = this.props;
-
-    const account = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
-    ApiService.getUserByAccount(account.name).then(user => {
-      setUser({ account: user.account, username: user.username, balance: user.balance });
-    }).catch((err) => { console.error(err) });
   }
 
   render() {
