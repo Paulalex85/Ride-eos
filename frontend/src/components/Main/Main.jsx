@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from 'react-redux';
 import {
     Route,
-    NavLink,
     BrowserRouter
 } from "react-router-dom";
 
@@ -20,8 +19,8 @@ import OfferDashboard from '../OfferDashboard';
 import KeyGenerator from '../KeyGenerator';
 import Logout from '../Logout';
 import Scatter from '../Scatter';
+import { Menu } from './components';
 
-import "./Main.css";
 
 class Main extends Component {
     constructor(props) {
@@ -70,24 +69,14 @@ class Main extends Component {
     }
 
     render() {
-        const { user: { account } } = this.props;
-        let router = null;
 
-
-        if (account) {
-            router =
+        return (
+            <BrowserRouter>
                 <div className="body">
-                    <ul className="header">
-                        <li><NavLink exact to="/">Home</NavLink></li>
-                        <li><NavLink to="/profile">Profile</NavLink></li>
-                        <li><NavLink to="/createOrder">Create Order</NavLink></li>
-                        <li><NavLink to="/orders">Orders</NavLink></li>
-                        <li><NavLink to="/assign">Assign Place</NavLink></li>
-                        <li><NavLink to="/offers">Offers</NavLink></li>
-                        <li><NavLink to="/logout">Logout</NavLink></li>
-                    </ul>
+                    <Menu />
                     <div className="content">
                         <Route exact path="/" component={KeyGenerator} />
+                        <Route path="/login" component={Scatter} />
                         <Route path="/profile" component={UserProfile} />
                         <Route path="/createOrder" component={CreateOrder} />
                         <Route path="/orders" component={OrderDashboard} />
@@ -96,24 +85,6 @@ class Main extends Component {
                         <Route path="/logout" component={Logout} />
                     </div>
                 </div>
-        }
-        else {
-            router =
-                <div className="body">
-                    <ul className="header">
-                        <li><NavLink exact to="/">Home</NavLink></li>
-                        <li><NavLink to="/login">Login with Scatter</NavLink></li>
-                    </ul>
-                    <div className="content">
-                        <Route exact path="/" component={KeyGenerator} />
-                        <Route path="/login" component={Scatter} />
-                    </div>
-                </div>
-        }
-
-        return (
-            <BrowserRouter>
-                {router}
             </BrowserRouter>
         );
     }

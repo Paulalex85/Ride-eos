@@ -15,6 +15,7 @@
     "randomstring": "^1.1.5",
     "scatterjs-core": "^2.7.7",
     "scatterjs-plugin-eosjs2": "^1.5.0",
+    "react-bootstrap": "^1.0.0-beta.5",
     "material-kit-react": "^1.4.0"
   },
   "scripts": {
