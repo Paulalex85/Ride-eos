@@ -50,7 +50,7 @@ class ValidateOrder extends Component {
             KeyGenerator.storeKey(orderKey, key, hash, "buyer");
             const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
-            await ApiServiceScatter.updatePermission(accountScatter, process.env.REACT_APP_EOSIO_CONTRACT_ORDERS, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.updatePermission(accountScatter, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
             await ApiServiceScatter.validateBuyer(orderKey, hash, scatter).catch((err) => { console.error(err) });
         }
     }

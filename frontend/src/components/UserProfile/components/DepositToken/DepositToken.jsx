@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import { Col, Form, Row, Button } from 'react-bootstrap';
 // Services and redux action
 import { UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -57,26 +56,28 @@ class DepositToken extends Component {
         const { form } = this.state;
 
         return (
-            <div className="Deposit">
-                <div className="title">Deposit</div>
-                <form name="form" onSubmit={this.handleSubmit}>
-                    <TextField
+
+            <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
+                <Form.Label column md={2}>Deposit</Form.Label>
+
+                <Col md={2}>
+                    <Form.Control
+                        type="text"
                         name="quantity"
                         value={form.quantity}
-                        label="Quantity"
                         onChange={this.handleChange}
                     />
-                    <div className="bottom">
-                        <Button
-                            type="submit"
-                            className="green"
-                            variant='contained'
-                            color='primary'>
-                            DEPOSIT
-                        </Button>
-                    </div>
-                </form>
-            </div>
+
+                </Col>
+                <Col md={2}>
+                    <Button
+                        onClick={this.handleSubmit}
+                        variant='primary'>
+                        DEPOSIT
+                    </Button>
+                </Col>
+                <Col md={2}></Col>
+            </Form.Group>
         )
     }
 }

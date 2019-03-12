@@ -66,7 +66,7 @@ class UpdateProfile extends Component {
                 </Col>
                 <Col md={2}>
                     <Button
-                        type="submit"
+                        onClick={this.handleSubmit}
                         variant='primary'>
                         UPDATE
                     </Button>
