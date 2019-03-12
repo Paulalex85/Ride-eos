@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
+import { Col, Form, Row, Button } from 'react-bootstrap';
 // Services and redux action
 import { UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -47,29 +46,32 @@ class UpdateProfile extends Component {
 
     render() {
         const { form } = this.state;
+        const { user: { username } } = this.props;
 
         return (
-            <div className="Update">
-                <div className="title">Update</div>
-                <div className="description">Update informations</div>
-                <form name="form" onSubmit={this.handleSubmit}>
-                    <TextField
+
+            <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
+                <Form.Label column md={2}>Username</Form.Label>
+                <Col md={2}>
+                    <Form.Label>{username}</Form.Label>
+                </Col>
+                <Col md={2}>
+                    <Form.Control
+                        type="text"
                         name="username"
                         value={form.username}
-                        label="Username"
                         onChange={this.handleChange}
                     />
-                    <div className="bottom">
-                        <Button
-                            type="submit"
-                            className="green"
-                            variant='contained'
-                            color='primary'>
-                            UPDATE
+
+                </Col>
+                <Col md={2}>
+                    <Button
+                        type="submit"
+                        variant='primary'>
+                        UPDATE
                     </Button>
-                    </div>
-                </form>
-            </div>
+                </Col>
+            </Form.Group>
         )
     }
 }

@@ -2,59 +2,41 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import Button from '@material-ui/core/Button';
 import { UpdateProfile, DepositToken, WithdrawToken } from './components'
 
 import { UserAction } from 'actions';
-import { ApiService } from 'services';
+import { Col, Form, Row } from 'react-bootstrap';
 
 class UserProfile extends Component {
 
-  constructor(props) {
-    // Inherit constructor
-    super(props);
-
-    this.state = {
-      update: false
-    }
-
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick(event) {
-    if (this.state.update) {
-      this.setState({ update: false });
-    } else {
-      this.setState({ update: true });
-    }
-  }
-
   render() {
-    const { user: { account, username, balance } } = this.props;
+    const { user: { account, balance } } = this.props;
 
     return (
-      <div className="UserProfile">
-        <div className="title">Rideos</div>
-        <div className="account">
-          <span>{account}</span>
-        </div>
-        <div className="username">
-          <span>{username}</span>
-        </div>
-        <div className="balance">
-          <span>{balance}</span>
-        </div>
-        <Button
-          onClick={this.handleClick}
-          className="green"
-          variant='contained'
-          color='primary'>
-          Modifier
-        </Button>
-        {this.state.update && <UpdateProfile />}
+      <Form>
+
+        <Form.Group as={Row} className="justify-content-center" controlId="userAccount">
+          <Form.Label column md={2}>Account</Form.Label>
+          <Col md={2}>
+            <Form.Label>{account}</Form.Label>
+          </Col>
+          <Col md={4}></Col>
+        </Form.Group>
+
+        <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
+          <Form.Label column md={2}>Balance</Form.Label>
+          <Col md={2}>
+            <Form.Label>{balance}</Form.Label>
+          </Col>
+          <Col md={4}></Col>
+        </Form.Group>
+
+        <UpdateProfile />
         <DepositToken />
         <WithdrawToken />
-      </div>
+
+      </Form >
+
     )
   }
 }
