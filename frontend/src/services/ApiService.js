@@ -55,8 +55,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "order",    // name of the table as specified by the contract abi
         limit: 1,
         lower_bound: orderKey,
@@ -72,8 +72,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_ORDERS,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "order",    // name of the table as specified by the contract abi
         //lower_bound: account,
         //upper_bound: account,
@@ -92,8 +92,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "place",    // name of the table as specified by the contract abi
         limit: 10,
       });
@@ -107,8 +107,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "place",    // name of the table as specified by the contract abi
         limit: 1,
         lower_bound: placeKey,
@@ -123,8 +123,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "assignment",    // name of the table as specified by the contract abi
         limit: 10,
         lower_bound: account,
@@ -140,8 +140,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "assignment",    // name of the table as specified by the contract abi
         limit: 1,
         lower_bound: assignmentKey,
@@ -157,8 +157,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "offer",    // name of the table as specified by the contract abi
         limit: 10,
       });
@@ -172,8 +172,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "offer",    // name of the table as specified by the contract abi
         limit: 1,
         lower_bound: offerKey,
@@ -188,8 +188,8 @@ class ApiService {
     try {
       const result = await getTableRows({
         json: true,
-        code: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,    // contract who owns the table
-        scope: process.env.REACT_APP_EOSIO_CONTRACT_MARKET,   // scope of the table
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
         table: "apply",    // name of the table as specified by the contract abi
         limit: 10,
       });
