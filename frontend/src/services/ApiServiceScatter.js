@@ -83,6 +83,13 @@ class ApiServiceScatter {
         return send("withdraw", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
 
+    //STACKPOWER
+    static stackpow(quantity, scatter) {
+        const account = getAccountFromScatter(scatter);
+        return send("stackpow", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    }
+
+
     //ORDERS
 
     static needDeliver({ buyer, seller, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {

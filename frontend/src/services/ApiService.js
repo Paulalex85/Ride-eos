@@ -51,6 +51,25 @@ class ApiService {
     }
   }
 
+  static async getStackByAccount(account) {
+    try {
+      const result = await getTableRows({
+        json: true,
+        code: process.env.REACT_APP_EOSIO_CONTRACT_USERS,    // contract who owns the table
+        scope: process.env.REACT_APP_EOSIO_CONTRACT_USERS,   // scope of the table
+        table: "stackpower",    // name of the table as specified by the contract abi
+        limit: 10,
+        lower_bound: account,
+        key_type: "i64",
+        index_position: 2,
+
+      });
+      return result;
+    } catch (err) {
+      return console.error(err);
+    }
+  }
+
   static async getOrderByKey(orderKey) {
     try {
       const result = await getTableRows({

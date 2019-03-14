@@ -9,7 +9,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
-import { PlaceAction, AssignmentAction } from 'actions';
 import { ApiService } from 'services';
 
 import ButtonAssign from './ButtonAssign'
@@ -104,9 +103,6 @@ const mapStateToProps = state => state;
 
 // Map the following action to props
 const mapDispatchToProps = {
-    setListPlaces: PlaceAction.setListPlaces,
-    setPlaceOfAssignment: AssignmentAction.setPlaceOfAssignment,
-    setListAssignment: AssignmentAction.setListAssignment,
 };
 
 // Export a redux connected component

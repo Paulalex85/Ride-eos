@@ -24,7 +24,6 @@ class Main extends Component {
     constructor(props) {
         super(props);
 
-        this.getCurrentUser = this.getCurrentUser.bind(this);
         this.getCurrentUser();
     }
 
@@ -68,17 +67,24 @@ class Main extends Component {
 
     render() {
 
+        const { user: { account } } = this.props;
+
         return (
             <BrowserRouter>
                 <div className="body">
                     <Menu />
+
                     <div className="content">
                         <Route exact path="/" component={KeyGenerator} />
-                        <Route path="/profile" component={UserProfile} />
-                        <Route path="/createOrder" component={CreateOrder} />
-                        <Route path="/orders" component={OrderDashboard} />
-                        <Route path="/assign" component={AssignPlace} />
-                        <Route path="/offers" component={OfferDashboard} />
+                        {account &&
+                            <div>
+                                <Route path="/profile" component={UserProfile} />
+                                <Route path="/createOrder" component={CreateOrder} />
+                                <Route path="/orders" component={OrderDashboard} />
+                                <Route path="/assign" component={AssignPlace} />
+                                <Route path="/offers" component={OfferDashboard} />
+                            </div>
+                        }
                     </div>
                 </div>
             </BrowserRouter>
