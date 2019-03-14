@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 // Components
 import { Col, Form, Row, Button } from 'react-bootstrap';
 
-import { StackpowerAction } from 'actions';
+import { StackpowerAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 
 class StackPower extends Component {
@@ -48,9 +48,16 @@ class StackPower extends Component {
     handleSubmit(event) {
         event.preventDefault();
         const { form: { stack } } = this.state;
-        const { scatter: { scatter } } = this.props;
+        const { setUser, scatter: { scatter }, user: { account } } = this.props;
 
         return ApiServiceScatter.stackpow(stack, scatter).then(() => {
+            ApiService.getUserByAccount(account).then(user => {
+                setUser({
+                    account: user.account,
+                    username: user.username,
+                    balance: user.balance,
+                });
+            });
             this.getStackpower();
         }).catch((err) => { console.error(err) });
     }
@@ -109,6 +116,7 @@ const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
     setListStackpower: StackpowerAction.setListStackpower,
+    setUser: UserAction.setUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(StackPower);
