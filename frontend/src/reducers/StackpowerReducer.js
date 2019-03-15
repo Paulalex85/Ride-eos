@@ -6,6 +6,8 @@ const initialState = {
     account: "",
     endAssignment: 0,
     balance: "0 SYS",
+    balanceCurrent: "0.0000 SYS",
+    stackKeyCurrent: undefined
 };
 
 export default function (state = initialState, action) {
@@ -13,6 +15,8 @@ export default function (state = initialState, action) {
         case ActionTypes.SET_LIST_STACKPOWER: {
             let listJSON = action.listStackpower || initialState.listStackpower;
             let listObject = [];
+            let balanceCurrent = initialState.balanceCurrent;
+            let stackKeyCurrent = initialState.stackKeyCurrent;
             for (let i = 0; i < listJSON.rows.length; i++) {
                 const element = listJSON.rows[i];
                 let stackpower = {
@@ -24,9 +28,15 @@ export default function (state = initialState, action) {
                 if (action.account === stackpower.account) {
                     listObject.push(stackpower);
                 }
+                if (new Date(stackpower.endAssignment).getTime() === 0) {
+                    balanceCurrent = stackpower.balance;
+                    stackKeyCurrent = stackpower.stackKey;
+                }
             }
             return Object.assign({}, state, {
-                listStackpower: listObject
+                listStackpower: listObject,
+                balanceCurrent: balanceCurrent,
+                stackKeyCurrent: stackKeyCurrent
             });
         }
         default:

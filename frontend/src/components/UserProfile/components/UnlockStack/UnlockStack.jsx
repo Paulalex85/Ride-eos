@@ -37,19 +37,10 @@ class UnlockStack extends Component {
     handleSubmit(event) {
         event.preventDefault();
         const { form: { unlock } } = this.state;
-        const { setListStackpower, scatter: { scatter }, user: { account }, stackpower: { listStackpower } } = this.props;
+        const { setListStackpower, scatter: { scatter }, user: { account }, stackpower: { stackKeyCurrent } } = this.props;
 
-        let id = undefined;
-        for (let i = 0; i < listStackpower.length; i++) {
-            const element = listStackpower[i];
-            if (new Date(element.endAssignment).getTime() === 0) {
-                id = element.stackKey;
-                break;
-            }
-        }
-
-        if (id !== undefined) {
-            return ApiServiceScatter.unlockpow(unlock, id, scatter).then(() => {
+        if (stackKeyCurrent !== undefined) {
+            return ApiServiceScatter.unlockpow(unlock, stackKeyCurrent, scatter).then(() => {
                 ApiService.getStackByAccount(account, scatter).then(stack => {
                     setListStackpower({ listStackpower: stack, account: account });
                 }).catch((err) => { console.error(err) });
@@ -58,7 +49,6 @@ class UnlockStack extends Component {
     }
 
     render() {
-        const { stackpower: { listStackpower } } = this.props;
         const { form } = this.state;
 
         return (

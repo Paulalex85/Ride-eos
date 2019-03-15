@@ -63,17 +63,8 @@ class StackPower extends Component {
     }
 
     render() {
-        const { stackpower: { listStackpower } } = this.props;
+        const { stackpower: { balanceCurrent } } = this.props;
         const { form } = this.state;
-
-        let balance = "0.0000 SYS";
-        for (let i = 0; i < listStackpower.length; i++) {
-            const element = listStackpower[i];
-            if (new Date(element.endAssignment).getTime() === 0) {
-                balance = element.balance;
-                break;
-            }
-        }
 
         return (
 
@@ -82,7 +73,7 @@ class StackPower extends Component {
                 <Form.Group as={Row} className="justify-content-center" controlId="userStack">
                     <Form.Label column md={2}>Stackpower balance</Form.Label>
                     <Col md={2}>
-                        <Form.Label>{balance}</Form.Label>
+                        <Form.Label>{balanceCurrent}</Form.Label>
                     </Col>
                     <Col md={4}></Col>
                 </Form.Group>
