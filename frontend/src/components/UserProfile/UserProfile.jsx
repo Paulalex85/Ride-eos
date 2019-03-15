@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { UpdateProfile, DepositToken, WithdrawToken, StackPower } from './components'
+import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack } from './components'
 import { Col, Form, Row } from 'react-bootstrap';
 
 
@@ -35,9 +35,8 @@ class UserProfile extends Component {
         <WithdrawToken />
 
         <StackPower />
+        <UnlockStack />
       </Form >
-
-
     )
   }
 }

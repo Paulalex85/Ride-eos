@@ -89,6 +89,11 @@ class ApiServiceScatter {
         return send("stackpow", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
 
+    static unlockpow(quantity, stackKey, scatter) {
+        const account = getAccountFromScatter(scatter);
+        return send("unlockpow", { account: account.name, quantity: quantity, stackKey: stackKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    }
+
 
     //ORDERS
 
