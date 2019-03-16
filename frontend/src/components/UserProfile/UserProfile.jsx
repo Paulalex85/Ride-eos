@@ -2,14 +2,24 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack } from './components'
+import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack, ListUnlocked } from './components'
 import { Col, Form, Row } from 'react-bootstrap';
 
 
 class UserProfile extends Component {
 
   render() {
-    const { user: { account, balance } } = this.props;
+    const { user: { account, balance }, stackpower: { listStackpower, stackKeyCurrent } } = this.props;
+
+    let hasUnlocked = false;
+
+    for (let i = 0; i < listStackpower.length; i++) {
+      const element = listStackpower[i];
+      if (element.stackKey !== stackKeyCurrent) {
+        hasUnlocked = true;
+        break;
+      }
+    }
 
     return (
 
@@ -36,6 +46,10 @@ class UserProfile extends Component {
 
         <StackPower />
         <UnlockStack />
+
+        {hasUnlocked &&
+          <ListUnlocked />
+        }
       </Form >
     )
   }

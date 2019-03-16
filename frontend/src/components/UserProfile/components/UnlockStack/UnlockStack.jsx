@@ -63,7 +63,6 @@ class UnlockStack extends Component {
                             value={form.unlock}
                             onChange={this.handleChange}
                         />
-
                     </Col>
                     <Col md={4}>
                         <Button
