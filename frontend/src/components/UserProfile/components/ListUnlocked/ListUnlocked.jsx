@@ -18,8 +18,9 @@ class ListUnlocked extends Component {
                     stack={stack}
                     key={stack.stackKey}
                 />
+            } else {
+                return <div></div>
             }
-            return <div></div>
         })
 
         return (
