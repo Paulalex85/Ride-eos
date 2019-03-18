@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import { Col, Form, Row, Button } from 'react-bootstrap';
+import { Form, Card, Button } from 'react-bootstrap';
 // Services and redux action
 import { UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -56,28 +56,21 @@ class DepositToken extends Component {
         const { form } = this.state;
 
         return (
-
-            <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
-                <Form.Label column md={2}>Deposit</Form.Label>
-
-                <Col md={2}>
-                    <Form.Control
-                        type="text"
-                        name="quantity"
-                        value={form.quantity}
-                        onChange={this.handleChange}
-                    />
-
-                </Col>
-                <Col md={2}>
-                    <Button
-                        onClick={this.handleSubmit}
-                        variant='primary'>
-                        DEPOSIT
+            <div>
+                <Card.Title>Deposit</Card.Title>
+                <Form.Control
+                    type="text"
+                    name="quantity"
+                    value={form.quantity}
+                    onChange={this.handleChange}
+                />
+                <Button
+                    className="mt-3"
+                    onClick={this.handleSubmit}
+                    variant='primary'>
+                    DEPOSIT
                     </Button>
-                </Col>
-                <Col md={2}></Col>
-            </Form.Group>
+            </div>
         )
     }
 }

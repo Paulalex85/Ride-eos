@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { Col, Form, Row, Button } from 'react-bootstrap';
+import { Form, Card, Button } from 'react-bootstrap';
 
 import { StackpowerAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -67,38 +67,25 @@ class StackPower extends Component {
         const { form } = this.state;
 
         return (
-
-            <Form>
-
-                <Form.Group as={Row} className="justify-content-center" controlId="userStack">
-                    <Form.Label column md={2}>Stackpower balance</Form.Label>
-                    <Col md={2}>
-                        <Form.Label>{balanceCurrent}</Form.Label>
-                    </Col>
-                    <Col md={4}></Col>
-                </Form.Group>
-
-                <Form.Group as={Row} className="justify-content-center" controlId="userStackAdd">
-                    <Form.Label column md={2}>Add Stackpower</Form.Label>
-                    <Col md={2}>
-                        <Form.Control
-                            type="text"
-                            name="stack"
-                            value={form.stack}
-                            onChange={this.handleChange}
-                        />
-
-                    </Col>
-                    <Col md={4}>
-                        <Button
-                            onClick={this.handleSubmit}
-                            variant='primary'>
-                            ADD
-                        </Button>
-                    </Col>
-                </Form.Group>
-            </Form >
-
+            <div>
+                <Card.Title>Stackpower balance</Card.Title>
+                <Card.Text>
+                    {balanceCurrent}
+                </Card.Text>
+                <Card.Title>Add Stackpower</Card.Title>
+                <Form.Control
+                    type="text"
+                    name="stack"
+                    value={form.stack}
+                    onChange={this.handleChange}
+                />
+                <Button
+                    className="mt-3"
+                    onClick={this.handleSubmit}
+                    variant='primary'>
+                    ADD
+                </Button>
+            </div>
         )
     }
 }

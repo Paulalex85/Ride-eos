@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import { Col, Form, Row, Button } from 'react-bootstrap';
+import { Form, Button, Card } from 'react-bootstrap';
 // Services and redux action
 import { UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -49,29 +49,23 @@ class UpdateProfile extends Component {
         const { user: { username } } = this.props;
 
         return (
-
-            <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
-                <Form.Label column md={2}>Username</Form.Label>
-                <Col md={2}>
-                    <Form.Label>{username}</Form.Label>
-                </Col>
-                <Col md={2}>
-                    <Form.Control
-                        type="text"
-                        name="username"
-                        value={form.username}
-                        onChange={this.handleChange}
-                    />
-
-                </Col>
-                <Col md={2}>
-                    <Button
-                        onClick={this.handleSubmit}
-                        variant='primary'>
-                        UPDATE
-                    </Button>
-                </Col>
-            </Form.Group>
+            <div >
+                <Card.Text>
+                    {username}
+                </Card.Text>
+                <Form.Control
+                    type="text"
+                    name="username"
+                    value={form.username}
+                    onChange={this.handleChange}
+                />
+                <Button
+                    className="mt-3"
+                    onClick={this.handleSubmit}
+                    variant='primary'>
+                    UPDATE
+                </Button>
+            </div>
         )
     }
 }

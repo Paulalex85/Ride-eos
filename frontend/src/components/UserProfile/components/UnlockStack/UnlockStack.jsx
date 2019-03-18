@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { Col, Form, Row, Button } from 'react-bootstrap';
+import { Card, Form, Button } from 'react-bootstrap';
 
 import { StackpowerAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -52,28 +52,21 @@ class UnlockStack extends Component {
         const { form } = this.state;
 
         return (
-
-            <Form>
-                <Form.Group as={Row} className="justify-content-center" controlId="userStackUnlock">
-                    <Form.Label column md={2}>Unlock Stackpower</Form.Label>
-                    <Col md={2}>
-                        <Form.Control
-                            type="text"
-                            name="unlock"
-                            value={form.unlock}
-                            onChange={this.handleChange}
-                        />
-                    </Col>
-                    <Col md={4}>
-                        <Button
-                            onClick={this.handleSubmit}
-                            variant='primary'>
-                            UNLOCK
-                        </Button>
-                    </Col>
-                </Form.Group>
-            </Form >
-
+            <div className="mt-3">
+                <Card.Title>Unlock Stackpower</Card.Title>
+                <Form.Control
+                    type="text"
+                    name="unlock"
+                    value={form.unlock}
+                    onChange={this.handleChange}
+                />
+                <Button
+                    className="mt-3"
+                    onClick={this.handleSubmit}
+                    variant='primary'>
+                    UNLOCK
+                </Button>
+            </div>
         )
     }
 }

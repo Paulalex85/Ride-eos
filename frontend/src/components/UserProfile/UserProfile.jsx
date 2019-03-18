@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack, ListUnlocked } from './components'
-import { Col, Form, Row } from 'react-bootstrap';
+import { Card, CardColumns } from 'react-bootstrap';
 
 import { ApiService } from 'services';
 
@@ -42,43 +42,52 @@ class UserProfile extends Component {
 
     return (
 
-      <Form>
-        <Form.Group as={Row} className="justify-content-center" controlId="userAccount">
-          <Form.Label column md={2}>Account</Form.Label>
-          <Col md={2}>
-            <Form.Label>{account}</Form.Label>
-          </Col>
-          <Col md={4}></Col>
-        </Form.Group>
+      <div className="justify-content-center">
+        <CardColumns className="m-3">
+          <Card >
+            <Card.Header>Account</Card.Header>
+            <Card.Body>
 
-        <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
-          <Form.Label column md={2}>Balance rideos</Form.Label>
-          <Col md={2}>
-            <Form.Label>{balance}</Form.Label>
-          </Col>
-          <Col md={4}></Col>
-        </Form.Group>
+              <Card.Title>EOS Account</Card.Title>
+              <Card.Text>
+                {account}
+              </Card.Text>
+              <Card.Title>Balance EOS Account</Card.Title>
+              <Card.Text>
+                {this.balanceEOS}
+              </Card.Text>
+              <Card.Title>Rideos Username</Card.Title>
 
-        <Form.Group as={Row} className="justify-content-center" controlId="userBalance">
-          <Form.Label column md={2}>Balance EOS</Form.Label>
-          <Col md={2}>
-            <Form.Label>{this.balanceEOS}</Form.Label>
-          </Col>
-          <Col md={4}></Col>
-        </Form.Group>
+              <UpdateProfile />
+            </Card.Body>
+          </Card>
 
+          <Card >
+            <Card.Header>Token Management</Card.Header>
+            <Card.Body>
+              <Card.Title>Rideos balance</Card.Title>
+              <Card.Text>
+                {balance}
+              </Card.Text>
+              <DepositToken />
+              <WithdrawToken />
+            </Card.Body>
+          </Card>
 
-        <UpdateProfile />
-        <DepositToken />
-        <WithdrawToken />
+          <Card >
+            <Card.Header>Stack Power</Card.Header>
+            <Card.Body>
+              <StackPower />
+              <UnlockStack />
 
-        <StackPower />
-        <UnlockStack />
+              {hasUnlocked &&
+                <ListUnlocked />
+              }
+            </Card.Body>
+          </Card>
 
-        {hasUnlocked &&
-          <ListUnlocked />
-        }
-      </Form >
+        </CardColumns>
+      </div>
     )
   }
 }
