@@ -24,8 +24,8 @@ class ListUnlocked extends Component {
         })
 
         return (
-            <Row className="justify-content-center">
-                <Col md={8}>
+            <Row className="justify-content-center mt-3">
+                <Col>
                     <h4> List unlocked stackpower</h4>
 
                     <Table responsive striped bordered hover size="sm">
