@@ -40,7 +40,7 @@ class UnstackPow extends Component {
         return (
             <tr>
                 <td>{stack.balance}</td>
-                <td>{stack.endAssignment.toString()}</td>
+                <td>{stack.endAssignment.toLocaleTimeString() + " " + stack.endAssignment.toLocaleDateString()}</td>
                 <td>
                     {isUnstackable &&
                         <Button
