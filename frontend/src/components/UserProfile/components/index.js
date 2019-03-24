@@ -4,6 +4,7 @@ import WithdrawToken from './WithdrawToken'
 import StackPower from './StackPower'
 import UnlockStack from './UnlockStack'
 import ListUnlocked from './ListUnlocked'
+import CurrencyInput from './CurrencyInput'
 
 export {
     UpdateProfile,
@@ -11,5 +12,6 @@ export {
     WithdrawToken,
     StackPower,
     UnlockStack,
-    ListUnlocked
+    ListUnlocked,
+    CurrencyInput
 }
