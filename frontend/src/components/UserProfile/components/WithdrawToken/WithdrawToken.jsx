@@ -1,40 +1,32 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import { Card, Form, Button } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 // Services and redux action
 import { UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import CurrencyInput from '../CurrencyInput'
 
 class WithdrawToken extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            form: {
-                quantity: "0.0000 SYS"
-            },
+            quantity: ""
         }
 
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        const { name, value } = event.target;
-        const { form } = this.state;
-
+    handleChange = (amount) => {
         this.setState({
-            form: {
-                ...form,
-                [name]: value,
-            },
-        });
+            quantity: amount
+        })
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        const { form: { quantity } } = this.state;
+        const { quantity } = this.state;
         const { setUser, user: { account }, scatter: { scatter } } = this.props;
 
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
@@ -53,17 +45,11 @@ class WithdrawToken extends Component {
     }
 
     render() {
-        const { form } = this.state;
 
         return (
             <div className="mt-3">
                 <Card.Title>Withdraw</Card.Title>
-                <Form.Control
-                    type="text"
-                    name="quantity"
-                    value={form.quantity}
-                    onChange={this.handleChange}
-                />
+                <CurrencyInput handleChange={this.handleChange} />
                 <Button
                     className="mt-3"
                     onClick={this.handleSubmit}

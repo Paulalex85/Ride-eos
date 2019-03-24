@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { Card, Form, Button } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 
 import { StackpowerAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import CurrencyInput from '../CurrencyInput'
+
 
 class UnlockStack extends Component {
     constructor(props) {
@@ -13,34 +15,25 @@ class UnlockStack extends Component {
         super(props);
 
         this.state = {
-            form: {
-                unlock: "0.0000 SYS"
-            },
+            quantity: ""
         }
 
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        const { name, value } = event.target;
-        const { form } = this.state;
-
+    handleChange = (amount) => {
         this.setState({
-            form: {
-                ...form,
-                [name]: value,
-            },
-        });
+            quantity: amount
+        })
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        const { form: { unlock } } = this.state;
+        const { quantity } = this.state;
         const { setListStackpower, scatter: { scatter }, user: { account }, stackpower: { stackKeyCurrent } } = this.props;
 
         if (stackKeyCurrent !== undefined) {
-            return ApiServiceScatter.unlockpow(unlock, stackKeyCurrent, scatter).then(() => {
+            return ApiServiceScatter.unlockpow(quantity, stackKeyCurrent, scatter).then(() => {
                 ApiService.getStackByAccount(account, scatter).then(stack => {
                     setListStackpower({ listStackpower: stack, account: account });
                 }).catch((err) => { console.error(err) });
@@ -49,17 +42,11 @@ class UnlockStack extends Component {
     }
 
     render() {
-        const { form } = this.state;
 
         return (
             <div className="mt-3">
                 <Card.Title>Unlock Stackpower</Card.Title>
-                <Form.Control
-                    type="text"
-                    name="unlock"
-                    value={form.unlock}
-                    onChange={this.handleChange}
-                />
+                <CurrencyInput handleChange={this.handleChange} />
                 <Button
                     className="mt-3"
                     onClick={this.handleSubmit}

@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { Form, Card, Button } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 
 import { StackpowerAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import CurrencyInput from '../CurrencyInput'
 
 class StackPower extends Component {
     constructor(props) {
@@ -15,12 +16,9 @@ class StackPower extends Component {
         this.getStackpower();
 
         this.state = {
-            form: {
-                stack: "0.0000 SYS"
-            },
+            quantity: ""
         }
 
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.getStackpower = this.getStackpower.bind(this);
     }
@@ -33,24 +31,18 @@ class StackPower extends Component {
         }).catch((err) => { console.error(err) });
     }
 
-    handleChange(event) {
-        const { name, value } = event.target;
-        const { form } = this.state;
-
+    handleChange = (amount) => {
         this.setState({
-            form: {
-                ...form,
-                [name]: value,
-            },
-        });
+            quantity: amount
+        })
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        const { form: { stack } } = this.state;
+        const { quantity } = this.state;
         const { setUser, scatter: { scatter }, user: { account } } = this.props;
 
-        return ApiServiceScatter.stackpow(stack, scatter).then(() => {
+        return ApiServiceScatter.stackpow(quantity, scatter).then(() => {
             ApiService.getUserByAccount(account).then(user => {
                 setUser({
                     account: user.account,
@@ -64,7 +56,6 @@ class StackPower extends Component {
 
     render() {
         const { stackpower: { balanceCurrent } } = this.props;
-        const { form } = this.state;
 
         return (
             <div>
@@ -73,12 +64,7 @@ class StackPower extends Component {
                     {balanceCurrent}
                 </Card.Text>
                 <Card.Title>Add Stackpower</Card.Title>
-                <Form.Control
-                    type="text"
-                    name="stack"
-                    value={form.stack}
-                    onChange={this.handleChange}
-                />
+                <CurrencyInput handleChange={this.handleChange} />
                 <Button
                     className="mt-3"
                     onClick={this.handleSubmit}
