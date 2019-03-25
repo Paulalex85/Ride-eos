@@ -37,6 +37,7 @@ class DepositToken extends Component {
                         username: user.username,
                         balance: user.balance,
                     });
+                    this.props.update();
                 });
             })
         }).catch((err) => { console.error(err) });

@@ -13,15 +13,20 @@ class UserProfile extends Component {
   constructor(props) {
     super(props)
 
-    this.balanceEOS = "0.0000 SYS"
+    this.state = {
+      balanceEOS: "0.0000 SYS"
+    }
+
     this.getAccountEOS();
   }
 
-  getAccountEOS() {
+  getAccountEOS = () => {
     const { user: { account } } = this.props;
-    console.log(account)
+    console.log("get balance eos ...")
     ApiService.getBalanceAccountEOS(account).then(value => {
-      this.balanceEOS = value;
+      this.setState({
+        balanceEOS: value
+      })
     }).catch(error => {
       console.error(error);
     });
@@ -29,7 +34,7 @@ class UserProfile extends Component {
 
   render() {
     const { user: { account, balance }, stackpower: { listStackpower, stackKeyCurrent } } = this.props;
-
+    const { balanceEOS } = this.state;
     let hasUnlocked = false;
 
     for (let i = 0; i < listStackpower.length; i++) {
@@ -41,7 +46,6 @@ class UserProfile extends Component {
     }
 
     return (
-
       <div className="justify-content-center">
         <CardColumns className="m-3">
           <Card >
@@ -54,7 +58,7 @@ class UserProfile extends Component {
               </Card.Text>
               <Card.Title>Balance EOS Account</Card.Title>
               <Card.Text>
-                {this.balanceEOS}
+                {balanceEOS}
               </Card.Text>
               <Card.Title>Rideos Username</Card.Title>
 
@@ -69,8 +73,8 @@ class UserProfile extends Component {
               <Card.Text>
                 {balance}
               </Card.Text>
-              <DepositToken />
-              <WithdrawToken />
+              <DepositToken update={this.getAccountEOS} />
+              <WithdrawToken update={this.getAccountEOS} />
             </Card.Body>
           </Card>
 
