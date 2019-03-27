@@ -5,6 +5,7 @@ import StackPower from './StackPower'
 import UnlockStack from './UnlockStack'
 import ListUnlocked from './ListUnlocked'
 import CurrencyInput from './CurrencyInput'
+import DeleteUser from './DeleteUser'
 
 export {
     UpdateProfile,
@@ -13,5 +14,6 @@ export {
     StackPower,
     UnlockStack,
     ListUnlocked,
-    CurrencyInput
+    CurrencyInput,
+    DeleteUser
 }

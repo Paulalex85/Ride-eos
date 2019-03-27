@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 // Components
-import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack, ListUnlocked } from './components'
+import { UpdateProfile, DepositToken, WithdrawToken, StackPower, UnlockStack, ListUnlocked, DeleteUser } from './components'
 import { Card, CardColumns } from 'react-bootstrap';
 
 import { ApiService } from 'services';
@@ -63,6 +63,7 @@ class UserProfile extends Component {
               <Card.Title>Rideos Username</Card.Title>
 
               <UpdateProfile />
+              <DeleteUser />
             </Card.Body>
           </Card>
 
