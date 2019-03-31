@@ -14,45 +14,19 @@ CONTRACT rideos : public eosio::contract
   public:
     // constructor
     rideos(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
-                                                                    _users(receiver, receiver.value),
-                                                                    _stackpower(receiver, receiver.value),
-                                                                    _orders(receiver, receiver.value),
-                                                                    _offers(receiver, receiver.value),
-                                                                    _applies(receiver, receiver.value) {}
+                                                                    _orders(receiver, receiver.value) {}
 
-    void find_stackpower_and_increase(const name account, const asset &quantity);
+    void deposit(const name account, const asset &quantity);
 
-    void add_balance(const name account, const asset &quantity);
-
-    ACTION adduser(const name account, const string &username);
-
-    ACTION updateuser(const name account, const string &username);
-
-    ACTION deleteuser(const name account);
-
-    ACTION deposit(const name account, const asset &quantity);
-
-    ACTION withdraw(const name account, const asset &quantity);
-
-    ACTION pay(const name account, const asset &quantity);
-
-    ACTION stackpow(const name account, const asset &quantity);
-
-    ACTION unlockpow(const name account, const asset &quantity, const uint64_t stackKey);
-
-    ACTION unstackpow(const name account, const uint64_t stackKey);
-
-    ACTION needdeliver(const name buyer, const name seller, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
-
-    ACTION deliverfound(const name deliver, const uint64_t orderKey);
+    void withdraw(const name account, const asset &quantity);
 
     ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
     ACTION validatebuy(const uint64_t orderKey, const capi_checksum256 &hash);
 
-    ACTION validatedeli(const uint64_t orderKey, const uint64_t stackKey);
+    ACTION validatedeli(const uint64_t orderKey);
 
-    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash, const uint64_t stackKey);
+    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash);
 
     ACTION orderready(const uint64_t orderKey);
 
@@ -65,46 +39,6 @@ CONTRACT rideos : public eosio::contract
     ACTION delaycancel(const uint64_t orderKey);
 
     ACTION deleteorder(const uint64_t orderKey);
-
-    ACTION addoffer(const uint64_t orderKey);
-
-    ACTION endoffer(const name deliver, const uint64_t offerKey);
-
-    ACTION canceloffer(const uint64_t offerKey);
-
-    ACTION deleteoffer(const uint64_t offerKey);
-
-    ACTION addapply(const name account, const uint64_t offerKey);
-
-    ACTION cancelapply(const uint64_t applyKey);
-
-    //@abi table user i64
-    TABLE user
-    {
-        name account;
-        string username;
-        asset balance;
-
-        uint64_t primary_key() const { return account.value; }
-    };
-
-    typedef multi_index<name("user"), user> user_table;
-
-    //@abi table stackpower i64
-    TABLE stackpower
-    {
-        uint64_t stackKey;
-        name account;
-        asset balance;
-        time_point_sec endAssignment;
-
-        uint64_t primary_key() const { return stackKey; }
-        uint64_t get_account() const { return account.value; }
-    };
-    typedef multi_index<name("stackpower"), stackpower,
-                        indexed_by<name("byaccount"),
-                                   const_mem_fun<stackpower, uint64_t, &stackpower::get_account>>>
-        stackpower_table;
 
     enum order_state : uint8_t
     {
@@ -158,45 +92,6 @@ CONTRACT rideos : public eosio::contract
                                    const_mem_fun<order, uint64_t, &order::get_deliver_key>>>
         order_table;
 
-    enum offer_state : uint8_t
-    {
-        OPEN = 0,
-        CLOSED = 1,
-        FOUNDED = 2,
-    };
-
-    TABLE offer
-    {
-        uint64_t offerKey;
-        uint64_t orderKey;
-        uint8_t stateOffer;
-
-        uint64_t primary_key() const { return offerKey; }
-        uint64_t getOrderKey() const { return orderKey; }
-    };
-    typedef multi_index<name("offer"), offer,
-                        indexed_by<name("byorderkey"),
-                                   const_mem_fun<offer, uint64_t, &offer::getOrderKey>>>
-        offer_table;
-
-    TABLE apply
-    {
-        uint64_t applyKey;
-        name deliver;
-        uint64_t offerKey;
-
-        uint64_t primary_key() const { return applyKey; }
-        uint64_t get_offer() const { return offerKey; }
-    };
-    typedef multi_index<name("apply"), apply,
-                        indexed_by<name("byoffer"),
-                                   const_mem_fun<apply, uint64_t, &apply::get_offer>>>
-        apply_table;
-
   private:
-    user_table _users;
-    stackpower_table _stackpower;
     order_table _orders;
-    offer_table _offers;
-    apply_table _applies;
 };
