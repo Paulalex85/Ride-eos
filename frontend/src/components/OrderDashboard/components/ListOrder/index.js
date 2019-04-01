@@ -1,5 +1,2 @@
 import ListOrder from './ListOrder'
-
-export {
-    ListOrder
-}
+export default ListOrder;

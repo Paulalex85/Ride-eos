@@ -42,7 +42,6 @@ export default function (state = initialState, action) {
                     validateDeliver: element.validateDeliver.toString() || initialState.validateDeliver,
                     details: element.details || initialState.details,
                     delay: element.delay || initialState.delay,
-                    placeKey: element.placeKey.toString() || initialState.placeKey,
                 }
                 order.currentActor = setCurrentActor(order, action.account);
                 listObject.push(order);
@@ -67,7 +66,6 @@ export default function (state = initialState, action) {
                 validateDeliver: action.order.validateDeliver.toString() || initialState.validateDeliver,
                 details: action.order.details || initialState.details,
                 delay: action.order.delay || initialState.delay,
-                placeKey: action.order.placeKey.toString() || initialState.placeKey,
             }
             order.currentActor = setCurrentActor(order, action.account);
 

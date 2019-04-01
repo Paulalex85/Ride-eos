@@ -54,9 +54,9 @@ class Main extends Component {
 
         return (
             <BrowserRouter>
-                <div className="body">
+                <div>
                     <Menu />
-                    <div classNaaccountme="content">
+                    <div >
                         <Route exact path="/" component={KeyGenerator} />
                         {scatter &&
                             <div>

@@ -1,0 +1,54 @@
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+
+// Components
+import { ListGroup } from 'react-bootstrap';
+
+import { ApiService } from 'services'
+import { OrderAction } from 'actions'
+
+import { OrderElement } from './components'
+
+class ListOrder extends Component {
+
+    constructor(props) {
+        // Inherit constructor
+        super(props);
+
+        this.loadOrders();
+    }
+
+    loadOrders() {
+        const { setListOrders, scatter: { scatter } } = this.props;
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
+        return ApiService.getOrderByBuyer(accountScatter).then(list => {
+            setListOrders({ listOrders: list, account: accountScatter });
+        }).catch((err) => { console.error(err) });
+    }
+
+    render() {
+        const { orders: { listOrders } } = this.props;
+
+        const Orders = listOrders.map(order => (
+            <OrderElement
+                order={order}
+                key={order.orderKey}
+            />
+        ))
+
+        return (
+            <ListGroup className="justify-content-center mt-3">
+                {Orders}
+            </ListGroup>
+        )
+    }
+}
+
+const mapStateToProps = state => state;
+
+const mapDispatchToProps = {
+    setListOrders: OrderAction.setListOrders,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ListOrder);
