@@ -6,8 +6,8 @@ import ScatterEOS from 'scatterjs-plugin-eosjs2';
 
 import { Nav } from 'react-bootstrap';
 
-import { UserAction, ScatterAction } from 'actions';
-import { ApiService, ApiServiceScatter } from 'services';
+import { ScatterAction } from 'actions';
+import { ApiServiceScatter } from 'services';
 
 class Scatter extends Component {
 
@@ -18,7 +18,7 @@ class Scatter extends Component {
     }
 
     handleClick() {
-        const { setScatter, setUser } = this.props;
+        const { setScatter } = this.props;
 
         const network = ScatterJS.Network.fromJson({
             blockchain: 'eos',
@@ -38,20 +38,8 @@ class Scatter extends Component {
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
                 const account = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
                 setScatter({ scatter: ScatterJS.scatter });
-                ApiService.getUserByAccount(account.name).then(user => {
-                    if (user === undefined || user.account !== account.name) {
-                        ApiServiceScatter.adduser(account.name, ScatterJS.scatter).then(() => {
-                            ApiService.getUserByAccount(account.name).then(user => {
-                                setUser({ account: user.account, username: user.username, balance: user.balance });
-                            })
-                        });
-                    } else {
-                        setUser({ account: user.account, username: user.username, balance: user.balance });
-                    }
-                });
-
+                ApiServiceScatter.updatePermission(account, process.env.REACT_APP_EOSIO_CONTRACT_USERS, ScatterJS.scatter);
             });
         }).catch(error => {
             console.error(error);
@@ -74,7 +62,6 @@ const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
     setScatter: ScatterAction.setScatter,
-    setUser: UserAction.setUser,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Scatter);

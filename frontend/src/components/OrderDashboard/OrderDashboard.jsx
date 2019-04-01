@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 // Components
 import { OrderElement } from './components';
-import { OrderAction, OfferAction } from 'actions';
+import { OrderAction } from 'actions';
 import { ApiService } from 'services';
 
 class OrderDashboard extends Component {
@@ -16,13 +16,11 @@ class OrderDashboard extends Component {
     }
 
     loadOrders() {
-        const { setListOffers, setListOrders, user: { account } } = this.props;
+        const { setListOrders, scatter: { scatter } } = this.props;
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
-        return ApiService.getOrderByBuyer(account).then(list => {
-            setListOrders({ listOrders: list, account: account });
-            ApiService.getAllOffers().then(offers => {
-                setListOffers({ listOffers: offers });
-            })
+        return ApiService.getOrderByBuyer(accountScatter).then(list => {
+            setListOrders({ listOrders: list, account: accountScatter });
         }).catch((err) => { console.error(err) });
     }
 
@@ -52,7 +50,6 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setListOrders: OrderAction.setListOrders,
-    setListOffers: OfferAction.setListOffers,
 };
 
 // Export a redux connected component

@@ -62,52 +62,8 @@ class ApiServiceScatter {
         return send("updateauth", { "account": account.name, "permission": "active", "parent": "owner", "auth": { "threshold": 1, "keys": [{ "key": account.publicKey, "weight": 1 }], "waits": [], "accounts": [{ "weight": 1, "permission": { "actor": actor, "permission": "active" } }] } }, "eosio", scatter);
     }
 
-    //USERS
-    static adduser(username, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("adduser", { account: account.name, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static updateUser(username, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("updateuser", { account: account.name, username: username }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static deposit(quantity, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("deposit", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static withdraw(quantity, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("withdraw", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static deleteuser(scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("deleteuser", { account: account.name }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-    //STACKPOWER
-    static stackpow(quantity, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("stackpow", { account: account.name, quantity: quantity }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static unlockpow(quantity, stackKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("unlockpow", { account: account.name, quantity: quantity, stackKey: stackKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static unstackpow(stackKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("unstackpow", { account: account.name, stackKey: stackKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
 
     //ORDERS
-
-    static needDeliver({ buyer, seller, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {
-        return send("needdeliver", { buyer: buyer, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
 
     static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {
         return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
@@ -145,38 +101,6 @@ class ApiServiceScatter {
     static delayCancel(orderKey, scatter) {
         return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
-
-    //MARKET
-    static newAssign(placeKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("newassign", { account: account.name, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static endAssign(assignmentKey, scatter) {
-        return send("endassign", { assignmentKey: assignmentKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static addOffer(orderKey, scatter) {
-        return send("addoffer", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static endOffer(deliver, offerKey, scatter) {
-        return send("endoffer", { deliver: deliver, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static cancelOffer(offerKey, scatter) {
-        return send("canceloffer", { offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static addApply(offerKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("addapply", { account: account.name, offerKey: offerKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
-    static cancelApply(applyKey, scatter) {
-        return send("cancelapply", { applyKey: applyKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
-    }
-
 }
 
 export default ApiServiceScatter;
