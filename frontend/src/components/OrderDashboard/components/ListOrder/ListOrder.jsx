@@ -10,7 +10,6 @@ import { OrderAction } from 'actions'
 import { OrderElement } from './components'
 
 class ListOrder extends Component {
-
     constructor(props) {
         // Inherit constructor
         super(props);
@@ -38,7 +37,7 @@ class ListOrder extends Component {
         ))
 
         return (
-            <ListGroup className="justify-content-center mt-3">
+            <ListGroup className="align-items-center">
                 {Orders}
             </ListGroup>
         )
