@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { ListGroup, Collapse, Col } from 'react-bootstrap';
 import Typography from '@material-ui/core/Typography';
+import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
 import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel } from './components';
 
@@ -20,13 +21,56 @@ class OrderElement extends Component {
         const { order } = this.props;
         const { open } = this.state;
 
+        let stateTitle = "";
+        let colorListGroup = "";
+        if (order.state === "1") {
+            stateTitle = "Order initialization"
+        }
+        else if (order.state === "2") {
+            stateTitle = "Wait seller preparing order"
+            colorListGroup = "info"
+        }
+        else if (order.state === "3") {
+            stateTitle = "Order ready to be delivered"
+            colorListGroup = "info"
+        }
+        else if (order.state === "4") {
+            stateTitle = "Delivery in progress"
+            colorListGroup = "info"
+        }
+        else if (order.state === "5") {
+            stateTitle = "Order delivered"
+            colorListGroup = "success"
+        }
+        else if (order.state === "98") {
+            stateTitle = "Order cancelled"
+            colorListGroup = "danger"
+        }
+        else if (order.state === "99") {
+            stateTitle = "Order cancelled"
+            colorListGroup = "danger"
+        }
+
         return (
             <Col className="col-sm-6 col-sm-offset-3">
                 <ListGroup.Item
+                    action
+                    variant={colorListGroup}
+                    className="text-center"
                     onClick={() => this.setState({ open: !open })}
                     aria-controls="collapse-order"
                     aria-expanded={open}>
-                    Order #{order.orderKey}
+                    <span className="float-left">
+                        Order #{order.orderKey}
+                    </span>
+                    <span>
+                        {stateTitle}
+                    </span>
+                    {open ?
+                        <Octicon className="float-right" size='medium' icon={getIconByName("chevron-up")} />
+                        :
+                        <Octicon className="float-right" size='medium' icon={getIconByName("chevron-down")} />
+                    }
                 </ListGroup.Item>
                 <Collapse in={this.state.open}>
                     <ListGroup.Item id="collapse-order">
