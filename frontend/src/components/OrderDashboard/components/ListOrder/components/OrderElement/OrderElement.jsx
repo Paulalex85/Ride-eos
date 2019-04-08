@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { ListGroup, Collapse, Col } from 'react-bootstrap';
-import Typography from '@material-ui/core/Typography';
+import { ListGroup, Collapse, Col, Row, Badge } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
 import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel } from './components';
@@ -74,20 +73,69 @@ class OrderElement extends Component {
                 </ListGroup.Item>
                 <Collapse in={this.state.open}>
                     <ListGroup.Item id="collapse-order">
-                        <Typography>Buyer : {order.buyer}</Typography>
-                        <Typography>Seller : {order.seller}</Typography>
-                        <Typography>Deliver : {order.deliver}</Typography>
-                        <Typography>State : {order.state}</Typography>
-                        <Typography>Date : {order.date}</Typography>
-                        <Typography>Date delay : {order.dateDelay}</Typography>
-                        <Typography>Order Price : {order.priceOrder}</Typography>
-                        <Typography>Deliver Price : {order.priceDeliver}</Typography>
-                        <Typography>Buyer validate : {order.validateBuyer}</Typography>
-                        <Typography>Seller validate : {order.validateSeller}</Typography>
-                        <Typography>Deliver validate : {order.validateDeliver}</Typography>
-                        <Typography>Details : {order.details}</Typography>
-                        <Typography>Delay : {order.delay}</Typography>
-                        <Typography>Place Key : {order.placeKey}</Typography>
+                        <h5>Users</h5>
+                        <Row className="mb-3">
+                            <Col>
+                                <Badge className="mr-3" variant="info">Buyer</Badge>
+                                {order.buyer}
+                            </Col>
+                            <Col>
+                                <Badge className="mr-3" variant="info">Seller</Badge>
+                                {order.seller}
+                            </Col>
+                            <Col>
+                                <Badge className="mr-3" variant="info">Deliver</Badge>
+                                {order.deliver}
+                            </Col>
+                        </Row>
+                        <h5>Delay</h5>
+                        <Row className="mb-3">
+                            <Col>
+                                Creation : {order.date.toLocaleTimeString() + " " + order.date.toLocaleDateString()}
+                            </Col>
+                            <Col>
+                                Max delivery : {order.dateDelay.toLocaleTimeString() + " " + order.dateDelay.toLocaleDateString()}
+                            </Col>
+                        </Row>
+                        <h5>Price</h5>
+                        <Row className="mb-3">
+                            <Col>
+                                Seller : {order.priceOrder}
+                            </Col>
+                            <Col>
+                                Deliver : {order.priceDeliver}
+                            </Col>
+                        </Row>
+                        <h5>Order Validation</h5>
+                        <Row className="mb-3">
+                            <Col className="sm-1">
+                                {order.validateBuyer === "1" ?
+                                    <Badge variant="success">Buyer</Badge>
+                                    :
+                                    <Badge variant="danger">Buyer</Badge>
+                                }
+                            </Col>
+                            <Col className="sm-1">
+                                {order.validateSeller === "1" ?
+                                    <Badge variant="success">Seller</Badge>
+                                    :
+                                    <Badge variant="danger">Seller</Badge>
+                                }
+                            </Col>
+                            <Col className="sm-1">
+                                {order.validateDeliver === "1" ?
+                                    <Badge variant="success">Deliver</Badge>
+                                    :
+                                    <Badge variant="danger">Deliver</Badge>
+                                }
+                            </Col>
+                        </Row>
+                        <h5>Infos</h5>
+                        <Row className="mb-3">
+                            <Col>
+                                {order.details}
+                            </Col>
+                        </Row>
 
                         <ValidateOrder order={order} />
                         <OrderReady order={order} />
