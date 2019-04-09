@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
+import { Button } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction } from 'actions';
-import { ApiService } from 'services';
+import { ApiService, ApiServiceScatter } from 'services';
 
 class DelayCancel extends Component {
     constructor(props) {
@@ -18,7 +18,7 @@ class DelayCancel extends Component {
 
         const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders }, scatter: { scatter } } = this.props;
 
-        ApiService.delayCancel(orderKey, scatter).then(() => {
+        ApiServiceScatter.delayCancel(orderKey, scatter).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
                 setOrder({ listOrders: listOrders, order: order, account });
             })
@@ -42,9 +42,8 @@ class DelayCancel extends Component {
                 {isPrint &&
                     <Button
                         onClick={this.handleClick}
-                        className="green"
-                        variant='contained'
-                        color='primary'
+                        variant="danger"
+                        className="float-right"
                     >
                         DELAY CANCEL
                 </Button>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
+import { Button } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter, KeyGenerator } from 'services';
@@ -91,9 +91,7 @@ class ValidateOrder extends Component {
                 {canValidate &&
                     <Button
                         onClick={this.handleClick}
-                        className="green"
-                        variant='contained'
-                        color='primary'
+                        variant='primary'
                     >
                         VALIDATE
                 </Button>

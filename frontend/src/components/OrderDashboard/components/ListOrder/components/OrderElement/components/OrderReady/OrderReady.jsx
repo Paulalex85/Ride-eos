@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import Button from '@material-ui/core/Button';
+import { Button } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -40,9 +40,7 @@ class OrderReady extends Component {
                 {isPrint &&
                     <Button
                         onClick={this.handleClick}
-                        className="green"
-                        variant='contained'
-                        color='primary'
+                        variant='primary'
                     >
                         ORDER READY
                 </Button>

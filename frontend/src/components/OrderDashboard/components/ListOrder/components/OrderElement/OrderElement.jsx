@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { ListGroup, Collapse, Col, Row, Badge } from 'react-bootstrap';
+import { ListGroup, Collapse, Col, Row, Badge, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
 import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel } from './components';
@@ -137,12 +137,18 @@ class OrderElement extends Component {
                             </Col>
                         </Row>
 
-                        <ValidateOrder order={order} />
-                        <OrderReady order={order} />
-                        <OrderTaken order={order} />
-                        <OrderDelivered order={order} />
-                        <InitializeCancel order={order} />
-                        <DelayCancel order={order} />
+                        <ButtonToolbar className="justify-content-between">
+                            <ButtonGroup>
+                                <ValidateOrder order={order} />
+                                <OrderReady order={order} />
+                                <OrderTaken order={order} />
+                                <OrderDelivered order={order} />
+                            </ButtonGroup>
+                            <ButtonGroup>
+                                <InitializeCancel order={order} />
+                                <DelayCancel order={order} />
+                            </ButtonGroup>
+                        </ButtonToolbar>
                     </ListGroup.Item>
                 </Collapse>
             </Col>

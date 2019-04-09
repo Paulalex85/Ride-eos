@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
+
+import { Button } from 'react-bootstrap'
+
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 
@@ -38,9 +40,8 @@ class InitializeCancel extends Component {
                 {isPrint &&
                     <Button
                         onClick={this.handleClick}
-                        className="green"
-                        variant='contained'
-                        color='primary'
+                        variant="danger"
+                        className="float-right"
                     >
                         INITIALIZATION CANCEL
                 </Button>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Button from '@material-ui/core/Button';
+import { Button } from 'react-bootstrap'
 import TextField from '@material-ui/core/TextField';
 
 import { OrderAction } from 'actions';
@@ -62,10 +62,10 @@ class OrderDelivered extends Component {
                             label="Key"
                             onChange={this.handleChange}
                         />
-                        <Button className="green"
-                            variant='contained'
-                            color='primary'
-                            onClick={this.handleClick} >
+                        <Button
+                            onClick={this.handleClick}
+                            variant='primary'
+                        >
                             ORDER DELIVERED
                         </Button>
                     </div>
