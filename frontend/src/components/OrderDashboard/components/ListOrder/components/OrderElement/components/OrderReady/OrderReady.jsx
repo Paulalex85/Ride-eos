@@ -16,11 +16,12 @@ class OrderReady extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders }, scatter: { scatter } } = this.props;
+        const { order: { orderKey }, setOrder, orders: { listOrders }, scatter: { scatter } } = this.props;
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.orderReady(orderKey, scatter).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account });
+                setOrder({ listOrders: listOrders, order: order, account: accountScatter });
             })
         }).catch((err) => { console.error(err) });
     }
