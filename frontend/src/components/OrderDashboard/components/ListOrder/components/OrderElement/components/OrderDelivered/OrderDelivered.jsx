@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { Button } from 'react-bootstrap'
-import TextField from '@material-ui/core/TextField';
+import { Button, InputGroup, FormControl } from 'react-bootstrap'
 
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
@@ -56,20 +55,27 @@ class OrderDelivered extends Component {
         return (
             <div>
                 {isPrint &&
-                    <div>
-                        <TextField
+                    <InputGroup className="mb-3">
+                        <InputGroup.Prepend>
+                            <InputGroup.Text id="inputGroup-sizing-default">Key</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
                             name="key"
                             value={key}
                             label="Key"
                             onChange={this.handleChange}
+                            aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default"
                         />
-                        <Button
-                            onClick={this.handleClick}
-                            variant='primary'
-                        >
-                            ORDER DELIVERED
-                        </Button>
-                    </div>
+                        <InputGroup.Append>
+                            <Button
+                                onClick={this.handleClick}
+                                variant='primary'
+                            >
+                                ORDER DELIVERED
+                            </Button>
+                        </InputGroup.Append>
+                    </InputGroup>
                 }
             </div>
         )
