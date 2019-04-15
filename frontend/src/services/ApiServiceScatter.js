@@ -58,10 +58,10 @@ async function send(actionName, actionData, contractDestination, scatter) {
 
 class ApiServiceScatter {
 
-    static updatePermission(account, actor, scatter) {
+    static updatePermission(actor, scatter) {
+        const account = getAccountFromScatter(scatter);
         return send("updateauth", { "account": account.name, "permission": "active", "parent": "owner", "auth": { "threshold": 1, "keys": [{ "key": account.publicKey, "weight": 1 }], "waits": [], "accounts": [{ "weight": 1, "permission": { "actor": actor, "permission": "active" } }] } }, "eosio", scatter);
     }
-
 
     //ORDERS
 

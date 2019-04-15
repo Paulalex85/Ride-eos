@@ -37,9 +37,10 @@ class Scatter extends Component {
             const requiredFields = { accounts: [network] };
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-                const account = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
-                setScatter({ scatter: ScatterJS.scatter });
-                ApiServiceScatter.updatePermission(account, process.env.REACT_APP_EOSIO_CONTRACT_USERS, ScatterJS.scatter);
+                console.log(process.env)
+                ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, ScatterJS.scatter).then(() => {
+                    setScatter({ scatter: ScatterJS.scatter });
+                });
             });
         }).catch(error => {
             console.error(error);

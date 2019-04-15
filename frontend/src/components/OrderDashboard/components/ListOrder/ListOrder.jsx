@@ -21,9 +21,6 @@ class ListOrder extends Component {
         const { setListOrders, scatter: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
-        console.log("bonjour")
-        console.log(accountScatter)
-
         return ApiService.getOrderByBuyer(accountScatter).then(list => {
             setListOrders({ listOrders: list, account: accountScatter.name });
         }).catch((err) => { console.error(err) });

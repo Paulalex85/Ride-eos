@@ -7,26 +7,21 @@ import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter, KeyGenerator } from 'services';
 
 class ValidateOrder extends Component {
-    constructor(props) {
-        super(props);
 
-        this.handleClick = this.handleClick.bind(this);
-        this.validateAPI = this.validateAPI.bind(this);
-    }
-
-    handleClick(event) {
+    handleClick = (event) => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, user: { account }, orders: { listOrders } } = this.props;
+        const { order: { orderKey }, setOrder, orders: { listOrders }, scatter: { scatter } } = this.props;
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         this.validateAPI().then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account });
+                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
             })
         }).catch((err) => { console.error(err) });
     }
 
-    async validateAPI() {
+    validateAPI = async () => {
         const { order: { currentActor, orderKey }, scatter: { scatter } } = this.props;
 
         if (currentActor === "deliver") {
