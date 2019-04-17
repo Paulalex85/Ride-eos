@@ -101,6 +101,10 @@ class ApiServiceScatter {
     static delayCancel(orderKey, scatter) {
         return send("delaycancel", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
+
+    static deleteOrder(orderKey, scatter) {
+        return send("deleteorder", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    }
 }
 
 export default ApiServiceScatter;

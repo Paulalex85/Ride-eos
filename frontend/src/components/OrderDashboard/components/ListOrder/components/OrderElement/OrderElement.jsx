@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { ListGroup, Collapse, Col, Row, Badge, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
-import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel } from './components';
+import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel, DeleteOrder } from './components';
 
 class OrderElement extends Component {
 
@@ -147,6 +147,7 @@ class OrderElement extends Component {
                             <ButtonGroup>
                                 <InitializeCancel order={order} />
                                 <DelayCancel order={order} />
+                                <DeleteOrder order={order} />
                             </ButtonGroup>
                         </ButtonToolbar>
                     </ListGroup.Item>
