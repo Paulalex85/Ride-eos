@@ -8,11 +8,16 @@ import { Nav } from 'react-bootstrap';
 
 import { ScatterAction } from 'actions';
 import { ApiServiceScatter } from 'services';
+import { PopupNoScatter } from './components'
 
 class Scatter extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            show: false,
+        };
 
         this.handleClick = this.handleClick.bind(this);
     }
@@ -31,7 +36,9 @@ class Scatter extends Component {
         ScatterJS.plugins(new ScatterEOS());
 
         ScatterJS.connect('Rideos', { network }).then(connected => {
-            if (!connected) return console.error('no scatter');
+            if (!connected) {
+                this.setState({ show: true });
+            }
 
             window.ScatterJS = null;
             const requiredFields = { accounts: [network] };
@@ -50,6 +57,10 @@ class Scatter extends Component {
     render() {
         return (
             <Nav className="ml-auto" >
+                <PopupNoScatter
+                    show={this.state.show}
+                    hide={() => this.setState({ show: false })}
+                />
                 <Nav.Link onClick={this.handleClick}>
                     Login with Scatter
                 </Nav.Link>
