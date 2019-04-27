@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Button from '@material-ui/core/Button';
+import { Button } from 'react-bootstrap'
 
 import ecc from 'eosjs-ecc';
 import randomstring from 'randomstring';
@@ -32,8 +32,7 @@ class KeyGenerator extends Component {
         return (
             <div>
                 <Button
-                    variant='contained'
-                    color='primary'
+                    variant='primary'
                     onClick={this.handleGenerator}>
                     Generate Key
                 </Button><br />

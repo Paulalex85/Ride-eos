@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // Components
-import { ListOrder } from './components';
+import { ListOrder, NewOrder } from './components';
 
 class OrderDashboard extends Component {
 
@@ -8,6 +8,7 @@ class OrderDashboard extends Component {
 
         return (
             <div>
+                <NewOrder />
                 <ListOrder />
             </div>
         )
