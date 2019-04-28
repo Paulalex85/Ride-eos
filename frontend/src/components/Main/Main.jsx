@@ -12,6 +12,7 @@ import { ScatterAction } from 'actions';
 
 import OrderDashboard from '../OrderDashboard';
 import KeyGenerator from '../KeyGenerator';
+import CreateOrder from '../CreateOrder'
 import { Menu } from './components';
 
 
@@ -61,6 +62,7 @@ class Main extends Component {
                         {scatter &&
                             <div>
                                 <Route path="/orders" component={OrderDashboard} />
+                                <Route path="/create" component={CreateOrder} />
                             </div>
                         }
                     </div>

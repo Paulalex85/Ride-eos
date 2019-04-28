@@ -13,7 +13,6 @@ class ListOrder extends Component {
     constructor(props) {
         // Inherit constructor
         super(props);
-
         this.loadOrders();
     }
 
