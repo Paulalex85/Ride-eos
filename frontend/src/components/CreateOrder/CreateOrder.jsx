@@ -5,8 +5,6 @@ import { Row, Col } from 'react-bootstrap';
 import { IsBuyer, BuyerInfo } from './components'
 
 class CreateOrder extends Component {
-
-
     constructor(props) {
         super(props);
 
