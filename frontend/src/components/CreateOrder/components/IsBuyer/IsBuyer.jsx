@@ -6,7 +6,6 @@ import { Card, Button } from 'react-bootstrap';
 class IsBuyer extends Component {
 
     render() {
-
         return (
             <Card>
                 <Card.Body>
@@ -14,7 +13,7 @@ class IsBuyer extends Component {
                         Order
                     </Card.Text>
                     <Button variant='primary'
-                        onClick={this.props.changePage(1)}>
+                        onClick={() => this.props.changePage(1)}>
                         Next
                     </Button>
                 </Card.Body>

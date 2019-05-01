@@ -15,7 +15,8 @@ class BuyerInfo extends Component {
                         Info
                     </Card.Text>
                     <Button variant='primary'
-                        onClick={this.props.changePage(1)}>
+                        onClick={this.props.changePage}
+                        value={1}>
                         Next
                     </Button>
                 </Card.Body>

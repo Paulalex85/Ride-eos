@@ -6,18 +6,20 @@ import { IsBuyer, BuyerInfo } from './components'
 
 class CreateOrder extends Component {
 
-    MAX_VALUE_PAGE = 2;
+
     constructor(props) {
         super(props);
 
+        this.MAX_VALUE_PAGE = 2;
+
         this.state = {
-            page: "IS_BUYER"
+            page: 1
         }
     }
 
     changePage = (updatePage) => {
         let nextValue = this.state.page + updatePage
-        if (nextValue >= 1 && nextValue <= MAX_VALUE_PAGE) {
+        if (nextValue >= 1 && nextValue <= this.MAX_VALUE_PAGE) {
             this.setState({ page: nextValue });
         }
     }
@@ -27,13 +29,13 @@ class CreateOrder extends Component {
         switch (this.state.page) {
             case 1:
                 pageToPrint = <IsBuyer
-                    changePage={this.changePage(value)}
+                    changePage={(updatePage) => this.changePage(updatePage)}
                 />
                 break;
 
             case 2:
                 pageToPrint = <BuyerInfo
-                    changePage={this.changePage(value)}
+                    changePage={this.changePage}
                 />
                 break;
 
