@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { Card, Button } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
-class IsBuyer extends Component {
+class SellerInfo extends Component {
 
     render() {
         return (
             <Card>
-                <Card.Header>
+                <Card.Header className="text-center">
                     <div onClick={() => this.props.changePage(-1)}>
                         <Octicon
                             className="float-left"
@@ -18,7 +18,7 @@ class IsBuyer extends Component {
                 </Card.Header>
                 <Card.Body>
                     <Card.Text>
-                        Order
+                        Seller
                     </Card.Text>
                     <Button variant='primary'
                         className="float-right"
@@ -26,10 +26,10 @@ class IsBuyer extends Component {
                         Next
                     </Button>
                 </Card.Body>
-            </Card>
+            </Card >
         )
     }
 }
 
 // Export a redux connected component
-export default IsBuyer;
+export default SellerInfo;

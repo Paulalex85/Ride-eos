@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 // Components
 import { Row, Col } from 'react-bootstrap';
 
-import { IsBuyer, BuyerInfo } from './components'
+import { SellerInfo, BuyerInfo, DeliverInfo } from './components'
 
 class CreateOrder extends Component {
     constructor(props) {
         super(props);
 
-        this.MAX_VALUE_PAGE = 2;
+        this.MAX_VALUE_PAGE = 3;
 
         this.state = {
             page: 1
@@ -26,13 +26,17 @@ class CreateOrder extends Component {
         let pageToPrint = <div></div>;
         switch (this.state.page) {
             case 1:
-                pageToPrint = <IsBuyer
-                    changePage={(updatePage) => this.changePage(updatePage)}
+                pageToPrint = <BuyerInfo
+                    changePage={this.changePage}
                 />
                 break;
-
             case 2:
-                pageToPrint = <BuyerInfo
+                pageToPrint = <SellerInfo
+                    changePage={this.changePage}
+                />
+                break;
+            case 3:
+                pageToPrint = <DeliverInfo
                     changePage={this.changePage}
                 />
                 break;

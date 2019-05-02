@@ -1,9 +1,9 @@
-import IsBuyer from './IsBuyer'
 import BuyerInfo from './BuyerInfo'
-import ButtonNext from './ButtonNext'
+import SellerInfo from './SellerInfo'
+import DeliverInfo from './DeliverInfo'
 
 export {
-    IsBuyer,
     BuyerInfo,
-    ButtonNext
+    SellerInfo,
+    DeliverInfo
 }
