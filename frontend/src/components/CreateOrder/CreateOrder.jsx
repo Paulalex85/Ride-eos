@@ -11,7 +11,10 @@ class CreateOrder extends Component {
         this.MAX_VALUE_PAGE = 3;
 
         this.state = {
-            page: 1
+            page: 1,
+            buyer: "",
+            seller: "",
+            deliver: ""
         }
     }
 
@@ -22,22 +25,33 @@ class CreateOrder extends Component {
         }
     }
 
+    handleChange = (value, name) => {
+        this.setState({
+            ...this.state,
+            [name]: value
+        })
+    }
+
     render() {
         let pageToPrint = <div></div>;
         switch (this.state.page) {
             case 1:
                 pageToPrint = <BuyerInfo
                     changePage={this.changePage}
+                    buyer={this.state.buyer}
+                    handleChange={this.handleChange}
                 />
                 break;
             case 2:
                 pageToPrint = <SellerInfo
                     changePage={this.changePage}
+                    seller={this.state.seller}
                 />
                 break;
             case 3:
                 pageToPrint = <DeliverInfo
                     changePage={this.changePage}
+                    deliver={this.state.deliver}
                 />
                 break;
 

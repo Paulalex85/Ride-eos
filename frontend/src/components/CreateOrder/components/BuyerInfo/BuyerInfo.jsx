@@ -10,7 +10,7 @@ class BuyerInfo extends Component {
         super(props);
 
         this.state = {
-            name: ""
+            name: this.props.buyer
         }
     }
 
@@ -18,6 +18,8 @@ class BuyerInfo extends Component {
         this.setState({
             name: value
         })
+
+        this.props.handleChange(value, "buyer")
     }
 
     render() {
