@@ -1,13 +1,9 @@
-import BuyerInfo from './BuyerInfo'
-import SellerInfo from './SellerInfo'
-import DeliverInfo from './DeliverInfo'
+import AccountInfo from './AccountInfo'
 import CurrencyInput from './CurrencyInput'
 import AccountInput from './AccountInput'
 
 export {
-    BuyerInfo,
-    SellerInfo,
-    DeliverInfo,
+    AccountInfo,
     CurrencyInput,
     AccountInput
 }

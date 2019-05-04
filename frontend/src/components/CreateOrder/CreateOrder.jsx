@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // Components
 import { Row, Col } from 'react-bootstrap';
 
-import { SellerInfo, BuyerInfo, DeliverInfo } from './components'
+import { AccountInfo } from './components'
 
 class CreateOrder extends Component {
     constructor(props) {
@@ -36,22 +36,36 @@ class CreateOrder extends Component {
         let pageToPrint = <div></div>;
         switch (this.state.page) {
             case 1:
-                pageToPrint = <BuyerInfo
+                pageToPrint = <AccountInfo
+                    key={1}
+                    firstPage={true}
                     changePage={this.changePage}
-                    buyer={this.state.buyer}
+                    account={this.state.buyer}
                     handleChange={this.handleChange}
+                    actor="buyer"
+                    titleHeader="Buyer"
                 />
                 break;
             case 2:
-                pageToPrint = <SellerInfo
+                pageToPrint = <AccountInfo
+                    key={2}
+                    firstPage={false}
                     changePage={this.changePage}
-                    seller={this.state.seller}
+                    account={this.state.seller}
+                    handleChange={this.handleChange}
+                    actor="seller"
+                    titleHeader="Seller"
                 />
                 break;
             case 3:
-                pageToPrint = <DeliverInfo
+                pageToPrint = <AccountInfo
+                    key={3}
+                    firstPage={false}
                     changePage={this.changePage}
-                    deliver={this.state.deliver}
+                    account={this.state.deliver}
+                    handleChange={this.handleChange}
+                    actor="deliver"
+                    titleHeader="Deliver"
                 />
                 break;
 

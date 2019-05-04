@@ -2,16 +2,17 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
 import { Card, Button, Form, Col, Row } from 'react-bootstrap';
+import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
-import { AccountInput } from '../'
+import { AccountInput } from '..'
 
-class BuyerInfo extends Component {
+class AccountInfo extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            account: this.props.buyer,
+            account: this.props.account,
             disabled: false
         }
     }
@@ -38,14 +39,28 @@ class BuyerInfo extends Component {
             account: value
         })
 
-        this.props.handleChange(value, "buyer")
+        this.props.handleChange(value, this.props.actor)
     }
 
     render() {
+
+        let returnPage = "";
+        if (!this.props.firstPage) {
+            returnPage = <div onClick={() => this.props.changePage(-1)}>
+                <Octicon
+                    className="float-left"
+                    size='medium'
+                    icon={getIconByName("arrow-left")} />
+            </div>
+        }
+
+        let labelCheckBox = "I'm the " + this.props.actor
+
         return (
             <Card className="text-center" >
                 <Card.Header>
-                    Buyer
+                    {returnPage}
+                    {this.props.titleHeader}
                 </Card.Header>
                 <Card.Body>
                     <AccountInput
@@ -58,7 +73,7 @@ class BuyerInfo extends Component {
                         <Col sm={7}>
                             <Form.Check
                                 onChange={this.handleCheckBox}
-                                label="I'm the buyer"
+                                label={labelCheckBox}
                             />
                         </Col>
                     </Form.Group>
@@ -68,7 +83,7 @@ class BuyerInfo extends Component {
                         Next
                     </Button>
                 </Card.Body>
-            </Card >
+            </Card>
         )
     }
 }
@@ -76,4 +91,4 @@ class BuyerInfo extends Component {
 const mapStateToProps = state => state;
 
 // Export a redux connected component
-export default connect(mapStateToProps)(BuyerInfo);
+export default connect(mapStateToProps)(AccountInfo);
