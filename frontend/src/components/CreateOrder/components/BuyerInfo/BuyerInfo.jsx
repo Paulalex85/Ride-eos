@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 // Components
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, Form, Col, Row } from 'react-bootstrap';
 
 import { AccountInput } from '../'
 
@@ -10,13 +11,31 @@ class BuyerInfo extends Component {
         super(props);
 
         this.state = {
-            name: this.props.buyer
+            account: this.props.buyer,
+            disabled: false
+        }
+    }
+
+    handleCheckBox = (event) => {
+        if (event.target.checked === true) {
+            const { scatter: { scatter } } = this.props;
+            const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+            this.setState({
+                account: accountScatter.name,
+                disabled: true
+            })
+        }
+        else {
+            this.setState({
+                ...this.state,
+                disabled: false
+            })
         }
     }
 
     handleChange = (value) => {
         this.setState({
-            name: value
+            account: value
         })
 
         this.props.handleChange(value, "buyer")
@@ -29,10 +48,20 @@ class BuyerInfo extends Component {
                     Buyer
                 </Card.Header>
                 <Card.Body>
-                    <Card.Text>
-                        Buyer
-                    </Card.Text>
-                    <AccountInput handleChange={this.handleChange} />
+                    <AccountInput
+                        handleChange={this.handleChange}
+                        label="Account"
+                        disabled={this.state.disabled}
+                        account={this.state.account}
+                    />
+                    <Form.Group as={Row} controlId="imselfCheck">
+                        <Col sm={7}>
+                            <Form.Check
+                                onChange={this.handleCheckBox}
+                                label="I'm the buyer"
+                            />
+                        </Col>
+                    </Form.Group>
                     <Button variant='primary'
                         className="float-right"
                         onClick={() => this.props.changePage(1)}>
@@ -44,5 +73,7 @@ class BuyerInfo extends Component {
     }
 }
 
+const mapStateToProps = state => state;
+
 // Export a redux connected component
-export default BuyerInfo;
+export default connect(mapStateToProps)(BuyerInfo);
