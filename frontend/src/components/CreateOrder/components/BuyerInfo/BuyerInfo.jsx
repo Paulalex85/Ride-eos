@@ -1,26 +1,36 @@
 import React, { Component } from 'react';
 // Components
 import { Card, Button } from 'react-bootstrap';
-import Octicon, { getIconByName } from '@githubprimer/octicons-react';
+
+import { AccountInput } from '../'
 
 class BuyerInfo extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            name: ""
+        }
+    }
+
+    handleChange = (value) => {
+        this.setState({
+            name: value
+        })
+    }
 
     render() {
         return (
             <Card className="text-center" >
                 <Card.Header>
-                    <div onClick={() => this.props.changePage(-1)}>
-                        <Octicon
-                            className="float-left"
-                            size='medium'
-                            icon={getIconByName("arrow-left")} />
-                    </div>
                     Buyer
                 </Card.Header>
                 <Card.Body>
                     <Card.Text>
                         Buyer
                     </Card.Text>
+                    <AccountInput handleChange={this.handleChange} />
                     <Button variant='primary'
                         className="float-right"
                         onClick={() => this.props.changePage(1)}>
