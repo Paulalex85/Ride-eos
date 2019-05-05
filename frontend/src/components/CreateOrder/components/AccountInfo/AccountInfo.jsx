@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Card, Button, Form, Col, Row } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
-import { AccountInput } from '..'
+import { AccountInput } from './components'
 
 class AccountInfo extends Component {
 
