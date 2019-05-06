@@ -2,19 +2,20 @@ import React, { Component } from 'react';
 // Components
 import { Row, Col } from 'react-bootstrap';
 
-import { AccountInfo } from './components'
+import { AccountInfo, OrderDetails } from './components'
 
 class CreateOrder extends Component {
     constructor(props) {
         super(props);
 
-        this.MAX_VALUE_PAGE = 3;
+        this.MAX_VALUE_PAGE = 4;
 
         this.state = {
             page: 1,
             buyer: "",
             seller: "",
-            deliver: ""
+            deliver: "",
+            details: ""
         }
     }
 
@@ -66,6 +67,15 @@ class CreateOrder extends Component {
                     handleChange={this.handleChange}
                     actor="deliver"
                     titleHeader="Deliver"
+                />
+                break;
+            case 4:
+                pageToPrint = <OrderDetails
+                    firstPage={false}
+                    changePage={this.changePage}
+                    handleChange={this.handleChange}
+                    key={4}
+                    titleHeader="Details"
                 />
                 break;
 
