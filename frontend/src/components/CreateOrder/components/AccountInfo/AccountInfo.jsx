@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // Components
-import { Card, Button, Form, Col, Row } from 'react-bootstrap';
-import Octicon, { getIconByName } from '@githubprimer/octicons-react';
+import { Form, Col, Row } from 'react-bootstrap';
 
 import { AccountInput } from './components'
 
@@ -25,6 +24,7 @@ class AccountInfo extends Component {
                 account: accountScatter.name,
                 disabled: true
             })
+            this.props.handleChange(accountScatter.name, this.props.actor)
         }
         else {
             this.setState({
@@ -43,47 +43,25 @@ class AccountInfo extends Component {
     }
 
     render() {
-
-        let returnPage = "";
-        if (!this.props.firstPage) {
-            returnPage = <div onClick={() => this.props.changePage(-1)}>
-                <Octicon
-                    className="float-left"
-                    size='medium'
-                    icon={getIconByName("arrow-left")} />
-            </div>
-        }
-
         let labelCheckBox = "I'm the " + this.props.actor
 
         return (
-            <Card className="text-center" >
-                <Card.Header>
-                    {returnPage}
-                    {this.props.titleHeader}
-                </Card.Header>
-                <Card.Body>
+            <Row>
+                <Col>
                     <AccountInput
                         handleChange={this.handleChange}
-                        label="Account"
+                        label={this.props.label}
                         disabled={this.state.disabled}
                         account={this.state.account}
                     />
-                    <Form.Group as={Row} controlId="imselfCheck">
-                        <Col sm={7}>
-                            <Form.Check
-                                onChange={this.handleCheckBox}
-                                label={labelCheckBox}
-                            />
-                        </Col>
-                    </Form.Group>
-                    <Button variant='primary'
-                        className="float-right"
-                        onClick={() => this.props.changePage(1)}>
-                        Next
-                    </Button>
-                </Card.Body>
-            </Card>
+                </Col>
+                <Col sm={7}>
+                    <Form.Check
+                        onChange={this.handleCheckBox}
+                        label={labelCheckBox}
+                    />
+                </Col>
+            </Row>
         )
     }
 }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 // Components
-import { Card, Button, Form } from 'react-bootstrap';
-import Octicon, { getIconByName } from '@githubprimer/octicons-react';
+import { Form, Row, Col } from 'react-bootstrap';
 
 
 class OrderDetails extends Component {
@@ -25,34 +24,15 @@ class OrderDetails extends Component {
 
     render() {
 
-        let returnPage = "";
-        if (!this.props.firstPage) {
-            returnPage = <div onClick={() => this.props.changePage(-1)}>
-                <Octicon
-                    className="float-left"
-                    size='medium'
-                    icon={getIconByName("arrow-left")} />
-            </div>
-        }
-
         return (
-            <Card className="text-center" >
-                <Card.Header>
-                    {returnPage}
-                    {this.props.titleHeader}
-                </Card.Header>
-                <Card.Body>
-                    <Form.Group>
-                        <Form.Label>Details of the order</Form.Label>
-                        <Form.Control as="textarea" onChange={this.handleChange} value={this.state.details} />
-                    </Form.Group>
-                    <Button variant='primary'
-                        className="float-right"
-                        onClick={() => this.props.changePage(1)}>
-                        Next
-                    </Button>
-                </Card.Body>
-            </Card>
+            <Form.Group as={Row}>
+                <Form.Label column sm={2}>
+                    Details of the order
+                </Form.Label>
+                <Col sm={10}>
+                    <Form.Control as="textarea" onChange={this.handleChange} value={this.state.details} />
+                </Col>
+            </Form.Group>
         )
     }
 }

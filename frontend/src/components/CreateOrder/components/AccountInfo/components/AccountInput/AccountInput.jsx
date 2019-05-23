@@ -18,7 +18,7 @@ class AccountInput extends Component {
                 <Form.Label column sm={4}>
                     {this.props.label}
                 </Form.Label>
-                <Col sm={7}>
+                <Col sm={8}>
                     <Form.Control
                         disabled={this.props.disabled}
                         pattern="^[a-z0-5.]{0,12}$"
