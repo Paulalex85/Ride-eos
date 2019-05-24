@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 // Components
 import { Row, Col, Card, Button } from 'react-bootstrap';
 
-import { AccountInfo, OrderDetails } from './components'
+import { AccountInfo, OrderDetails, CurrencyInput } from './components'
 
 class CreateOrder extends Component {
     constructor(props) {
@@ -13,7 +13,9 @@ class CreateOrder extends Component {
             buyer: "",
             seller: "",
             deliver: "",
-            details: ""
+            details: "",
+            amountSeller: "0.0000",
+            amountDeliver: "0.0000",
         }
     }
 
@@ -55,6 +57,18 @@ class CreateOrder extends Component {
                             <OrderDetails
                                 handleChange={this.handleChange}
                                 details={this.state.details} />
+                            <CurrencyInput
+                                handleChange={this.handleChange}
+                                amount={this.state.amountSeller}
+                                name={"amountSeller"}
+                                label={"Seller price"}
+                            />
+                            <CurrencyInput
+                                handleChange={this.handleChange}
+                                amount={this.state.amountDeliver}
+                                name={"amountDeliver"}
+                                label={"Deliver price"}
+                            />
                             <Button
                                 variant="primary"
                                 type="submit"

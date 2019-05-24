@@ -26,10 +26,10 @@ class OrderDetails extends Component {
 
         return (
             <Form.Group as={Row}>
-                <Form.Label column sm={2}>
+                <Form.Label column sm={3}>
                     Details of the order
                 </Form.Label>
-                <Col sm={10}>
+                <Col sm={9}>
                     <Form.Control as="textarea" onChange={this.handleChange} value={this.state.details} />
                 </Col>
             </Form.Group>

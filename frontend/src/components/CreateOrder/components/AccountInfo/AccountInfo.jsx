@@ -55,7 +55,7 @@ class AccountInfo extends Component {
                         account={this.state.account}
                     />
                 </Col>
-                <Col sm={7}>
+                <Col sm={4}>
                     <Form.Check
                         onChange={this.handleCheckBox}
                         label={labelCheckBox}

@@ -1,30 +1,22 @@
 import React, { Component } from 'react';
 // Components
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup, Row, Col } from 'react-bootstrap';
 
 class CurrencyInput extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            form: {
-                quantity: "0.0000"
-            },
+            quantity: this.props.amount
         }
-
-        this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(event) {
-        const { name, value, validity } = event.target;
-        const { form } = this.state;
+    handleChange = (event) => {
+        const { value, validity } = event.target;
 
         if (validity.valid) {
             this.setState({
-                form: {
-                    ...form,
-                    [name]: value.replace(',', '.'),
-                },
+                quantity: value.replace(',', '.'),
             });
 
             let amount = value.replace(',', '.');
@@ -46,26 +38,33 @@ class CurrencyInput extends Component {
                 amount += " SYS"
             }
 
-            this.props.handleChange(amount);
+            this.props.handleChange(amount, this.props.name);
         }
     }
 
     render() {
-        const { form } = this.state;
 
         return (
-            <InputGroup >
-                <Form.Control
-                    pattern="^[0-9]*([,.][0-9]{0,4})?$"
-                    type="text"
-                    name="quantity"
-                    value={form.quantity}
-                    onChange={this.handleChange}
-                />
-                <InputGroup.Append>
-                    <InputGroup.Text id="symbol">SYS</InputGroup.Text>
-                </InputGroup.Append>
-            </InputGroup>
+            <Form.Group as={Row}>
+                <Col sm={3}>
+                    <Form.Label >
+                        {this.props.label}
+                    </Form.Label>
+                </Col>
+                <Col sm={6}>
+                    <InputGroup >
+                        <Form.Control
+                            pattern="^[0-9]*([,.][0-9]{0,4})?$"
+                            type="text"
+                            value={this.state.quantity}
+                            onChange={this.handleChange}
+                        />
+                        <InputGroup.Append>
+                            <InputGroup.Text id="symbol">SYS</InputGroup.Text>
+                        </InputGroup.Append>
+                    </InputGroup>
+                </Col>
+            </Form.Group>
         )
     }
 }
