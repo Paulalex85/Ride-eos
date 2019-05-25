@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 
 import { AccountInfo, OrderDetails, CurrencyInput } from './components'
+import DelayInput from './components/DelayInput/DelayInput';
 
 class CreateOrder extends Component {
     constructor(props) {
@@ -16,6 +17,7 @@ class CreateOrder extends Component {
             details: "",
             amountSeller: "0.0000",
             amountDeliver: "0.0000",
+            delay: new Date()
         }
     }
 
@@ -56,7 +58,8 @@ class CreateOrder extends Component {
                             />
                             <OrderDetails
                                 handleChange={this.handleChange}
-                                details={this.state.details} />
+                                details={this.state.details}
+                            />
                             <CurrencyInput
                                 handleChange={this.handleChange}
                                 amount={this.state.amountSeller}
@@ -69,6 +72,12 @@ class CreateOrder extends Component {
                                 name={"amountDeliver"}
                                 label={"Deliver price"}
                             />
+                            <DelayInput
+                                handleChange={this.handleChange}
+                                name={"delay"}
+                                delay={this.state.delay}
+                            />
+
                             <Button
                                 variant="primary"
                                 type="submit"
