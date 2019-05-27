@@ -50,7 +50,6 @@ class Main extends Component {
     }
 
     render() {
-
         const { scatter: { scatter } } = this.props;
 
         return (

@@ -65,8 +65,8 @@ class ApiServiceScatter {
 
     //ORDERS
 
-    static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay, placeKey }, scatter) {
-        return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay, placeKey: placeKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay }, scatter) {
+        return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
 
     static validateBuyer(orderKey, hash, scatter) {

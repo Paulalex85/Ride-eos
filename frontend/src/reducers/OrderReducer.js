@@ -15,7 +15,6 @@ const initialState = {
     validateSeller: 0,
     validateDeliver: 0,
     details: "",
-    delay: 0,
     placeKey: undefined,
     currentActor: "",
 };
@@ -41,7 +40,6 @@ export default function (state = initialState, action) {
                     validateSeller: element.validateSeller.toString() || initialState.validateSeller,
                     validateDeliver: element.validateDeliver.toString() || initialState.validateDeliver,
                     details: element.details || initialState.details,
-                    delay: element.delay || initialState.delay,
                 }
                 order.currentActor = setCurrentActor(order, action.account);
                 listObject.push(order);
@@ -65,7 +63,6 @@ export default function (state = initialState, action) {
                 validateSeller: action.order.validateSeller.toString() || initialState.validateSeller,
                 validateDeliver: action.order.validateDeliver.toString() || initialState.validateDeliver,
                 details: action.order.details || initialState.details,
-                delay: action.order.delay || initialState.delay,
             }
             order.currentActor = setCurrentActor(order, action.account);
 

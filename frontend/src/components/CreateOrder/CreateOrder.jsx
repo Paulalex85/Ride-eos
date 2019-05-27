@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router";
+import { connect } from 'react-redux';
 // Components
 import { Row, Col, Card, Button } from 'react-bootstrap';
+
+import { ApiServiceScatter } from 'services';
 
 import { AccountInfo, OrderDetails, CurrencyInput } from './components'
 import DelayInput from './components/DelayInput/DelayInput';
@@ -10,7 +14,6 @@ class CreateOrder extends Component {
         super(props);
 
         this.state = {
-            page: 1,
             buyer: "",
             seller: "",
             deliver: "",
@@ -26,6 +29,23 @@ class CreateOrder extends Component {
             ...this.state,
             [name]: value
         })
+    }
+
+    handleSubmit = () => {
+        const { history, scatter: { scatter } } = this.props;
+
+        ApiServiceScatter.initializeOrder({
+            buyer: this.state.buyer,
+            seller: this.state.seller,
+            deliver: this.state.deliver,
+            details: this.state.details,
+            priceOrder: this.state.amountSeller,
+            priceDeliver: this.state.amountDeliver,
+            delay: Math.floor(this.state.delay.getTime() / 1000)
+        }, scatter).then(() => {
+            history.push("/orders");
+        });
+
     }
 
     render() {
@@ -81,6 +101,7 @@ class CreateOrder extends Component {
                             <Button
                                 variant="primary"
                                 type="submit"
+                                onClick={this.handleSubmit}
                                 className="float-right">
                                 Submit
                             </Button>
@@ -92,5 +113,7 @@ class CreateOrder extends Component {
     }
 }
 
+const mapStateToProps = state => state;
+
 // Export a redux connected component
-export default CreateOrder;
+export default withRouter(connect(mapStateToProps)(CreateOrder));

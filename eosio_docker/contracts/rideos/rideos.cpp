@@ -72,14 +72,13 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
         order.deliver = deliver;
         order.state = INITIALIZATION;
         order.date = time_point_sec(now());
-        order.dateDelay = time_point_sec(now());
+        order.dateDelay = time_point_sec(delay);
         order.priceOrder = priceOrder;
         order.priceDeliver = priceDeliver;
         order.validateBuyer = false;
         order.validateSeller = false;
         order.validateDeliver = false;
         order.details = details;
-        order.delay = delay;
     });
 }
 
@@ -103,7 +102,6 @@ void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
         if (iteratorOrder->validateSeller && iteratorOrder->validateDeliver)
         {
             order.state = ORDER_READY;
-            order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
         }
     });
 }
@@ -125,7 +123,6 @@ void rideos::validatedeli(const uint64_t orderKey)
         if (iteratorOrder->validateSeller && iteratorOrder->validateBuyer)
         {
             order.state = ORDER_READY;
-            order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
         }
     });
 }
@@ -148,7 +145,6 @@ void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
         if (iteratorOrder->validateDeliver && iteratorOrder->validateBuyer)
         {
             order.state = ORDER_READY;
-            order.dateDelay = eosio::time_point_sec(now() + iteratorOrder->delay);
         }
     });
 }

@@ -44,7 +44,6 @@ class Scatter extends Component {
             const requiredFields = { accounts: [network] };
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-                console.log(process.env)
                 ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, ScatterJS.scatter).then(() => {
                     setScatter({ scatter: ScatterJS.scatter });
                 });
