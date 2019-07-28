@@ -8,9 +8,6 @@ PATH="$PATH:/opt/eosio/bin:/opt/eosio/bin/scripts"
 
 set -m
 
-echo "=== install EOSIO.CDT (Contract Development Toolkit) ==="
-apt install /opt/eosio/bin/scripts/eosio.cdt-1.4.1.x86_64.deb
-
 # start nodeos ( local node of blockchain )
 # run it in a background job such that docker run could continue
 nodeos -e -p eosio -d /mnt/dev/data \
@@ -59,14 +56,12 @@ echo "=== deploy smart contract ==="
 # $2 account holder name of the smart contract
 # $3 wallet that holds the keys for the account
 # $4 password for unlocking the wallet
- deploy_contract.sh rideos rideos rideoswallet $(cat rideos_wallet_password.txt)
-cleos set contract eosio.token /contracts/eosio.token
+deploy_contract.sh rideos rideos rideoswallet $(cat rideos_wallet_password.txt)
+deploy_system_contract.sh eosio.token eosio.token
 
-#echo "=== create mock data for contract ==="
-# script for calling actions on the smart contract to create mock data
-#create_mock_data.sh
-
-# * Replace the script with different form of data that you would pushed into the blockchain when you start your own project
+echo "Issuing SYS tokens"
+# cleos push action eosio.token create '["eosio", "10000000000.0000 SYS"]' -p eosio.token
+# cleos push action eosio.token issue '["eosio", "5000000000.0000 SYS", "Half of available supply"]' -p eosio
 
 echo "=== end of setup blockchain accounts and smart contract ==="
 # create a file to indicate the blockchain has been initialized

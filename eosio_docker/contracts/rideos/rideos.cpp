@@ -7,12 +7,12 @@ using namespace eosio;
 int DELAY_END_ASSIGN = 5;
 int DELAY_POWER_NEEDED = 5;
 
-bool is_equal(const capi_checksum256 &a, const capi_checksum256 &b)
+bool is_equal(const checksum256 &a, const checksum256 &b)
 {
-    return memcmp((void *)&a, (const void *)&b, sizeof(capi_checksum256)) == 0;
+    return memcmp((void *)&a, (const void *)&b, sizeof(checksum256)) == 0;
 }
 
-bool is_zero(const capi_checksum256 &a)
+bool is_zero(const checksum256 &a)
 {
     const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&a);
     return p64[0] == 0 && p64[1] == 0 && p64[2] == 0 && p64[3] == 0;
@@ -29,9 +29,9 @@ bool is_actor(const name sender, const name buyer, const name seller, const name
 
 void rideos::deposit(const name account, const asset &quantity)
 {
-    eosio_assert(quantity.is_valid(), "invalid quantity");
-    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
-    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+    check(quantity.is_valid(), "invalid quantity");
+    check(quantity.amount > 0, "must withdraw positive quantity");
+    check(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
 
     action(
         permission_level{account, name("active")},
@@ -43,9 +43,9 @@ void rideos::deposit(const name account, const asset &quantity)
 
 void rideos::withdraw(const name account, const asset &quantity)
 {
-    eosio_assert(quantity.is_valid(), "invalid quantity");
-    eosio_assert(quantity.amount > 0, "must withdraw positive quantity");
-    eosio_assert(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+    check(quantity.is_valid(), "invalid quantity");
+    check(quantity.amount > 0, "must withdraw positive quantity");
+    check(quantity.symbol == eosio::symbol("SYS", 4), "only core token allowed");
 
     action(
         permission_level{_self, name("active")},
@@ -57,13 +57,13 @@ void rideos::withdraw(const name account, const asset &quantity)
 void rideos::initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder,
                         const asset &priceDeliver, const string &details, const uint64_t delay)
 {
-    eosio_assert(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
-    eosio_assert(priceOrder.is_valid(), "invalid bet");
-    eosio_assert(priceOrder.amount > 0, "must bet positive quantity");
+    check(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+    check(priceOrder.is_valid(), "invalid bet");
+    check(priceOrder.amount > 0, "must bet positive quantity");
 
-    eosio_assert(priceDeliver.symbol == eosio::symbol("SYS", 4), "only core token allowed");
-    eosio_assert(priceDeliver.is_valid(), "invalid bet");
-    eosio_assert(priceDeliver.amount > 0, "must bet positive quantity");
+    check(priceDeliver.symbol == eosio::symbol("SYS", 4), "only core token allowed");
+    check(priceDeliver.is_valid(), "invalid bet");
+    check(priceDeliver.amount > 0, "must bet positive quantity");
 
     _orders.emplace(_self, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
@@ -82,16 +82,16 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
     });
 }
 
-void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
+void rideos::validatebuy(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->buyer);
 
-    eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
+    check(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
-    eosio_assert(iteratorOrder->validateBuyer == false, "Buyer already validate");
+    check(iteratorOrder->validateBuyer == false, "Buyer already validate");
 
     deposit(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
@@ -109,13 +109,13 @@ void rideos::validatebuy(const uint64_t orderKey, const capi_checksum256 &hash)
 void rideos::validatedeli(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
+    check(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
-    eosio_assert(iteratorOrder->validateDeliver == false, "Deliver already validate");
+    check(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateDeliver = true;
@@ -127,16 +127,16 @@ void rideos::validatedeli(const uint64_t orderKey)
     });
 }
 
-void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
+void rideos::validatesell(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->seller);
 
-    eosio_assert(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
+    check(iteratorOrder->state == INITIALIZATION, "The order is not in the state of initialization");
 
-    eosio_assert(iteratorOrder->validateSeller == false, "Seller already validate");
+    check(iteratorOrder->validateSeller == false, "Seller already validate");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;
@@ -152,43 +152,52 @@ void rideos::validatesell(const uint64_t orderKey, const capi_checksum256 &hash)
 void rideos::orderready(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->seller);
 
-    eosio_assert(iteratorOrder->state == ORDER_READY, "The order is not in the state of product ready");
+    check(iteratorOrder->state == ORDER_READY, "The order is not in the state of product ready");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_TAKEN;
     });
 }
 
-void rideos::ordertaken(const uint64_t orderKey, const capi_checksum256 &source)
+void rideos::ordertaken(const uint64_t orderKey, const checksum256 &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    assert_sha256((char *)&source, sizeof(source), (const capi_checksum256 *)&iteratorOrder->takeverification);
+    assert_sha256((char *)&source, sizeof(source), iteratorOrder->takeverification);
 
-    eosio_assert(iteratorOrder->state == ORDER_TAKEN, "The order is not in the state of waiting deliver");
+    check(iteratorOrder->state == ORDER_TAKEN, "The order is not in the state of waiting deliver");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_DELIVERED;
     });
 }
 
-void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source)
+void rideos::orderdelive(const uint64_t orderKey, const string source)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    assert_sha256((char *)&source, sizeof(source), (const capi_checksum256 *)&iteratorOrder->deliveryverification);
+    eosio::print("============================\n");
+    eosio::print(source);
+    eosio::print("\n");
+    eosio::print(sha256((char *)source.c_str(), source.size()));
+    eosio::print("\n");
+    eosio::print(sha256(const_cast<char *>(source.c_str()), source.size()));
+    eosio::print("\n");
+    eosio::print(iteratorOrder->deliveryverification);
 
-    eosio_assert(iteratorOrder->state == ORDER_DELIVERED, "The order is not in the state delivery");
+    assert_sha256((char *)&source, sizeof(source), iteratorOrder->deliveryverification);
+
+    check(iteratorOrder->state == ORDER_DELIVERED, "The order is not in the state delivery");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.state = ORDER_END;
@@ -201,15 +210,15 @@ void rideos::orderdelive(const uint64_t orderKey, const capi_checksum256 &source
 void rideos::initcancel(const uint64_t orderKey, const name account)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(account);
 
-    eosio_assert(is_actor(account, iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not in the contract");
+    check(is_actor(account, iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not in the contract");
 
     bool isState = iteratorOrder->state == INITIALIZATION || iteratorOrder->state == NEED_DELIVER;
 
-    eosio_assert(isState, "The order is not in the state of initialization or need deliver");
+    check(isState, "The order is not in the state of initialization or need deliver");
 
     if (iteratorOrder->validateBuyer)
     {
@@ -224,14 +233,14 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
 void rideos::delaycancel(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->buyer);
 
-    eosio_assert(iteratorOrder->state > INITIALIZATION, "The order is in the state of initialization");
-    eosio_assert(iteratorOrder->state < ORDER_END, "The order is finish");
+    check(iteratorOrder->state > INITIALIZATION, "The order is in the state of initialization");
+    check(iteratorOrder->state < ORDER_END, "The order is finish");
 
-    eosio_assert(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
+    check(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
 
     withdraw(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
@@ -243,7 +252,7 @@ void rideos::delaycancel(const uint64_t orderKey)
 void rideos::deleteorder(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
-    eosio_assert(iteratorOrder != _orders.end(), "Address for order not found");
+    check(iteratorOrder != _orders.end(), "Address for order not found");
 
     if (iteratorOrder->state == 5 || iteratorOrder->state == 98 || iteratorOrder->state == 99)
     {

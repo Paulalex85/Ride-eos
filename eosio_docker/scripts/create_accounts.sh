@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit
 
-echo "=== start deploy data ==="
-
 # set PATH
 PATH="$PATH:/opt/eosio/bin"
 

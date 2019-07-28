@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o errexit
+source constant.sh
 
 echo "=== start of first time setup ==="
 
@@ -18,10 +18,13 @@ if [ ! -x "$(command -v docker)" ]; then
     exit
 fi
 
-
-# download eosio/eos-dev:v1.4.2 image
-echo "=== pull eosio/eos-dev image v1.4.2 from docker hub ==="
-docker pull eosio/eos-dev:v1.4.2
+# build docker image, if necessary
+if [[ "$(docker images -q $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG)" == "" ]]; then
+  echo "=== Build docker image $DOCKER_IMAGE_NAME version $DOCKER_IMAGE_TAG, this will take some time for the first time run ==="
+  docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
+else
+  echo "=== Docker image already exists, skip building ==="
+fi
 
 # force remove the previous eosio container if it exists
 # create a clean data folder in the eosio_docker to preserve block data

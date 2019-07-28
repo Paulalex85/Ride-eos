@@ -1,7 +1,8 @@
-#include <eosiolib/eosio.hpp>
-#include <eosiolib/crypto.h>
-#include <eosiolib/asset.hpp>
-#include <eosiolib/time.hpp>
+#include <eosio/eosio.hpp>
+#include <eosio/crypto.hpp>
+#include <eosio/asset.hpp>
+#include <eosio/time.hpp>
+#include <eosio/system.hpp>
 
 using namespace eosio;
 
@@ -11,10 +12,15 @@ CONTRACT rideos : public eosio::contract
 {
     using contract::contract;
 
-  public:
+public:
     // constructor
     rideos(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
                                                                     _orders(receiver, receiver.value) {}
+
+    uint32_t now()
+    {
+        return (uint32_t)(eosio::current_time_point().sec_since_epoch());
+    }
 
     void deposit(const name account, const asset &quantity);
 
@@ -22,17 +28,17 @@ CONTRACT rideos : public eosio::contract
 
     ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
-    ACTION validatebuy(const uint64_t orderKey, const capi_checksum256 &hash);
+    ACTION validatebuy(const uint64_t orderKey, const checksum256 &hash);
 
     ACTION validatedeli(const uint64_t orderKey);
 
-    ACTION validatesell(const uint64_t orderKey, const capi_checksum256 &hash);
+    ACTION validatesell(const uint64_t orderKey, const checksum256 &hash);
 
     ACTION orderready(const uint64_t orderKey);
 
-    ACTION ordertaken(const uint64_t orderKey, const capi_checksum256 &source);
+    ACTION ordertaken(const uint64_t orderKey, const checksum256 &source);
 
-    ACTION orderdelive(const uint64_t orderKey, const capi_checksum256 &source);
+    ACTION orderdelive(const uint64_t orderKey, const string source);
 
     ACTION initcancel(const uint64_t orderKey, const name account);
 
@@ -61,8 +67,8 @@ CONTRACT rideos : public eosio::contract
         uint8_t state;
         time_point_sec date;
         time_point_sec dateDelay;
-        capi_checksum256 takeverification;
-        capi_checksum256 deliveryverification;
+        checksum256 takeverification;
+        checksum256 deliveryverification;
         asset priceOrder;
         asset priceDeliver;
         bool validateBuyer;
@@ -76,7 +82,7 @@ CONTRACT rideos : public eosio::contract
         uint64_t get_seller_key() const { return seller.value; }
         uint64_t get_deliver_key() const { return deliver.value; }
 
-        static fixed_bytes<32> checksum256_to_sha256(const capi_checksum256 &hash)
+        static fixed_bytes<32> checksum256_to_sha256(const checksum256 &hash)
         {
             const uint64_t *p64 = reinterpret_cast<const uint64_t *>(&hash);
             return fixed_bytes<32>::make_from_word_sequence<uint64_t>(p64[0], p64[1], p64[2], p64[3]);
@@ -92,6 +98,6 @@ CONTRACT rideos : public eosio::contract
                                    const_mem_fun<order, uint64_t, &order::get_deliver_key>>>
         order_table;
 
-  private:
+private:
     order_table _orders;
 };
