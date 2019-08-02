@@ -15,8 +15,6 @@ const initialState = {
     validateSeller: 0,
     validateDeliver: 0,
     details: "",
-    placeKey: undefined,
-    currentActor: "",
 };
 
 export default function (state = initialState, action) {

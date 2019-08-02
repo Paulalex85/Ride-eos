@@ -6,6 +6,52 @@ const initial = {
 };
 
 class KeyGenerator {
+
+    static generateDataToSign(orderKey, buyer, seller, deliver, date, priceOrder, priceDeliver, details) {
+        return "orderKey:" + orderKey
+            + ",buyer:" + buyer
+            + ",seller:" + seller
+            + ",deliver:" + deliver
+            + ",date:" + date
+            + ",priceOrder:" + priceOrder
+            + ",priceDeliver:" + priceDeliver
+            + ",details:" + details;
+    }
+
+    static sliceData(data) {
+        return this.chunk(data, 8).join(' ');
+    }
+
+    static chunk(str, n) {
+        var ret = [];
+        var i;
+        var len;
+
+        for (i = 0, len = str.length; i < len; i += n) {
+            ret.push(str.substr(i, n))
+        }
+
+        return ret
+    };
+
+    static verifySign(signature, data, pubkey) {
+        return ecc.verify(signature, data, pubkey)
+    }
+
+
+    static async signData(scatter, publicKey, data) {
+        try {
+            return await scatter.getArbitrarySignature(
+                publicKey,
+                data,
+                'Order key creation',
+                true
+            );
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     static generateKey() {
         return randomstring.generate({
             length: 64,

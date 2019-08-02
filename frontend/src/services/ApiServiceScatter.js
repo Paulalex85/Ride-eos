@@ -27,7 +27,6 @@ function getAccountFromScatter(scatter) {
     return scatter.identity.accounts.find(x => x.blockchain === 'eos');
 }
 
-
 async function send(actionName, actionData, contractDestination, scatter) {
 
     const eos = eosAPI(scatter);

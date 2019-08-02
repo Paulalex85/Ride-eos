@@ -22,7 +22,7 @@ class ValidateOrder extends Component {
     }
 
     validateAPI = async () => {
-        const { order: { currentActor, orderKey }, scatter: { scatter } } = this.props;
+        const { order: { currentActor, orderKey, buyer, seller, deliver, date, priceDeliver, priceOrder, details }, scatter: { scatter } } = this.props;
 
         if (currentActor === "deliver") {
 
@@ -39,13 +39,22 @@ class ValidateOrder extends Component {
                 .catch((err) => { console.error(err) });
 
         } else if (currentActor === "buyer") {
-
-            let key = KeyGenerator.generateKey();
-            let hash = KeyGenerator.generateHash(key);
-            KeyGenerator.storeKey(orderKey, key, hash, "buyer");
             const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), priceOrder, priceDeliver, details);
+            let hashData = KeyGenerator.generateHash(data);
+            let slicedData = KeyGenerator.sliceData(hashData);
+            let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
+            console.log(signature)
+            console.log(signature.split(' '))
+            console.log(signature.substring(7))
 
-            await ApiServiceScatter.updatePermission(accountScatter, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
+            let key = KeyGenerator.generateHash(KeyGenerator.generateKey() + signature.substring(7))
+            console.log(key)
+            let hash = KeyGenerator.generateHash(key);
+            console.log(hash)
+            KeyGenerator.storeKey(orderKey, signature, hash, "buyer");
+
+            await ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
             await ApiServiceScatter.validateBuyer(orderKey, hash, scatter).catch((err) => { console.error(err) });
         }
     }
