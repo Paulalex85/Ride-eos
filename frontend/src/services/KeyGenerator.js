@@ -7,12 +7,13 @@ const initial = {
 
 class KeyGenerator {
 
-    static generateDataToSign(orderKey, buyer, seller, deliver, date, priceOrder, priceDeliver, details) {
+    static generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, priceOrder, priceDeliver, details) {
         return "orderKey:" + orderKey
             + ",buyer:" + buyer
             + ",seller:" + seller
             + ",deliver:" + deliver
             + ",date:" + date
+            + ",dateDelay:" + dateDelay
             + ",priceOrder:" + priceOrder
             + ",priceDeliver:" + priceDeliver
             + ",details:" + details;

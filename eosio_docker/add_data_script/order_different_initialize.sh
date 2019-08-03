@@ -2,6 +2,13 @@
 
 ./user_accounts.sh
 
+buyer="tester"
+seller="seller"
+deliver="rider"
+priceSeller="50.0000 SYS"
+priceDeliver"20.0000 SYS"
+details="order details"
+
 keyTester=$(openssl rand -hex 32)
 keySeller=$(openssl rand -hex 32)
 

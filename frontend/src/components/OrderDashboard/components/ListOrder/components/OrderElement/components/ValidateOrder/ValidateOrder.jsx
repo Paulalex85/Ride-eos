@@ -22,7 +22,7 @@ class ValidateOrder extends Component {
     }
 
     validateAPI = async () => {
-        const { order: { currentActor, orderKey, buyer, seller, deliver, date, priceDeliver, priceOrder, details }, scatter: { scatter } } = this.props;
+        const { order: { currentActor, orderKey, buyer, seller, deliver, date, dateDelay, priceDeliver, priceOrder, details }, scatter: { scatter } } = this.props;
 
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
         if (currentActor === "deliver") {
@@ -33,7 +33,7 @@ class ValidateOrder extends Component {
         } else if (currentActor === "seller") {
 
             let nonce = KeyGenerator.generateKey();
-            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), priceOrder, priceDeliver, details);
+            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
             let hashData = KeyGenerator.generateHash(data);
             let slicedData = KeyGenerator.sliceData(hashData);
             let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
