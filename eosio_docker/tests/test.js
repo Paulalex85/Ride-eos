@@ -6,7 +6,7 @@ const TOKEN_PATH = "/opt/eosio/bin/contracts/eosio.contracts/contracts/eosio.tok
 
 const TOTAL_SUPPLY = '1000000000.0000 SYS';
 
-describe('Rideos contract test', function () {
+describe('Rideos contract', function () {
 
     let rideosContract;
     let tokenContract;
@@ -65,15 +65,31 @@ describe('Rideos contract test', function () {
     });
 
     it('Should create a new order', async () => {
-        await rideosContract.initialize(buyer.name, seller.name, deliver.name, "5.0000 SYS", "2.0000 SYS", "order", 0, { from: buyer });
+        let priceOrder = "5.0000 SYS"
+        let priceDeliver = "2.0000 SYS"
+        let orderDetail = "order"
+        let dateDelay = 555
+        await rideosContract.initialize(buyer.name, seller.name, deliver.name, priceOrder, priceDeliver, orderDetail, dateDelay, { from: buyer });
 
-        let tableResults = await rideosContract.provider.eos.getTableRows({
+        let result = await rideosContract.provider.eos.getTableRows({
             code: rideosContract.name,
             scope: rideosContract.name,
             table: "order",
             limit: 10,
             json: true
         });
-        console.log(tableResults)
+
+        assert.strictEqual(result.rows.length > 0, true, "Table result should't be empty");
+
+        let order = result.rows[0];
+        console.log(result.rows[0])
+        assert.strictEqual(order.buyer, buyer.name, "Not the same buyer");
+        assert.strictEqual(order.seller, seller.name, "Not the same seller");
+        assert.strictEqual(order.deliver, deliver.name, "Not the same deliver");
+        assert.strictEqual(order.state, 1, "The state should be 1");
+        assert.strictEqual(new Date(order.dateDelay + "Z").getTime() / 1000, dateDelay, "The delay should be " + dateDelay);
+        assert.strictEqual(order.priceDeliver, priceDeliver, "The price deliver should be " + priceDeliver);
+        assert.strictEqual(order.priceOrder, priceOrder, "The price order should be " + priceOrder);
+        assert.strictEqual(order.details, orderDetail, "The order detail should be " + orderDetail);
     });
 });

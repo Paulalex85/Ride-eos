@@ -5,6 +5,8 @@ echo "=== setup npm for tests ==="
 cd "/opt/eosio/bin/tests"
 npm install
 
+cd "/opt/eosio/bin/"
+
 echo "=== setup blockchain accounts and smart contract ==="
 
 # set PATH
