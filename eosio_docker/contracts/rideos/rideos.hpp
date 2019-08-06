@@ -77,7 +77,6 @@ public:
         bool validateSeller;
         bool validateDeliver;
         string details;
-        uint64_t delay;
 
         uint64_t primary_key() const { return orderKey; }
         uint64_t get_buyer_key() const { return buyer.value; }
