@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -o errexit
 
+echo "=== setup npm for tests ==="
+cd "/opt/eosio/bin/tests"
+npm install
+
 echo "=== setup blockchain accounts and smart contract ==="
 
 # set PATH
