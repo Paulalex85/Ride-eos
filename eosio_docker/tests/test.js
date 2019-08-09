@@ -1,95 +1,207 @@
+const ecc = require('eosjs-ecc');
 const assert = require('assert');
 const eoslime = require('eoslime').init('local');
+const randomstring = require('randomstring');
 
 const RIDEOS_PATH = '/opt/eosio/bin/compiled_contracts/rideos/rideos';
 const TOKEN_PATH = "/opt/eosio/bin/contracts/eosio.contracts/contracts/eosio.token/src/eosio.token"
 
 const TOTAL_SUPPLY = '1000000000.0000 SYS';
 
+let rideosContract;
+let tokenContract;
+let buyer, seller, deliver;
+let rideosAccount, eosiotokenAccount;
+
+function generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, priceOrder, priceDeliver, details) {
+    return "orderKey:" + orderKey
+        + ",buyer:" + buyer
+        + ",seller:" + seller
+        + ",deliver:" + deliver
+        + ",date:" + date
+        + ",dateDelay:" + dateDelay
+        + ",priceOrder:" + priceOrder
+        + ",priceDeliver:" + priceDeliver
+        + ",details:" + details;
+}
+
+function chunk(str, n) {
+    var ret = [];
+    var i;
+    var len;
+
+    for (i = 0, len = str.length; i < len; i += n) {
+        ret.push(str.substr(i, n))
+    }
+
+    return ret
+};
+
+function sliceData(data) {
+    return chunk(data, 8).join(' ');
+}
+
+function createKey(account, order) {
+    let nonce = randomstring.generate({
+        length: 64,
+        charset: 'hex'
+    });
+    let data = generateDataToSign(order.orderKey, order.buyer, order.seller, order.deliver, new Date(order.date).getTime(), new Date(order.dateDelay).getTime(), order.priceOrder, order.priceDeliver, order.details);
+    let hashData = ecc.sha256(new Buffer(data, 'hex'));
+    let slicedData = sliceData(hashData);
+    let signature = ecc.sign(slicedData, account.privateKey);
+
+    let key = ecc.sha256(new Buffer(nonce + signature.substring(7), 'hex'));
+    let hash = ecc.sha256(new Buffer(key, 'hex'));
+
+    return {
+        nonce: nonce,
+        key: key,
+        hash: hash
+    }
+}
+
+async function orderTableIsEmpty() {
+    let result = await rideosContract.provider.eos.getTableRows({
+        code: rideosContract.name,
+        scope: rideosContract.name,
+        table: "order",
+        limit: 10,
+        json: true
+    });
+
+    return result.rows.length == 0;
+}
+
+async function getOrder(key) {
+    let result = await rideosContract.provider.eos.getTableRows({
+        json: true,
+        code: rideosContract.name,    // contract who owns the table
+        scope: rideosContract.name,   // scope of the table
+        table: "order",    // name of the table as specified by the contract abi
+        limit: 1,
+        lower_bound: key,
+    });
+
+    return result.rows[0]
+}
+
+async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", priceDeliver = "2.0000 SYS", orderDetail = "order", dateDelay = 555) {
+    await rideosContract.initialize(buyer.name,
+        seller.name,
+        deliver.name,
+        priceOrder,
+        priceDeliver,
+        orderDetail,
+        dateDelay,
+        { from: buyer }
+    );
+
+    let result = await rideosContract.provider.eos.getTableRows({
+        code: rideosContract.name,
+        scope: rideosContract.name,
+        table: "order",
+        limit: 10,
+        json: true
+    });
+
+    assert.strictEqual(result.rows.length > 0, true, "Table result should't be empty");
+
+    let order = result.rows[0];
+    assert.strictEqual(order.buyer, buyer.name, "Not the same buyer");
+    assert.strictEqual(order.seller, seller.name, "Not the same seller");
+    assert.strictEqual(order.deliver, deliver.name, "Not the same deliver");
+    assert.strictEqual(order.state, 1, "The state should be 1");
+    assert.strictEqual(new Date(order.dateDelay + "Z").getTime() / 1000, dateDelay, "The delay should be " + dateDelay);
+    assert.strictEqual(order.priceDeliver, priceDeliver, "The price deliver should be " + priceDeliver);
+    assert.strictEqual(order.priceOrder, priceOrder, "The price order should be " + priceOrder);
+    assert.strictEqual(order.details, orderDetail, "The order detail should be " + orderDetail);
+
+    return order;
+}
+
+async function initializeCancel(orderKey, account) {
+    await rideosContract.initcancel(orderKey, account.name, { from: account });
+    let order = await getOrder(orderKey)
+    assert.strictEqual(order.state, 99, "The state should be 99");
+    return order;
+}
+
+async function delayCancel(orderKey, account) {
+    await rideosContract.delaycancel(orderKey, { from: account });
+    let order = await getOrder(orderKey)
+    assert.strictEqual(order.state, 98, "The state should be 98");
+    return order;
+}
+
+async function deleteOrder(orderKey) {
+    await rideosContract.deleteorder(orderKey);
+    let tableIsEmpty = await orderTableIsEmpty()
+    assert.strictEqual(tableIsEmpty, true, "The table should be empty");
+}
+
 describe('Rideos contract', function () {
 
-    let rideosContract;
-    let tokenContract;
-    let buyer;
-    let seller;
-    let deliver;
-    let tokenAccount;
-    let rideosAccount;
-
-    this.timeout(15000);
+    this.timeout(20000);
 
     before(async () => {
-        let accounts = await eoslime.Account.createRandoms(5);
+        rideosAccount = eoslime.Account.load('rideos', '5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr');
+        eosiotokenAccount = eoslime.Account.load('eosio.token', '5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw');
+
+        tokenContract = eoslime.Contract(TOKEN_PATH + ".abi", "eosio.token", eosiotokenAccount);
+        rideosContract = eoslime.Contract(RIDEOS_PATH + ".abi", "rideos", rideosAccount);
+        await rideosContract.makeInline();
+
+        await tokenContract.create(eosiotokenAccount.name, TOTAL_SUPPLY, { from: eosiotokenAccount });
+        await tokenContract.issue(eosiotokenAccount.name, "50000000.0000 SYS", 'memo', { from: eosiotokenAccount });
+    });
+
+    beforeEach(async () => {
+        let accounts = await eoslime.Account.createRandoms(3);
         buyer = accounts[0];
         seller = accounts[1];
         deliver = accounts[2];
-        tokenAccount = accounts[3];
-        rideosAccount = accounts[4];
 
-        // await tokenAccount.addPermission(
-        //     tokenAccount.name,
-        //     "active",
-        //     tokenAccount.name,
-        //     "eosio.code"
-        // );
+        await tokenContract.transfer(tokenContract.executor.name, buyer.name, "10000.0000 SYS", "memo", { from: tokenContract.executor });
 
-        // await tokenAccount.addPermission(
-        //     tokenAccount.name,
-        //     "owner",
-        //     tokenAccount.name,
-        //     "eosio.code"
-        // );
-
-        // await rideosAccount.addPermission(
-        //     rideosAccount.name,
-        //     "active",
-        //     rideosAccount.name,
-        //     "eosio.code"
-        // );
-
-        tokenContract = await eoslime.AccountDeployer.deploy(
-            TOKEN_PATH + ".wasm",
-            TOKEN_PATH + ".abi",
-            tokenAccount
-        );
-
-        rideosContract = await eoslime.AccountDeployer.deploy(
-            RIDEOS_PATH + ".wasm",
-            RIDEOS_PATH + ".abi",
-            rideosAccount
-        );
-
-        await tokenContract.create(tokenAccount.name, TOTAL_SUPPLY, { from: tokenAccount });
-        await tokenContract.issue(tokenAccount.name, "50000000.0000 SYS", 'memo', { from: tokenAccount });
-        await tokenContract.transfer(tokenAccount.name, buyer.name, "10000.0000 SYS", "memo", { from: tokenAccount });
+        await buyer.addPermission('active', rideosContract.executor.name);
     });
 
-    it('Should create a new order', async () => {
-        let priceOrder = "5.0000 SYS"
-        let priceDeliver = "2.0000 SYS"
-        let orderDetail = "order"
-        let dateDelay = 555
-        await rideosContract.initialize(buyer.name, seller.name, deliver.name, priceOrder, priceDeliver, orderDetail, dateDelay, { from: buyer });
+    it('Create a new order, cancel and delete', async () => {
+        let order = await createOrder(buyer, seller, deliver);
 
-        let result = await rideosContract.provider.eos.getTableRows({
-            code: rideosContract.name,
-            scope: rideosContract.name,
-            table: "order",
-            limit: 10,
-            json: true
-        });
+        order = await initializeCancel(order.orderKey, buyer);
 
-        assert.strictEqual(result.rows.length > 0, true, "Table result should't be empty");
+        await deleteOrder(order.orderKey)
+    });
 
-        let order = result.rows[0];
-        console.log(result.rows[0])
-        assert.strictEqual(order.buyer, buyer.name, "Not the same buyer");
-        assert.strictEqual(order.seller, seller.name, "Not the same seller");
-        assert.strictEqual(order.deliver, deliver.name, "Not the same deliver");
-        assert.strictEqual(order.state, 1, "The state should be 1");
-        assert.strictEqual(new Date(order.dateDelay + "Z").getTime() / 1000, dateDelay, "The delay should be " + dateDelay);
-        assert.strictEqual(order.priceDeliver, priceDeliver, "The price deliver should be " + priceDeliver);
-        assert.strictEqual(order.priceOrder, priceOrder, "The price order should be " + priceOrder);
-        assert.strictEqual(order.details, orderDetail, "The order detail should be " + orderDetail);
+    it('Validate the order, end with buyer', async () => {
+        let order = await createOrder(buyer, seller, deliver);
+
+        await rideosContract.validatedeli(order.orderKey, { from: deliver });
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.validateDeliver, 1, "Validate deliver should be 1");
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keySeller = createKey(seller, order);
+        await rideosContract.validatesell(order.orderKey, keySeller.nonce, keySeller.hash, { from: seller });
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.validateSeller, 1, "Validate seller should be 1");
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keyBuyer = createKey(buyer, order);
+        await rideosContract.validatebuy(order.orderKey, keyBuyer.nonce, keyBuyer.hash, { from: buyer });
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.validateBuyer, 1, "Validate seller should be 1");
+        assert.strictEqual(order.state, 2, "The state should move at 2");
+
+        await eoslime.utils.test.expectAssert(
+            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+        );
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.state, 2, "The state should stay at 2");
+
+        order = await delayCancel(order.orderKey, buyer);
+        await deleteOrder(order.orderKey)
     });
 });

@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "eoslime": "^0.0.15"
+    "eoslime": "^0.0.15",
+    "randomstring": "^1.1.5"
   },
   "scripts": {
     "test": "mocha ./test.js"

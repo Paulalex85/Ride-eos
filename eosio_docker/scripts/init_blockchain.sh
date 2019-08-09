@@ -43,14 +43,14 @@ echo "=== setup wallet: rideoswallet ==="
 # key for eosio account and export the generated password to a file for unlocking wallet later
 cleos wallet create -n rideoswallet --to-console | tail -1 | sed -e 's/^"//' -e 's/"$//' > rideos_wallet_password.txt
 # Import key for rideoswallet wallet
-cleos wallet import -n rideoswallet --private-key 5JpWT4ehouB2FF9aCfdfnZ5AwbQbTtHBAwebRXt94FmjyhXwL4K
-cleos wallet import -n rideoswallet --private-key 5JD9AGTuTeD5BXZwGQ5AtwBqHK21aHmYnTetHgk1B3pjj7krT8N
-cleos wallet import -n rideoswallet --private-key 5KaqYiQzKsXXXxVvrG8Q3ECZdQAj2hNcvCgGEubRvvq7CU3LySK
-cleos wallet import -n rideoswallet --private-key 5K7mtrinTFrVTduSxizUc5hjXJEtTjVTsqSHeBHes1Viep86FP5
+#rideos
+cleos wallet import -n rideoswallet --private-key 5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr
+#eosio.code
+cleos wallet import -n rideoswallet --private-key 5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw
 
 # create account for rideos with above wallet's public keys
-cleos create account eosio rideos EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B EOS6PUh9rs7eddJNzqgqDx1QrspSHLRxLMcRdwHZZRL4tpbtvia5B
-cleos create account eosio eosio.token EOS6kYgMTCh1iqpq9XGNQbEi8Q6k5GujefN9DSs55dcjVyFAq7B6b EOS6kYgMTCh1iqpq9XGNQbEi8Q6k5GujefN9DSs55dcjVyFAq7B6b
+cleos create account eosio rideos EOS7e4xQuxLZFBDeAqeSC5qHaUYKcMmEdyxjPFbe9Yjjx9z36nm7J EOS7e4xQuxLZFBDeAqeSC5qHaUYKcMmEdyxjPFbe9Yjjx9z36nm7J
+cleos create account eosio eosio.token EOS82WxL7ZkBbZPEPArmaeNv3dfchMo82A5hzdx3A7vCPyGDzDwCf EOS82WxL7ZkBbZPEPArmaeNv3dfchMo82A5hzdx3A7vCPyGDzDwCf
 
 echo "=== create user accounts ==="
 # script for creating data into blockchain
