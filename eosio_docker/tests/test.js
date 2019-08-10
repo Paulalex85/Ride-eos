@@ -120,6 +120,27 @@ async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", pr
     return order;
 }
 
+async function validateDeliver(order) {
+    await rideosContract.validatedeli(order.orderKey, { from: deliver });
+    order = await getOrder(order.orderKey);
+    assert.strictEqual(order.validateDeliver, 1, "Validate deliver should be 1");
+    return order;
+}
+
+async function validateBuyer(order, keyBuyer) {
+    await rideosContract.validatebuy(order.orderKey, keyBuyer.nonce, keyBuyer.hash, { from: buyer });
+    order = await getOrder(order.orderKey);
+    assert.strictEqual(order.validateBuyer, 1, "Validate buyer should be 1");
+    return order;
+}
+
+async function validateSeller(order, keySeller) {
+    await rideosContract.validatesell(order.orderKey, keySeller.nonce, keySeller.hash, { from: seller });
+    order = await getOrder(order.orderKey);
+    assert.strictEqual(order.validateSeller, 1, "Validate seller should be 1");
+    return order;
+}
+
 async function initializeCancel(orderKey, account) {
     await rideosContract.initcancel(orderKey, account.name, { from: account });
     let order = await getOrder(orderKey)
@@ -178,21 +199,15 @@ describe('Rideos contract', function () {
     it('Validate the order, end with buyer', async () => {
         let order = await createOrder(buyer, seller, deliver);
 
-        await rideosContract.validatedeli(order.orderKey, { from: deliver });
-        order = await getOrder(order.orderKey)
-        assert.strictEqual(order.validateDeliver, 1, "Validate deliver should be 1");
+        order = await validateDeliver(order);
         assert.strictEqual(order.state, 1, "The state should not move of 1");
 
         let keySeller = createKey(seller, order);
-        await rideosContract.validatesell(order.orderKey, keySeller.nonce, keySeller.hash, { from: seller });
-        order = await getOrder(order.orderKey)
-        assert.strictEqual(order.validateSeller, 1, "Validate seller should be 1");
+        order = await validateSeller(order, keySeller);
         assert.strictEqual(order.state, 1, "The state should not move of 1");
 
         let keyBuyer = createKey(buyer, order);
-        await rideosContract.validatebuy(order.orderKey, keyBuyer.nonce, keyBuyer.hash, { from: buyer });
-        order = await getOrder(order.orderKey)
-        assert.strictEqual(order.validateBuyer, 1, "Validate seller should be 1");
+        order = await validateBuyer(order, keyBuyer);
         assert.strictEqual(order.state, 2, "The state should move at 2");
 
         await eoslime.utils.test.expectAssert(
@@ -204,4 +219,54 @@ describe('Rideos contract', function () {
         order = await delayCancel(order.orderKey, buyer);
         await deleteOrder(order.orderKey)
     });
+
+    it('Validate the order, end with deliver', async () => {
+        let order = await createOrder(buyer, seller, deliver);
+
+        let keySeller = createKey(seller, order);
+        order = await validateSeller(order, keySeller);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keyBuyer = createKey(buyer, order);
+        order = await validateBuyer(order, keyBuyer);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        order = await validateDeliver(order);
+        assert.strictEqual(order.state, 2, "The state should move to 2");
+
+        await eoslime.utils.test.expectAssert(
+            rideosContract.initcancel(order.orderKey, deliver.name, { from: deliver })
+        );
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.state, 2, "The state should stay at 2");
+
+        order = await delayCancel(order.orderKey, buyer);
+        await deleteOrder(order.orderKey)
+    });
+
+    it('Validate the order, end with seller', async () => {
+        let order = await createOrder(buyer, seller, deliver);
+
+        let keyBuyer = createKey(buyer, order);
+        order = await validateBuyer(order, keyBuyer);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        order = await validateDeliver(order);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keySeller = createKey(seller, order);
+        order = await validateSeller(order, keySeller);
+        assert.strictEqual(order.state, 2, "The state should move to 2");
+
+        await eoslime.utils.test.expectAssert(
+            rideosContract.initcancel(order.orderKey, seller.name, { from: seller })
+        );
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.state, 2, "The state should stay at 2");
+
+        order = await delayCancel(order.orderKey, buyer);
+        await deleteOrder(order.orderKey)
+    });
 });
+
+
