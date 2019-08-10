@@ -141,6 +141,13 @@ async function validateSeller(order, keySeller) {
     return order;
 }
 
+async function orderReady(orderKey, account) {
+    await rideosContract.orderready(orderKey, { from: account });
+    let order = await getOrder(orderKey)
+    assert.strictEqual(order.state, 3, "The state should be 3");
+    return order;
+}
+
 async function initializeCancel(orderKey, account) {
     await rideosContract.initcancel(orderKey, account.name, { from: account });
     let order = await getOrder(orderKey)
@@ -163,7 +170,7 @@ async function deleteOrder(orderKey) {
 
 describe('Rideos contract', function () {
 
-    this.timeout(20000);
+    this.timeout(25000);
 
     before(async () => {
         rideosAccount = eoslime.Account.load('rideos', '5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr');
@@ -263,6 +270,32 @@ describe('Rideos contract', function () {
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
+
+        order = await delayCancel(order.orderKey, buyer);
+        await deleteOrder(order.orderKey)
+    });
+
+    it('Order ready', async () => {
+        let order = await createOrder(buyer, seller, deliver);
+
+        order = await validateDeliver(order);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keySeller = createKey(seller, order);
+        order = await validateSeller(order, keySeller);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keyBuyer = createKey(buyer, order);
+        order = await validateBuyer(order, keyBuyer);
+        assert.strictEqual(order.state, 2, "The state should move at 2");
+
+        order = await orderReady(order.orderKey, seller)
+
+        await eoslime.utils.test.expectAssert(
+            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+        );
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.state, 3, "The state should stay at 3");
 
         order = await delayCancel(order.orderKey, buyer);
         await deleteOrder(order.orderKey)
