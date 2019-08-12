@@ -15,8 +15,8 @@ keySeller=$(openssl rand -hex 32)
 echo "key tester $keyTester"
 echo "key seller $keySeller"
 
-hashTester=$(echo -n $keyTester | xxd -r -p | sha256sum -b | awk '{print $1}')
-hashSeller=$(echo -n $keySeller | xxd -r -p | sha256sum -b | awk '{print $1}')
+hashTester=$(echo -n $keyTester | sha256sum -b | awk '{print $1}')
+hashSeller=$(echo -n $keySeller | sha256sum -b | awk '{print $1}')
 
 
 cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0]' -p tester

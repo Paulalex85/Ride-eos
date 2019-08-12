@@ -61,7 +61,7 @@ class KeyGenerator {
     }
 
     static generateHash(key) {
-        return ecc.sha256(new Buffer(key, 'hex'));
+        return ecc.sha256(key);
     }
 
     static storeKey(orderKey, key, hash, type) {

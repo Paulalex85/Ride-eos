@@ -165,14 +165,14 @@ void rideos::orderready(const uint64_t orderKey)
     });
 }
 
-void rideos::ordertaken(const uint64_t orderKey, const checksum256 &source)
+void rideos::ordertaken(const uint64_t orderKey, const string &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    assert_sha256((char *)&source, sizeof(source), iteratorOrder->takeverification);
+    assert_sha256((char *)source.c_str(), source.size(), iteratorOrder->takeverification);
 
     check(iteratorOrder->state == ORDER_TAKEN, "The order is not in the state of waiting deliver");
 
@@ -181,23 +181,14 @@ void rideos::ordertaken(const uint64_t orderKey, const checksum256 &source)
     });
 }
 
-void rideos::orderdelive(const uint64_t orderKey, const string source)
+void rideos::orderdelive(const uint64_t orderKey, const string &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
 
     require_auth(iteratorOrder->deliver);
 
-    eosio::print("============================\n");
-    eosio::print(source);
-    eosio::print("\n");
-    eosio::print(sha256((char *)source.c_str(), source.size()));
-    eosio::print("\n");
-    eosio::print(sha256(const_cast<char *>(source.c_str()), source.size()));
-    eosio::print("\n");
-    eosio::print(iteratorOrder->deliveryverification);
-
-    assert_sha256((char *)&source, sizeof(source), iteratorOrder->deliveryverification);
+    assert_sha256((char *)source.c_str(), source.size(), iteratorOrder->deliveryverification);
 
     check(iteratorOrder->state == ORDER_DELIVERED, "The order is not in the state delivery");
 

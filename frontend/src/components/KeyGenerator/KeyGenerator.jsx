@@ -24,7 +24,7 @@ class KeyGenerator extends Component {
 
         this.setState({
             key: key,
-            hash: ecc.sha256(new Buffer(key, 'hex'))
+            hash: ecc.sha256(key)
         });
     }
 

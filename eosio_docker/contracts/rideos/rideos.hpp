@@ -36,9 +36,9 @@ public:
 
     ACTION orderready(const uint64_t orderKey);
 
-    ACTION ordertaken(const uint64_t orderKey, const checksum256 &source);
+    ACTION ordertaken(const uint64_t orderKey, const string &source);
 
-    ACTION orderdelive(const uint64_t orderKey, const string source);
+    ACTION orderdelive(const uint64_t orderKey, const string &source);
 
     ACTION initcancel(const uint64_t orderKey, const name account);
 

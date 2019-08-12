@@ -47,12 +47,12 @@ function createKey(account, order) {
         charset: 'hex'
     });
     let data = generateDataToSign(order.orderKey, order.buyer, order.seller, order.deliver, new Date(order.date).getTime(), new Date(order.dateDelay).getTime(), order.priceOrder, order.priceDeliver, order.details);
-    let hashData = ecc.sha256(new Buffer(data, 'hex'));
+    let hashData = ecc.sha256(data);
     let slicedData = sliceData(hashData);
     let signature = ecc.sign(slicedData, account.privateKey);
 
-    let key = ecc.sha256(new Buffer(nonce + signature.substring(7), 'hex'));
-    let hash = ecc.sha256(new Buffer(key, 'hex'));
+    let key = ecc.sha256(nonce + signature.substring(7));
+    let hash = ecc.sha256(key);
 
     return {
         nonce: nonce,
@@ -152,6 +152,13 @@ async function orderTaken(orderKey, key, account) {
     await rideosContract.ordertaken(orderKey, key, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 4, "The state should be 4");
+    return order;
+}
+
+async function orderDelive(orderKey, key, account) {
+    await rideosContract.orderdelive(orderKey, key, { from: account });
+    let order = await getOrder(orderKey)
+    assert.strictEqual(order.state, 5, "The state should be 5");
     return order;
 }
 
@@ -333,6 +340,35 @@ describe('Rideos contract', function () {
         assert.strictEqual(order.state, 4, "The state should stay at 4");
 
         order = await delayCancel(order.orderKey, buyer);
+        await deleteOrder(order.orderKey)
+    });
+
+    it('Order delivered', async () => {
+        let order = await createOrder(buyer, seller, deliver);
+
+        order = await validateDeliver(order);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keySeller = createKey(seller, order);
+        order = await validateSeller(order, keySeller);
+        assert.strictEqual(order.state, 1, "The state should not move of 1");
+
+        let keyBuyer = createKey(buyer, order);
+        order = await validateBuyer(order, keyBuyer);
+        assert.strictEqual(order.state, 2, "The state should move at 2");
+
+        order = await orderReady(order.orderKey, seller)
+
+        order = await orderTaken(order.orderKey, keySeller.key, deliver)
+
+        order = await orderDelive(order.orderKey, keyBuyer.key, deliver)
+
+        await eoslime.utils.test.expectAssert(
+            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+        );
+        order = await getOrder(order.orderKey)
+        assert.strictEqual(order.state, 5, "The state should stay at 5");
+
         await deleteOrder(order.orderKey)
     });
 });

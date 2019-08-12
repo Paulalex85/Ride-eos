@@ -16,7 +16,3 @@ RUN mkdir -p /eosio.contracts
 RUN tar xvzf ./v1.7.0.tar.gz -C /eosio.contracts
 RUN mv /eosio.contracts/eosio.contracts-1.7.0 /opt/eosio/bin/contracts
 RUN mv /opt/eosio/bin/contracts/eosio.contracts-1.7.0 /opt/eosio/bin/contracts/eosio.contracts
-
-RUN echo "INSTALLING XXD"
-RUN wget http://archive.ubuntu.com/ubuntu/pool/main/v/vim/xxd_8.0.1453-1ubuntu1_i386.deb
-RUN apt-get update && apt-get install -y xxd
