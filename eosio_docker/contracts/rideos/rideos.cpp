@@ -102,7 +102,7 @@ void rideos::validatebuy(const uint64_t orderKey, const checksum256 &nonce, cons
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateDeliver)
         {
-            order.state = ORDER_READY;
+            order.state = ORDER_VALIDATE;
         }
     });
 }
@@ -123,7 +123,7 @@ void rideos::validatedeli(const uint64_t orderKey)
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateBuyer)
         {
-            order.state = ORDER_READY;
+            order.state = ORDER_VALIDATE;
         }
     });
 }
@@ -146,7 +146,7 @@ void rideos::validatesell(const uint64_t orderKey, const checksum256 &nonce, con
 
         if (iteratorOrder->validateDeliver && iteratorOrder->validateBuyer)
         {
-            order.state = ORDER_READY;
+            order.state = ORDER_VALIDATE;
         }
     });
 }
@@ -158,10 +158,10 @@ void rideos::orderready(const uint64_t orderKey)
 
     require_auth(iteratorOrder->seller);
 
-    check(iteratorOrder->state == ORDER_READY, "The order is not in the state of product ready");
+    check(iteratorOrder->state == ORDER_VALIDATE, "The order is not in the state of product ready");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
-        order.state = ORDER_TAKEN;
+        order.state = ORDER_PREPARED;
     });
 }
 
@@ -174,10 +174,10 @@ void rideos::ordertaken(const uint64_t orderKey, const string &source)
 
     assert_sha256((char *)source.c_str(), source.size(), iteratorOrder->takeverification);
 
-    check(iteratorOrder->state == ORDER_TAKEN, "The order is not in the state of waiting deliver");
+    check(iteratorOrder->state == ORDER_PREPARED, "The order is not in the state of waiting deliver");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
-        order.state = ORDER_DELIVERED;
+        order.state = ORDER_TAKED;
     });
 }
 
@@ -190,10 +190,10 @@ void rideos::orderdelive(const uint64_t orderKey, const string &source)
 
     assert_sha256((char *)source.c_str(), source.size(), iteratorOrder->deliveryverification);
 
-    check(iteratorOrder->state == ORDER_DELIVERED, "The order is not in the state delivery");
+    check(iteratorOrder->state == ORDER_TAKED, "The order is not in the state delivery");
 
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
-        order.state = ORDER_END;
+        order.state = ORDER_DELIVERED;
     });
 
     withdraw(iteratorOrder->seller, iteratorOrder->priceOrder);
@@ -231,7 +231,7 @@ void rideos::delaycancel(const uint64_t orderKey)
     require_auth(iteratorOrder->buyer);
 
     check(iteratorOrder->state > INITIALIZATION, "The order is in the state of initialization");
-    check(iteratorOrder->state < ORDER_END, "The order is finish");
+    check(iteratorOrder->state < ORDER_DELIVERED, "The order is finish");
 
     check(iteratorOrder->dateDelay < eosio::time_point_sec(now()), "The delay for cancel the order is not passed");
 

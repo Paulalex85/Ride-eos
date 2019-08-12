@@ -50,10 +50,10 @@ public:
     {
         NEED_DELIVER = 0,
         INITIALIZATION = 1,
-        ORDER_READY = 2,
-        ORDER_TAKEN = 3,
-        ORDER_DELIVERED = 4,
-        ORDER_END = 5,
+        ORDER_VALIDATE = 2,
+        ORDER_PREPARED = 3,
+        ORDER_TAKED = 4,
+        ORDER_DELIVERED = 5,
         INIT_CANCEL = 99,
         ORDER_CANCEL = 98
     };
