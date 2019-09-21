@@ -38,7 +38,7 @@ class ValidateOrder extends Component {
             let slicedData = KeyGenerator.sliceData(hashData);
             let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
 
-            let key = KeyGenerator.generateHash(nonce + signature.substring(7))
+            let key = KeyGenerator.generateHash(signature + nonce);
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "seller");
 
@@ -46,12 +46,12 @@ class ValidateOrder extends Component {
 
         } else if (currentActor === "buyer") {
             let nonce = KeyGenerator.generateKey();
-            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), priceOrder, priceDeliver, details);
+            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
             let hashData = KeyGenerator.generateHash(data);
             let slicedData = KeyGenerator.sliceData(hashData);
             let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
 
-            let key = KeyGenerator.generateHash(nonce + signature.substring(7))
+            let key = KeyGenerator.generateHash(signature + nonce);
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "buyer");
 
