@@ -32,31 +32,29 @@ class ValidateOrder extends Component {
 
         } else if (currentActor === "seller") {
 
-            let nonce = KeyGenerator.generateKey();
             let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
             let hashData = KeyGenerator.generateHash(data);
             let slicedData = KeyGenerator.sliceData(hashData);
             let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
 
-            let key = KeyGenerator.generateHash(signature + nonce);
+            let key = KeyGenerator.generateHash(signature);
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "seller");
 
-            await ApiServiceScatter.validateSeller(orderKey, nonce, hash, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateSeller(orderKey, hash, scatter).catch((err) => { console.error(err) });
 
         } else if (currentActor === "buyer") {
-            let nonce = KeyGenerator.generateKey();
             let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
             let hashData = KeyGenerator.generateHash(data);
             let slicedData = KeyGenerator.sliceData(hashData);
             let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
 
-            let key = KeyGenerator.generateHash(signature + nonce);
+            let key = KeyGenerator.generateHash(signature);
             let hash = KeyGenerator.generateHash(key);
             KeyGenerator.storeKey(orderKey, key, hash, "buyer");
 
             await ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
-            await ApiServiceScatter.validateBuyer(orderKey, nonce, hash, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateBuyer(orderKey, hash, scatter).catch((err) => { console.error(err) });
         }
     }
 

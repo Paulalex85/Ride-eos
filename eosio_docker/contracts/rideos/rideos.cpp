@@ -82,7 +82,7 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
     });
 }
 
-void rideos::validatebuy(const uint64_t orderKey, const checksum256 &nonce, const checksum256 &hash)
+void rideos::validatebuy(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -98,7 +98,6 @@ void rideos::validatebuy(const uint64_t orderKey, const checksum256 &nonce, cons
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateBuyer = true;
         order.deliveryverification = hash;
-        order.nonceBuyer = nonce;
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateDeliver)
         {
@@ -128,7 +127,7 @@ void rideos::validatedeli(const uint64_t orderKey)
     });
 }
 
-void rideos::validatesell(const uint64_t orderKey, const checksum256 &nonce, const checksum256 &hash)
+void rideos::validatesell(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -142,7 +141,6 @@ void rideos::validatesell(const uint64_t orderKey, const checksum256 &nonce, con
     _orders.modify(iteratorOrder, _self, [&](auto &order) {
         order.validateSeller = true;
         order.takeverification = hash;
-        order.nonceSeller = nonce;
 
         if (iteratorOrder->validateDeliver && iteratorOrder->validateBuyer)
         {

@@ -42,20 +42,15 @@ function sliceData(data) {
 }
 
 function createKey(account, order) {
-    let nonce = randomstring.generate({
-        length: 64,
-        charset: 'hex'
-    });
     let data = generateDataToSign(order.orderKey, order.buyer, order.seller, order.deliver, new Date(order.date).getTime(), new Date(order.dateDelay).getTime(), order.priceOrder, order.priceDeliver, order.details);
     let hashData = ecc.sha256(data);
     let slicedData = sliceData(hashData);
     let signature = ecc.sign(slicedData, account.privateKey);
 
-    let key = ecc.sha256(nonce + signature.substring(7));
+    let key = ecc.sha256(signature);
     let hash = ecc.sha256(key);
 
     return {
-        nonce: nonce,
         key: key,
         hash: hash
     }
@@ -128,14 +123,14 @@ async function validateDeliver(order) {
 }
 
 async function validateBuyer(order, keyBuyer) {
-    await rideosContract.validatebuy(order.orderKey, keyBuyer.nonce, keyBuyer.hash, { from: buyer });
+    await rideosContract.validatebuy(order.orderKey, keyBuyer.hash, { from: buyer });
     order = await getOrder(order.orderKey);
     assert.strictEqual(order.validateBuyer, 1, "Validate buyer should be 1");
     return order;
 }
 
 async function validateSeller(order, keySeller) {
-    await rideosContract.validatesell(order.orderKey, keySeller.nonce, keySeller.hash, { from: seller });
+    await rideosContract.validatesell(order.orderKey, keySeller.hash, { from: seller });
     order = await getOrder(order.orderKey);
     assert.strictEqual(order.validateSeller, 1, "Validate seller should be 1");
     return order;

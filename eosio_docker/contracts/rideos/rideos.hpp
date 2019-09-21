@@ -28,11 +28,11 @@ public:
 
     ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
-    ACTION validatebuy(const uint64_t orderKey, const checksum256 &nonce, const checksum256 &hash);
+    ACTION validatebuy(const uint64_t orderKey, const checksum256 &hash);
 
     ACTION validatedeli(const uint64_t orderKey);
 
-    ACTION validatesell(const uint64_t orderKey, const checksum256 &nonce, const checksum256 &hash);
+    ACTION validatesell(const uint64_t orderKey, const checksum256 &hash);
 
     ACTION orderready(const uint64_t orderKey);
 
@@ -69,8 +69,6 @@ public:
         time_point_sec dateDelay;
         checksum256 takeverification;
         checksum256 deliveryverification;
-        checksum256 nonceSeller;
-        checksum256 nonceBuyer;
         asset priceOrder;
         asset priceDeliver;
         bool validateBuyer;
