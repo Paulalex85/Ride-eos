@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 
 import { Button } from 'react-bootstrap'
 
-import ecc from 'eosjs-ecc';
-import randomstring from 'randomstring';
 
 class KeyGenerator extends Component {
     constructor(props) {
@@ -17,15 +15,6 @@ class KeyGenerator extends Component {
     }
 
     handleGenerator() {
-        let key = randomstring.generate({
-            length: 64,
-            charset: 'hex'
-        });
-
-        this.setState({
-            key: key,
-            hash: ecc.sha256(key)
-        });
     }
 
     render() {

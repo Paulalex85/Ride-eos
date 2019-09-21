@@ -1,5 +1,4 @@
 import ecc from 'eosjs-ecc';
-import randomstring from 'randomstring';
 
 const initial = {
     listKeys: []
@@ -51,13 +50,6 @@ class KeyGenerator {
         } catch (e) {
             console.log(e)
         }
-    }
-
-    static generateKey() {
-        return randomstring.generate({
-            length: 64,
-            charset: 'hex'
-        });
     }
 
     static generateHash(key) {

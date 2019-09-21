@@ -1,7 +1,6 @@
 const ecc = require('eosjs-ecc');
 const assert = require('assert');
 const eoslime = require('eoslime').init('local');
-const randomstring = require('randomstring');
 
 const RIDEOS_PATH = '/opt/eosio/bin/compiled_contracts/rideos/rideos';
 const TOKEN_PATH = "/opt/eosio/bin/contracts/eosio.contracts/contracts/eosio.token/src/eosio.token"
