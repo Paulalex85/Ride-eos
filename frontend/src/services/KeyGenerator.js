@@ -56,6 +56,23 @@ class KeyGenerator {
         return ecc.sha256(key);
     }
 
+    static async createKeyForDelivery(order, scatter) {
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
+        let data = KeyGenerator.generateDataToSign(order.orderKey, order.buyer, order.seller, order.deliver, new Date(order.date).getTime(), new Date(order.dateDelay).getTime(), order.priceOrder, order.priceDeliver, order.details);
+        let hashData = KeyGenerator.generateHash(data);
+        let slicedData = KeyGenerator.sliceData(hashData);
+        let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
+
+        let key = KeyGenerator.generateHash(signature);
+        let hash = KeyGenerator.generateHash(key);
+
+        return {
+            key: key,
+            hash: hash
+        }
+    }
+
     static storeKey(orderKey, key, hash, type) {
         var o = {
             order: orderKey,

@@ -22,39 +22,23 @@ class ValidateOrder extends Component {
     }
 
     validateAPI = async () => {
-        const { order: { currentActor, orderKey, buyer, seller, deliver, date, dateDelay, priceDeliver, priceOrder, details }, scatter: { scatter } } = this.props;
+        const { order, order: { currentActor, orderKey }, scatter: { scatter } } = this.props;
 
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
         if (currentActor === "deliver") {
-
             await ApiServiceScatter.validateDeliver(orderKey, scatter)
                 .catch((err) => { console.error(err) });
 
         } else if (currentActor === "seller") {
 
-            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
-            let hashData = KeyGenerator.generateHash(data);
-            let slicedData = KeyGenerator.sliceData(hashData);
-            let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
-
-            let key = KeyGenerator.generateHash(signature);
-            let hash = KeyGenerator.generateHash(key);
-            KeyGenerator.storeKey(orderKey, key, hash, "seller");
-
-            await ApiServiceScatter.validateSeller(orderKey, hash, scatter).catch((err) => { console.error(err) });
+            let keyObject = await KeyGenerator.createKeyForDelivery(order, scatter)
+            KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, "seller");
+            await ApiServiceScatter.validateSeller(orderKey, keyObject.hash, scatter).catch((err) => { console.error(err) });
 
         } else if (currentActor === "buyer") {
-            let data = KeyGenerator.generateDataToSign(orderKey, buyer, seller, deliver, new Date(date).getTime(), new Date(dateDelay).getTime(), priceOrder, priceDeliver, details);
-            let hashData = KeyGenerator.generateHash(data);
-            let slicedData = KeyGenerator.sliceData(hashData);
-            let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
-
-            let key = KeyGenerator.generateHash(signature);
-            let hash = KeyGenerator.generateHash(key);
-            KeyGenerator.storeKey(orderKey, key, hash, "buyer");
-
+            let keyObject = await KeyGenerator.createKeyForDelivery(order, scatter)
+            KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, "buyer");
             await ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
-            await ApiServiceScatter.validateBuyer(orderKey, hash, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateBuyer(orderKey, keyObject.hash, scatter).catch((err) => { console.error(err) });
         }
     }
 
