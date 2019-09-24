@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { ListGroup, Collapse, Col, Row, Badge, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
 import Octicon, { getIconByName } from '@githubprimer/octicons-react';
 
-import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel, DeleteOrder } from './components';
+import { ValidateOrder, OrderReady, OrderTaken, OrderDelivered, InitializeCancel, DelayCancel, DeleteOrder, GenerateQRCode } from './components';
 
 class OrderElement extends Component {
 
@@ -136,6 +136,8 @@ class OrderElement extends Component {
                                 {order.details}
                             </Col>
                         </Row>
+
+                        <GenerateQRCode order={order} />
 
                         <ButtonToolbar className="justify-content-between">
                             <ButtonGroup>

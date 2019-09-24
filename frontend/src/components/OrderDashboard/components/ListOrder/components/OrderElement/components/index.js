@@ -5,6 +5,8 @@ import OrderDelivered from './OrderDelivered'
 import InitializeCancel from './InitializeCancel'
 import DelayCancel from './DelayCancel'
 import DeleteOrder from './DeleteOrder'
+import GenerateQRCode from './GenerateQRCode'
+// import ReadQRCode from './ReadQRCode'
 
 export {
     OrderReady,
@@ -13,5 +15,7 @@ export {
     OrderDelivered,
     InitializeCancel,
     DelayCancel,
-    DeleteOrder
+    DeleteOrder,
+    GenerateQRCode
+    // ReadQRCode
 }
