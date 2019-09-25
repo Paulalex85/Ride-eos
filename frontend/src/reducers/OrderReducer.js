@@ -15,6 +15,8 @@ const initialState = {
     validateSeller: 0,
     validateDeliver: 0,
     details: "",
+    takeverification: "",
+    deliveryverification: ""
 };
 
 export default function (state = initialState, action) {
@@ -38,6 +40,8 @@ export default function (state = initialState, action) {
                     validateSeller: element.validateSeller.toString() || initialState.validateSeller,
                     validateDeliver: element.validateDeliver.toString() || initialState.validateDeliver,
                     details: element.details || initialState.details,
+                    takeverification: element.takeverification || initialState.takeverification,
+                    deliveryverification: element.deliveryverification || initialState.deliveryverification,
                 }
                 order.currentActor = setCurrentActor(order, action.account);
                 listObject.push(order);
@@ -61,6 +65,8 @@ export default function (state = initialState, action) {
                 validateSeller: action.order.validateSeller.toString() || initialState.validateSeller,
                 validateDeliver: action.order.validateDeliver.toString() || initialState.validateDeliver,
                 details: action.order.details || initialState.details,
+                takeverification: action.order.takeverification || initialState.takeverification,
+                deliveryverification: action.order.deliveryverification || initialState.deliveryverification,
             }
             order.currentActor = setCurrentActor(order, action.account);
 

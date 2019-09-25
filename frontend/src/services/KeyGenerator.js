@@ -38,7 +38,6 @@ class KeyGenerator {
         return ecc.verify(signature, data, pubkey)
     }
 
-
     static async signData(scatter, publicKey, data) {
         try {
             return await scatter.getArbitrarySignature(
@@ -73,6 +72,10 @@ class KeyGenerator {
         }
     }
 
+    static purgeStore() {
+        localStorage.setItem("listKeys", "");
+    }
+
     static storeKey(orderKey, key, hash, type) {
         var o = {
             order: orderKey,
@@ -80,7 +83,10 @@ class KeyGenerator {
             hash: hash,
             type: type
         }
-        let list = JSON.parse(localStorage.getItem("listKeys")) || initial;
+        let list = initial;
+        if (localStorage.getItem("listKeys") !== "") {
+            list = JSON.parse(localStorage.getItem("listKeys"))
+        }
 
         let index = this.getIndexKey(list, orderKey, type)
 
@@ -94,7 +100,10 @@ class KeyGenerator {
     }
 
     static getKey(orderKey, type) {
-        let list = JSON.parse(localStorage.getItem("listKeys")) || initial;
+        let list = initial;
+        if (localStorage.getItem("listKeys") !== "") {
+            list = JSON.parse(localStorage.getItem("listKeys"))
+        }
 
         let index = this.getIndexKey(list, orderKey, type)
         if (index === -1) {

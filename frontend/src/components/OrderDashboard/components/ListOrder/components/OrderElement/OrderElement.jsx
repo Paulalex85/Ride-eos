@@ -137,8 +137,9 @@ class OrderElement extends Component {
                             </Col>
                         </Row>
 
-                        <GenerateQRCode order={order} />
-
+                        {open &&
+                            <GenerateQRCode order={order} />
+                        }
                         <ButtonToolbar className="justify-content-between">
                             <ButtonGroup>
                                 <ValidateOrder order={order} />
