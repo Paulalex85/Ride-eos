@@ -13,9 +13,16 @@ class GenerateQRCode extends Component {
             key: "",
             hash: ""
         }
+    }
 
-        this.getKeyOfOrder();
-        this.render();
+    async componentDidMount() {
+        this.getKeyOfOrder()
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.order.state !== prevProps.order.state) {
+            this.getKeyOfOrder()
+        }
     }
 
     needToGenerate = (state, currentActor) => {
@@ -50,18 +57,16 @@ class GenerateQRCode extends Component {
                     key: keyObject.key,
                     hash: keyObject.hash
                 });
-                KeyGenerator.purgeStore()
+                KeyGenerator.purgeStore(order, currentActor)
                 KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, currentActor)
             }
         }
     }
 
     render() {
-        const { order } = this.props;
-
         let isPrint = false;
 
-        if (this.needToGenerate(order.state, order.currentActor)) {
+        if (this.state.key !== "") {
             isPrint = true;
         }
 

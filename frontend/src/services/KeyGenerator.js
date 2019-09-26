@@ -72,8 +72,19 @@ class KeyGenerator {
         }
     }
 
-    static purgeStore() {
-        localStorage.setItem("listKeys", "");
+    static purgeStore(orderKey, type) {
+        let list = initial;
+        if (localStorage.getItem("listKeys") !== "") {
+            list = JSON.parse(localStorage.getItem("listKeys"))
+        }
+
+        for (let i = list.listKeys.length - 1; i >= 0; i--) {
+            const element = list.listKeys[i];
+            if (element.orderKey === orderKey.toString() && element.type === type) {
+                list.listKeys.splice(i, 1);
+            }
+        }
+        localStorage.setItem("listKeys", JSON.stringify(list));
     }
 
     static storeKey(orderKey, key, hash, type) {
@@ -115,7 +126,7 @@ class KeyGenerator {
     static getIndexKey(list, orderKey, type) {
         for (let i = 0; i < list.listKeys.length; i++) {
             const element = list.listKeys[i];
-            if (element.orderKey === orderKey.toString() && element.type === type) {
+            if (element.order === orderKey.toString() && element.type === type) {
                 return i
             }
         }
