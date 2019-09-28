@@ -5,6 +5,7 @@ import { Button, InputGroup, FormControl } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import ReadQRCode from '../ReadQRCode';
 
 class OrderTaken extends Component {
     constructor(props) {
@@ -55,27 +56,31 @@ class OrderTaken extends Component {
         return (
             <div>
                 {isPrint &&
-                    <InputGroup className="mb-3">
-                        <InputGroup.Prepend>
-                            <InputGroup.Text id="inputGroup-sizing-default">Key</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <FormControl
-                            name="key"
-                            value={key}
-                            label="Key"
-                            onChange={this.handleChange}
-                            aria-label="Default"
-                            aria-describedby="inputGroup-sizing-default"
-                        />
-                        <InputGroup.Append>
-                            <Button
-                                onClick={this.handleClick}
-                                variant='primary'
-                            >
-                                ORDER TAKEN
+                    <div>
+                        <h5>Enter the code for validation or scan QR Code</h5>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Prepend>
+                                <InputGroup.Text id="inputGroup-sizing-default">Key</InputGroup.Text>
+                            </InputGroup.Prepend>
+                            <FormControl
+                                name="key"
+                                value={key}
+                                label="Key"
+                                onChange={this.handleChange}
+                                aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default"
+                            />
+                            <InputGroup.Append>
+                                <Button
+                                    onClick={this.handleClick}
+                                    variant='primary'
+                                >
+                                    ORDER TAKEN
                             </Button>
-                        </InputGroup.Append>
-                    </InputGroup>
+                            </InputGroup.Append>
+                        </InputGroup>
+                        <ReadQRCode />
+                    </div>
                 }
             </div>
         )
