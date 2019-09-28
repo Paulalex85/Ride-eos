@@ -1,27 +1,28 @@
 import React, { Component } from 'react';
 // Components
 import QrReader from 'react-qr-reader'
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
 class ReadQRCode extends Component {
 
     state = {
         result: 'No result',
-        show: false
+        show: false,
+        legacyMode: false
     }
 
-    handleClick = () => {
-        if (this.state.show) {
-            this.setState({
-                ...this.state,
-                show: false
-            })
-        } else {
-            this.setState({
-                ...this.state,
-                show: true
-            })
-        }
+    handleClickShow = () => {
+        this.setState({
+            ...this.state,
+            show: !this.state.show
+        })
+    }
+
+    handleClickLegacy = () => {
+        this.setState({
+            ...this.state,
+            legacyMode: !this.state.legacyMode
+        })
     }
 
     handleScan = data => {
@@ -36,29 +37,84 @@ class ReadQRCode extends Component {
         console.error(err)
     }
 
+    openImageDialog = () => {
+        this.refs.qrReader.openImageDialog()
+    }
+
     render() {
-        let buttonText = "";
+        let buttonTextShow = "";
         if (this.state.show) {
-            buttonText = "Hide"
+            buttonTextShow = "Hide"
         }
         else {
-            buttonText = "Show"
+            buttonTextShow = "Show"
+        }
+
+        let buttonTextLegacy = "";
+        if (this.state.legacyMode) {
+            buttonTextLegacy = "Back to picture"
+        } else {
+            buttonTextLegacy = "Not working ? Submit a picture"
+        }
+
+        let QrReaderElement = "";
+        if (this.state.legacyMode) {
+            QrReaderElement =
+                <div>
+                    <Row className="mb-3">
+                        <Col>
+                            <Button onClick={this.openImageDialog} >
+                                Submit QR Code
+                    </Button>
+                        </Col>
+                    </Row>
+                    <Row className="mb-3">
+                        <Col>
+                            <QrReader
+                                ref="qrReader"
+                                delay={300}
+                                onError={this.handleError}
+                                onScan={this.handleScan}
+                                style={{ width: '100%' }}
+                                legacyMode
+                            />
+                        </Col>
+                    </Row>
+                </div>
+        } else {
+            QrReaderElement =
+                <QrReader
+                    delay={300}
+                    onError={this.handleError}
+                    onScan={this.handleScan}
+                    style={{ width: '100%' }}
+                />
         }
 
         return (
             <div>
-                <Button onClick={this.handleClick} >
-                    {buttonText}
-                </Button>
+                <Row className="mb-3">
+                    <Col>
+                        <Button onClick={this.handleClickShow} >
+                            {buttonTextShow}
+                        </Button>
+                    </Col>
+                </Row>
                 {this.state.show &&
                     <div>
-                        <QrReader
-                            delay={300}
-                            onError={this.handleError}
-                            onScan={this.handleScan}
-                            style={{ width: '100%' }}
-                        />
-                        <p>{this.state.result}</p>
+                        <Row className="mb-3">
+                            <Col>
+                                <Button onClick={this.handleClickLegacy}>
+                                    {buttonTextLegacy}
+                                </Button>
+                            </Col>
+                        </Row>
+                        <Row className="mb-3">
+                            <Col>
+                                {QrReaderElement}
+                                <p>{this.state.result}</p>
+                            </Col>
+                        </Row>
                     </div>
                 }
             </div>

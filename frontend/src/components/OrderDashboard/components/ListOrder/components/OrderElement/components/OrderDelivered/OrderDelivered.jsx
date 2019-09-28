@@ -5,6 +5,7 @@ import { Button, InputGroup, FormControl } from 'react-bootstrap'
 
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import ReadQRCode from '../ReadQRCode';
 
 class OrderDelivered extends Component {
     constructor(props) {
@@ -75,6 +76,7 @@ class OrderDelivered extends Component {
                                 ORDER DELIVERED
                             </Button>
                         </InputGroup.Append>
+                        <ReadQRCode />
                     </InputGroup>
                 }
             </div>
