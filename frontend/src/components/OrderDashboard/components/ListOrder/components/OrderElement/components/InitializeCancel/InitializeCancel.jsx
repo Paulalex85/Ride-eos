@@ -21,7 +21,7 @@ class InitializeCancel extends Component {
 
         ApiServiceScatter.initCancel(orderKey, scatter).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter });
+                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
             })
         }).catch((err) => { console.error(err) });
     }
