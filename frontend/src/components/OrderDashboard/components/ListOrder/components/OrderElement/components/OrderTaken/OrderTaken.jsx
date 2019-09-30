@@ -14,12 +14,9 @@ class OrderTaken extends Component {
         this.state = {
             key: ""
         }
-
-        this.handleClick = this.handleClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(event) {
+    handleChange = event => {
         const { value } = event.target;
 
         this.setState({
@@ -27,11 +24,16 @@ class OrderTaken extends Component {
         });
     }
 
-    handleClick(event) {
+    handleReadQRCode = key => {
+        this.setState({
+            key: key
+        })
+    }
+
+    handleClick = event => {
         event.preventDefault();
 
         const { key } = this.state;
-
         const { setOrder, order: { orderKey }, orders: { listOrders }, scatter: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
@@ -76,10 +78,10 @@ class OrderTaken extends Component {
                                     variant='primary'
                                 >
                                     ORDER TAKEN
-                            </Button>
+                                </Button>
                             </InputGroup.Append>
                         </InputGroup>
-                        <ReadQRCode />
+                        <ReadQRCode dataQRCode={this.handleReadQRCode} />
                     </div>
                 }
             </div>

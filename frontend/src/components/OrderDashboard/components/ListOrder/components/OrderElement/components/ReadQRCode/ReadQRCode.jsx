@@ -30,6 +30,7 @@ class ReadQRCode extends Component {
             this.setState({
                 result: data
             })
+            this.props.dataQRCode(data)
         }
     }
 
@@ -52,7 +53,7 @@ class ReadQRCode extends Component {
 
         let buttonTextLegacy = "";
         if (this.state.legacyMode) {
-            buttonTextLegacy = "Back to picture"
+            buttonTextLegacy = "Back to scan"
         } else {
             buttonTextLegacy = "Not working ? Submit a picture"
         }
@@ -63,7 +64,7 @@ class ReadQRCode extends Component {
                 <div>
                     <Row className="mb-3">
                         <Col>
-                            <Button onClick={this.openImageDialog} >
+                            <Button onClick={this.openImageDialog}>
                                 Submit QR Code
                     </Button>
                         </Col>
@@ -95,7 +96,7 @@ class ReadQRCode extends Component {
             <div>
                 <Row className="mb-3">
                     <Col>
-                        <Button onClick={this.handleClickShow} >
+                        <Button onClick={this.handleClickShow}>
                             {buttonTextShow}
                         </Button>
                     </Col>
@@ -112,7 +113,6 @@ class ReadQRCode extends Component {
                         <Row className="mb-3">
                             <Col>
                                 {QrReaderElement}
-                                <p>{this.state.result}</p>
                             </Col>
                         </Row>
                     </div>

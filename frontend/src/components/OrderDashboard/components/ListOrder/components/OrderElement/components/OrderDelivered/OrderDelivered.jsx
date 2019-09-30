@@ -14,12 +14,9 @@ class OrderDelivered extends Component {
         this.state = {
             key: ""
         }
-
-        this.handleClick = this.handleClick.bind(this);
-        this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(event) {
+    handleChange = event => {
         const { value } = event.target;
 
         this.setState({
@@ -27,7 +24,13 @@ class OrderDelivered extends Component {
         });
     }
 
-    handleClick(event) {
+    handleReadQRCode = key => {
+        this.setState({
+            key: key
+        })
+    }
+
+    handleClick = event => {
         event.preventDefault();
 
         const { key } = this.state;
@@ -56,28 +59,30 @@ class OrderDelivered extends Component {
         return (
             <div>
                 {isPrint &&
-                    <InputGroup className="mb-3">
-                        <InputGroup.Prepend>
-                            <InputGroup.Text id="inputGroup-sizing-default">Key</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <FormControl
-                            name="key"
-                            value={key}
-                            label="Key"
-                            onChange={this.handleChange}
-                            aria-label="Default"
-                            aria-describedby="inputGroup-sizing-default"
-                        />
-                        <InputGroup.Append>
-                            <Button
-                                onClick={this.handleClick}
-                                variant='primary'
-                            >
-                                ORDER DELIVERED
+                    <div>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Prepend>
+                                <InputGroup.Text id="inputGroup-sizing-default">Key</InputGroup.Text>
+                            </InputGroup.Prepend>
+                            <FormControl
+                                name="key"
+                                value={key}
+                                label="Key"
+                                onChange={this.handleChange}
+                                aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default"
+                            />
+                            <InputGroup.Append>
+                                <Button
+                                    onClick={this.handleClick}
+                                    variant='primary'
+                                >
+                                    ORDER DELIVERED
                             </Button>
-                        </InputGroup.Append>
-                        <ReadQRCode />
-                    </InputGroup>
+                            </InputGroup.Append>
+                        </InputGroup>
+                        <ReadQRCode dataQRCode={this.handleReadQRCode} />
+                    </div>
                 }
             </div>
         )
