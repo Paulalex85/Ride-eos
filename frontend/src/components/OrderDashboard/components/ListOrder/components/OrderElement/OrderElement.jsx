@@ -140,12 +140,12 @@ class OrderElement extends Component {
                         {open &&
                             <GenerateQRCode order={order} />
                         }
+                        <OrderTaken order={order} />
+                        <OrderDelivered order={order} />
                         <ButtonToolbar className="justify-content-between">
                             <ButtonGroup>
                                 <ValidateOrder order={order} />
                                 <OrderReady order={order} />
-                                <OrderTaken order={order} />
-                                <OrderDelivered order={order} />
                             </ButtonGroup>
                             <ButtonGroup>
                                 <InitializeCancel order={order} />

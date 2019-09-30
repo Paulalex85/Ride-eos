@@ -76,7 +76,7 @@ class ReadQRCode extends Component {
                                 delay={300}
                                 onError={this.handleError}
                                 onScan={this.handleScan}
-                                style={{ width: '100%' }}
+                                style={{ width: '50%' }}
                                 legacyMode
                             />
                         </Col>
@@ -88,7 +88,7 @@ class ReadQRCode extends Component {
                     delay={300}
                     onError={this.handleError}
                     onScan={this.handleScan}
-                    style={{ width: '100%' }}
+                    style={{ width: '50%' }}
                 />
         }
 
