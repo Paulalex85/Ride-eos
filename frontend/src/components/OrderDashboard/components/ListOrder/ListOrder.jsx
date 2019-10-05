@@ -20,8 +20,17 @@ class ListOrder extends Component {
         const { setListOrders, scatter: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
-        return ApiService.getOrderByBuyer(accountScatter).then(list => {
-            setListOrders({ listOrders: list, account: accountScatter.name });
+        return ApiService.getOrderByBuyer(accountScatter).then(listBuyer => {
+            ApiService.getOrderBySeller(accountScatter).then(listSeller => {
+                ApiService.getOrderByDeliver(accountScatter).then(listDeliver => {
+                    let rows = listBuyer.rows.concat(listSeller.rows)
+                    rows = rows.concat(listDeliver.rows)
+                    let list = {
+                        rows: rows
+                    }
+                    setListOrders({ listOrders: list, account: accountScatter.name });
+                })
+            })
         }).catch((err) => { console.error(err) });
     }
 
@@ -36,7 +45,7 @@ class ListOrder extends Component {
         ))
 
         return (
-            <ListGroup className="align-items-center">
+            <ListGroup className="align-items-center" >
                 {Orders}
             </ListGroup>
         )

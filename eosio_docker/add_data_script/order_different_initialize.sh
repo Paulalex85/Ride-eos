@@ -22,6 +22,21 @@ hashSeller=$(echo -n $keySeller | sha256sum -b | awk '{print $1}')
 cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0]' -p tester
 sleep 1
 
+cleos push action rideos initialize '["sarabrown", "tester", "rider","50.0000 SYS", "20.0000 SYS","sara 1",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "rider", "tester","50.0000 SYS", "20.0000 SYS","sara 2",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "tester", "rider","50.0000 SYS", "20.0000 SYS","sara 3",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "seller", "tester","50.0000 SYS", "20.0000 SYS","sara 4",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "seller", "rider","50.0000 SYS", "20.0000 SYS","sara 5",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "seller", "tester","50.0000 SYS", "20.0000 SYS","sara 4",0]' -p sarabrown
+sleep 1
+cleos push action rideos initialize '["sarabrown", "seller", "rider","50.0000 SYS", "20.0000 SYS","sara 5",0]' -p sarabrown
+sleep 1
+
 cleos push action rideos initialize '["tester", "seller", "rider","50.0000 SYS", "20.0000 SYS","order 2",0]' -p tester
 cleos push action rideos validatebuy '["1", "'$hashTester'"]' -p tester
 cleos push action rideos validatedeli '["1"]' -p rider
