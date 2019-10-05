@@ -7,7 +7,6 @@ import ScatterEOS from 'scatterjs-plugin-eosjs2';
 import { Nav } from 'react-bootstrap';
 
 import { ScatterAction } from 'actions';
-import { ApiServiceScatter } from 'services';
 import { PopupNoScatter } from './components'
 
 class Scatter extends Component {
@@ -44,9 +43,7 @@ class Scatter extends Component {
             const requiredFields = { accounts: [network] };
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-                ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, ScatterJS.scatter).then(() => {
-                    setScatter({ scatter: ScatterJS.scatter });
-                });
+                setScatter({ scatter: ScatterJS.scatter });
             });
         }).catch(error => {
             console.error(error);
