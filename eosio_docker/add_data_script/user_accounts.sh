@@ -5,8 +5,6 @@ cleos push action eosio.token issue '["eosio","500000.0000 SYS","issue half"]' -
 cleos transfer eosio tester "5000.0000 SYS"
 cleos transfer eosio seller "500.0000 SYS"
 cleos transfer eosio sarabrown "500.0000 SYS"
-# cleos push action eosio.token issue '{"to":"seller","quantity":"500.0000 SYS","memo":""}' -p eosio.token
-# cleos push action eosio.token issue '{"to":"sarabrown","quantity":"500.0000 SYS","memo":""}' -p eosio.token
 
 cleos set account permission rideos active '{"threshold": 1,"keys": [{"key": "EOS8BCgapgYA2L4LJfCzekzeSr3rzgSTUXRXwNi8bNRoz31D14en9","weight": 1}],"accounts": [{"permission":{"actor":"rideos","permission":"eosio.code"},"weight":1}]}' owner -p rideos
 

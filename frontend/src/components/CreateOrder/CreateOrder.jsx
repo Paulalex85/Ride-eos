@@ -32,7 +32,7 @@ class CreateOrder extends Component {
     }
 
     handleSubmit = () => {
-        const { history, scatter: { scatter } } = this.props;
+        const { history, user: { scatter } } = this.props;
 
         ApiServiceScatter.initializeOrder({
             buyer: this.state.buyer,

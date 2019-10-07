@@ -43,7 +43,9 @@ class ApiService {
       account,
       symbol,
     });
-    console.log(result)
+    if (result[0] === undefined) {
+      return "0.0000 SYS"
+    }
     return result[0];
   }
 

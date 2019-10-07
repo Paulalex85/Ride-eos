@@ -18,7 +18,7 @@ class AccountInfo extends Component {
 
     handleCheckBox = (event) => {
         if (event.target.checked === true) {
-            const { scatter: { scatter } } = this.props;
+            const { user: { scatter } } = this.props;
             const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
             this.setState({
                 account: accountScatter.name,

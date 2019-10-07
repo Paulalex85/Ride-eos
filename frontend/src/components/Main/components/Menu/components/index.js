@@ -3,5 +3,5 @@ import Scatter from './Scatter'
 
 export {
     ButtonLogged,
-    Scatter
+    Scatter,
 }

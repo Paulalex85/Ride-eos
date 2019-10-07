@@ -8,7 +8,7 @@ import {
 import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs2';
 
-import { ScatterAction } from 'actions';
+import { UserAction } from 'actions';
 
 import OrderDashboard from '../OrderDashboard';
 import KeyGenerator from '../KeyGenerator';
@@ -24,7 +24,7 @@ class Main extends Component {
     }
 
     getCurrentUser() {
-        const { setScatter, scatter: { scatter } } = this.props;
+        const { setScatter, user: { scatter } } = this.props;
 
         const network = ScatterJS.Network.fromJson({
             blockchain: 'eos',
@@ -50,7 +50,7 @@ class Main extends Component {
     }
 
     render() {
-        const { scatter: { scatter } } = this.props;
+        const { user: { scatter } } = this.props;
 
         return (
             <BrowserRouter>
@@ -74,7 +74,7 @@ class Main extends Component {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
-    setScatter: ScatterAction.setScatter,
+    setScatter: UserAction.setScatter,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Main);

@@ -7,7 +7,7 @@ import { Navbar } from 'react-bootstrap'
 class Menu extends Component {
 
     render() {
-        const { scatter: { scatter } } = this.props;
+        const { user: { scatter } } = this.props;
 
         return (
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -17,10 +17,11 @@ class Menu extends Component {
                     </Navbar.Brand>
                 </LinkContainer>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-                <Navbar.Collapse id="responsive-navbar-nav">
+                <Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
                     {
                         scatter ?
-                            (<ButtonLogged />) :
+                            (<ButtonLogged />)
+                            :
                             (<Scatter />)
                     }
                 </Navbar.Collapse>

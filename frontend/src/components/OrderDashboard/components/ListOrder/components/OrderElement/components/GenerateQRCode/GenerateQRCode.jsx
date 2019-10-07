@@ -34,7 +34,7 @@ class GenerateQRCode extends Component {
     }
 
     getKeyOfOrder = async () => {
-        const { order, order: { state, orderKey, currentActor, takeverification, deliveryverification }, scatter: { scatter } } = this.props;
+        const { order, order: { state, orderKey, currentActor, takeverification, deliveryverification }, user: { scatter } } = this.props;
         if (this.needToGenerate(state, currentActor)) {
             let localStorageKey = KeyGenerator.getKey(orderKey, currentActor)
             let found = false;

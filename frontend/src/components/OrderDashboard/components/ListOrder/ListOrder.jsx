@@ -17,7 +17,7 @@ class ListOrder extends Component {
     }
 
     loadOrders() {
-        const { setListOrders, scatter: { scatter } } = this.props;
+        const { setListOrders, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         return ApiService.getOrderByBuyer(accountScatter).then(listBuyer => {

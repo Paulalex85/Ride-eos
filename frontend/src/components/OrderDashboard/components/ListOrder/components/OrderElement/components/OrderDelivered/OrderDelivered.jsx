@@ -35,7 +35,7 @@ class OrderDelivered extends Component {
 
         const { key } = this.state;
 
-        const { setOrder, order: { orderKey }, orders: { listOrders }, scatter: { scatter } } = this.props;
+        const { setOrder, order: { orderKey }, orders: { listOrders }, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.orderDelivered(orderKey, key, scatter).then(() => {

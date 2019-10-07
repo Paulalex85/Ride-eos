@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 import OrderReducer from './OrderReducer';
-import ScatterReducer from './ScatterReducer';
+import UserReducer from './UserReducer';
 
 export default combineReducers({
   orders: OrderReducer,
-  scatter: ScatterReducer,
+  user: UserReducer,
 })

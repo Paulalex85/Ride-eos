@@ -3,7 +3,7 @@ import { withRouter } from "react-router";
 import { connect } from 'react-redux';
 import { LinkContainer } from "react-router-bootstrap";
 // Components
-import { ScatterAction } from 'actions';
+import { UserAction } from 'actions';
 
 import { Nav } from 'react-bootstrap';
 
@@ -15,7 +15,7 @@ class Logout extends Component {
     }
 
     handleClick() {
-        const { history, setScatter, scatter: { scatter } } = this.props;
+        const { history, setScatter, user: { scatter } } = this.props;
 
         scatter.forgetIdentity();
         setScatter({ scatter: undefined });
@@ -36,7 +36,7 @@ class Logout extends Component {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
-    setScatter: ScatterAction.setScatter,
+    setScatter: UserAction.setScatter,
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Logout));

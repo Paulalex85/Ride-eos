@@ -16,7 +16,7 @@ class DeleteOrder extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { order: { orderKey }, setListOrders, scatter: { scatter } } = this.props;
+        const { order: { orderKey }, setListOrders, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.deleteOrder(orderKey, scatter).then(() => {

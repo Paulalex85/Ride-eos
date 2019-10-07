@@ -11,7 +11,7 @@ class ValidateOrder extends Component {
     handleClick = (event) => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, orders: { listOrders }, scatter: { scatter } } = this.props;
+        const { order: { orderKey }, setOrder, orders: { listOrders }, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         this.validateAPI().then(() => {
@@ -22,7 +22,7 @@ class ValidateOrder extends Component {
     }
 
     validateAPI = async () => {
-        const { order, order: { currentActor, orderKey }, scatter: { scatter } } = this.props;
+        const { order, order: { currentActor, orderKey }, user: { scatter } } = this.props;
 
         if (currentActor === "deliver") {
             await ApiServiceScatter.validateDeliver(orderKey, scatter)

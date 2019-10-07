@@ -1,7 +1,7 @@
 import OrderAction from './OrderAction';
-import ScatterAction from './ScatterAction'
+import UserAction from './UserAction'
 
 export {
   OrderAction,
-  ScatterAction,
+  UserAction,
 }
