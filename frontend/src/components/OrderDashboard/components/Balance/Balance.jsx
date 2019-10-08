@@ -27,7 +27,7 @@ class Balance extends Component {
 
         const { user: { balance } } = this.props;
         return (
-            <Row className="justify-content-md-center mt-4 mb-5">
+            <Row className="justify-content-md-center mt-1 mb-5">
                 <Col className="col-md-auto">
                     <h5>Balance : {balance}</h5>
                 </Col>
