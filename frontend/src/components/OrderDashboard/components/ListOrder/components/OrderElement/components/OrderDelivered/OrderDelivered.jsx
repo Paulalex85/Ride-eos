@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 
-import { OrderAction } from 'actions';
+import { OrderAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 import ReadQRCode from '../ReadQRCode';
 
@@ -35,12 +35,15 @@ class OrderDelivered extends Component {
 
         const { key } = this.state;
 
-        const { setOrder, order: { orderKey }, orders: { listOrders }, user: { scatter } } = this.props;
+        const { setOrder, setBalance, order: { orderKey }, orders: { listOrders }, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.orderDelivered(orderKey, key, scatter).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
+                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name })
+                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
+                    setBalance({ balance: balance });
+                })
             })
         }).catch((err) => { console.error(err) });
     }
@@ -93,6 +96,7 @@ const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
     setOrder: OrderAction.setOrder,
+    setBalance: UserAction.setBalance
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderDelivered);

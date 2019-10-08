@@ -7,7 +7,6 @@ import ScatterEOS from 'scatterjs-plugin-eosjs2';
 import { Nav } from 'react-bootstrap';
 
 import { UserAction } from 'actions';
-import { ApiService } from 'services'
 import { PopupNoScatter } from './components'
 
 class Scatter extends Component {
@@ -23,7 +22,7 @@ class Scatter extends Component {
     }
 
     handleClick() {
-        const { setScatter, setBalance } = this.props;
+        const { setScatter } = this.props;
 
         const network = ScatterJS.Network.fromJson({
             blockchain: 'eos',
@@ -44,11 +43,7 @@ class Scatter extends Component {
             const requiredFields = { accounts: [network] };
 
             ScatterJS.scatter.getIdentity(requiredFields).then(() => {
-                const accountScatter = ScatterJS.scatter.identity.accounts.find(x => x.blockchain === 'eos');
-                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
-                    setScatter({ scatter: ScatterJS.scatter });
-                    setBalance({ balance: balance });
-                })
+                setScatter({ scatter: ScatterJS.scatter });
             });
         }).catch(error => {
             console.error(error);
@@ -74,8 +69,7 @@ class Scatter extends Component {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
-    setScatter: UserAction.setScatter,
-    setBalance: UserAction.setBalance
+    setScatter: UserAction.setScatter
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Scatter);

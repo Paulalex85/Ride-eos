@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { Button } from 'react-bootstrap'
 
-import { OrderAction } from 'actions';
+import { OrderAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 
 class InitializeCancel extends Component {
@@ -16,12 +16,15 @@ class InitializeCancel extends Component {
     handleClick(event) {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, orders: { listOrders }, user: { scatter } } = this.props;
+        const { order: { orderKey }, setOrder, setBalance, orders: { listOrders }, user: { scatter } } = this.props;
         const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.initCancel(orderKey, scatter).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
+                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name })
+                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
+                    setBalance({ balance: balance });
+                })
             })
         }).catch((err) => { console.error(err) });
     }
@@ -58,6 +61,7 @@ const mapStateToProps = state => state;
 // Map the following action to props
 const mapDispatchToProps = {
     setOrder: OrderAction.setOrder,
+    setBalance: UserAction.setBalance
 };
 
 // Export a redux connected component

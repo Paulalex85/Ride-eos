@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 // Components
 import { Button } from 'react-bootstrap'
 // Services and redux action
-import { OrderAction } from 'actions';
+import { OrderAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter, KeyGenerator } from 'services';
 
 class ValidateOrder extends Component {
@@ -22,7 +22,7 @@ class ValidateOrder extends Component {
     }
 
     validateAPI = async () => {
-        const { order, order: { currentActor, orderKey }, user: { scatter } } = this.props;
+        const { order, order: { currentActor, orderKey }, user: { scatter }, setBalance } = this.props;
 
         if (currentActor === "deliver") {
             await ApiServiceScatter.validateDeliver(orderKey, scatter)
@@ -36,9 +36,15 @@ class ValidateOrder extends Component {
 
         } else if (currentActor === "buyer") {
             let keyObject = await KeyGenerator.createKeyForDelivery(order, scatter)
+            const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
             KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, "buyer");
             await ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
-            await ApiServiceScatter.validateBuyer(orderKey, keyObject.hash, scatter).catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateBuyer(orderKey, keyObject.hash, scatter).then(() => {
+                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
+                    setBalance({ balance: balance });
+                })
+            }).catch((err) => { console.error(err) });
         }
     }
 
@@ -92,6 +98,7 @@ const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
     setOrder: OrderAction.setOrder,
+    setBalance: UserAction.setBalance
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ValidateOrder);
