@@ -6,10 +6,13 @@ const RIDEOS_PATH = '/opt/eosio/bin/compiled_contracts/rideos/rideos';
 const TOKEN_PATH = "/opt/eosio/bin/contracts/eosio.contracts/contracts/eosio.token/src/eosio.token"
 
 const TOTAL_SUPPLY = '1000000000.0000 SYS';
+const DEV_RATE = 0.05;
+const CURRENCY_SYMBOL = 'SYS'
+const DEV_ACCOUNT_NAME = "sarabrown"
 
 let rideosContract;
 let tokenContract;
-let buyer, seller, deliver;
+let buyer, seller, deliver, devAccount;
 let rideosAccount, eosiotokenAccount;
 
 function generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, priceOrder, priceDeliver, details) {
@@ -22,6 +25,13 @@ function generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, p
         + ",priceOrder:" + priceOrder
         + ",priceDeliver:" + priceDeliver
         + ",details:" + details;
+}
+
+function assetToAmount(asset) {
+    if (asset !== undefined && asset.length > 0) {
+        return parseFloat(asset.split(" ")[0]);
+    }
+    return 0;
 }
 
 function chunk(str, n) {
@@ -150,8 +160,27 @@ async function orderTaken(orderKey, key, account) {
 }
 
 async function orderDelive(orderKey, key, account) {
+    let balanceSeller = await seller.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    let balanceDeliver = await deliver.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    let balanceDev = await devAccount.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    balanceSeller = assetToAmount(balanceSeller[0])
+    balanceDeliver = assetToAmount(balanceDeliver[0])
+    balanceDev = assetToAmount(balanceDev[0])
+
     await rideosContract.orderdelive(orderKey, key, { from: account });
     let order = await getOrder(orderKey)
+
+    let balanceDevAfter = await devAccount.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    balanceDevAfter = assetToAmount(balanceDevAfter[0])
+    let devAmount = (assetToAmount(order.priceOrder) + assetToAmount(order.priceDeliver)) * DEV_RATE
+    assert.strictEqual((balanceDevAfter - balanceDev).toString(), devAmount.toFixed(2).toString(), "The balance of the dev account is not ok");
+
+    let balanceSellerAfter = await seller.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    assert.strictEqual(balanceSeller + (assetToAmount(order.priceOrder) * (1 - DEV_RATE)), assetToAmount(balanceSellerAfter[0]), "The balance of the seller account is not ok");
+
+    let balanceDeliverAfter = await deliver.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    assert.strictEqual(balanceDeliver + (assetToAmount(order.priceDeliver) * (1 - DEV_RATE)), assetToAmount(balanceDeliverAfter[0]), "The balance of the deliver account is not ok");
+
     assert.strictEqual(order.state, 5, "The state should be 5");
     return order;
 }
@@ -183,6 +212,7 @@ describe('Rideos contract', function () {
     before(async () => {
         rideosAccount = eoslime.Account.load('rideos', '5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr');
         eosiotokenAccount = eoslime.Account.load('eosio.token', '5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw');
+        devAccount = eoslime.Account.load(DEV_ACCOUNT_NAME, '5KE2UNPCZX5QepKcLpLXVCLdAw7dBfJFJnuCHhXUf61hPRMtUZg');
 
         tokenContract = eoslime.Contract(TOKEN_PATH + ".abi", "eosio.token", eosiotokenAccount);
         rideosContract = eoslime.Contract(RIDEOS_PATH + ".abi", "rideos", rideosAccount);
@@ -193,12 +223,14 @@ describe('Rideos contract', function () {
     });
 
     beforeEach(async () => {
-        let accounts = await eoslime.Account.createRandoms(3);
+        let accounts = await eoslime.Account.createRandoms(4);
         buyer = accounts[0];
         seller = accounts[1];
         deliver = accounts[2];
 
         await tokenContract.transfer(tokenContract.executor.name, buyer.name, "10000.0000 SYS", "memo", { from: tokenContract.executor });
+        await tokenContract.transfer(tokenContract.executor.name, seller.name, "10.0000 SYS", "memo", { from: tokenContract.executor });
+        await tokenContract.transfer(tokenContract.executor.name, deliver.name, "10.0000 SYS", "memo", { from: tokenContract.executor });
 
         await buyer.addPermission('active', rideosContract.executor.name);
     });
