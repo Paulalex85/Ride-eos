@@ -26,7 +26,7 @@ public:
 
     void withdraw(const name account, const asset &quantity);
 
-    ACTION initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
+    ACTION initialize(const name sender, const name buyer, const name seller, const name deliver, const asset &priceOrder, const asset &priceDeliver, const string &details, const uint64_t delay);
 
     ACTION validatebuy(const uint64_t orderKey, const checksum256 &hash);
 

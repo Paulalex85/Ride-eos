@@ -55,9 +55,13 @@ void rideos::withdraw(const name account, const asset &quantity)
         .send();
 }
 
-void rideos::initialize(const name buyer, const name seller, const name deliver, const asset &priceOrder,
+void rideos::initialize(const name sender, const name buyer, const name seller, const name deliver, const asset &priceOrder,
                         const asset &priceDeliver, const string &details, const uint64_t delay)
 {
+    require_auth(sender);
+
+    check(is_actor(sender, buyer, seller, deliver), "The sender is not in the parameters");
+
     check(priceOrder.symbol == eosio::symbol("SYS", 4), "only core token allowed");
     check(priceOrder.is_valid(), "invalid bet");
     check(priceOrder.amount > 0, "must bet positive quantity");
@@ -66,7 +70,7 @@ void rideos::initialize(const name buyer, const name seller, const name deliver,
     check(priceDeliver.is_valid(), "invalid bet");
     check(priceDeliver.amount > 0, "must bet positive quantity");
 
-    _orders.emplace(_self, [&](auto &order) {
+    _orders.emplace(buyer, [&](auto &order) {
         order.orderKey = _orders.available_primary_key();
         order.buyer = buyer;
         order.seller = seller;
@@ -96,7 +100,7 @@ void rideos::validatebuy(const uint64_t orderKey, const checksum256 &hash)
 
     deposit(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto &order) {
         order.validateBuyer = true;
         order.deliveryverification = hash;
 
@@ -118,7 +122,7 @@ void rideos::validatedeli(const uint64_t orderKey)
 
     check(iteratorOrder->validateDeliver == false, "Deliver already validate");
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto &order) {
         order.validateDeliver = true;
 
         if (iteratorOrder->validateSeller && iteratorOrder->validateBuyer)
@@ -139,7 +143,7 @@ void rideos::validatesell(const uint64_t orderKey, const checksum256 &hash)
 
     check(iteratorOrder->validateSeller == false, "Seller already validate");
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto &order) {
         order.validateSeller = true;
         order.takeverification = hash;
 
@@ -159,7 +163,7 @@ void rideos::orderready(const uint64_t orderKey)
 
     check(iteratorOrder->state == ORDER_VALIDATE, "The order is not in the state of product ready");
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->seller, [&](auto &order) {
         order.state = ORDER_PREPARED;
     });
 }
@@ -175,7 +179,7 @@ void rideos::ordertaken(const uint64_t orderKey, const string &source)
 
     check(iteratorOrder->state == ORDER_PREPARED, "The order is not in the state of waiting deliver");
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto &order) {
         order.state = ORDER_TAKED;
     });
 }
@@ -191,7 +195,7 @@ void rideos::orderdelive(const uint64_t orderKey, const string &source)
 
     check(iteratorOrder->state == ORDER_TAKED, "The order is not in the state delivery");
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->deliver, [&](auto &order) {
         order.state = ORDER_DELIVERED;
     });
 
@@ -222,7 +226,7 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
         withdraw(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
     }
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, account, [&](auto &order) {
         order.state = INIT_CANCEL;
     });
 }
@@ -241,7 +245,7 @@ void rideos::delaycancel(const uint64_t orderKey)
 
     withdraw(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
-    _orders.modify(iteratorOrder, _self, [&](auto &order) {
+    _orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto &order) {
         order.state = ORDER_CANCEL;
     });
 }

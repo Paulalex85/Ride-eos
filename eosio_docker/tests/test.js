@@ -91,7 +91,9 @@ async function getOrder(key) {
 }
 
 async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", priceDeliver = "2.0000 SYS", orderDetail = "order", dateDelay = 555) {
-    await rideosContract.initialize(buyer.name,
+    await rideosContract.initialize(
+        buyer.name,
+        buyer.name,
         seller.name,
         deliver.name,
         priceOrder,

@@ -43,9 +43,9 @@ async function send(actionName, actionData, contractDestination, scatter) {
                 data: actionData,
             }],
         }, {
-                blocksBehind: 3,
-                expireSeconds: 30,
-            });
+            blocksBehind: 3,
+            expireSeconds: 30,
+        });
         return result;
     } catch (e) {
         console.log(actionName)
@@ -63,9 +63,8 @@ class ApiServiceScatter {
     }
 
     //ORDERS
-
-    static initializeOrder({ buyer, seller, deliver, priceOrder, priceDeliver, details, delay }, scatter) {
-        return send("initialize", { buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static initializeOrder({ sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay }, scatter) {
+        return send("initialize", { sender: sender, buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
     }
 
     static validateBuyer(orderKey, hash, scatter) {

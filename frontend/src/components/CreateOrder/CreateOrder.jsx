@@ -33,8 +33,10 @@ class CreateOrder extends Component {
 
     handleSubmit = () => {
         const { history, user: { scatter } } = this.props;
+        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
 
         ApiServiceScatter.initializeOrder({
+            sender: accountScatter.name,
             buyer: this.state.buyer,
             seller: this.state.seller,
             deliver: this.state.deliver,
