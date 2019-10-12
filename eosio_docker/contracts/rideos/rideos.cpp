@@ -231,12 +231,14 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
     });
 }
 
-void rideos::delaycancel(const uint64_t orderKey)
+void rideos::delaycancel(const uint64_t orderKey, const name sender)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
 
-    require_auth(iteratorOrder->buyer);
+    require_auth(sender);
+
+    check(is_actor(sender, iteratorOrder->buyer, iteratorOrder->seller, iteratorOrder->deliver), "The sender is not an actor");
 
     check(iteratorOrder->state > INITIALIZATION, "The order is in the state of initialization");
     check(iteratorOrder->state < ORDER_DELIVERED, "The order is finish");
@@ -245,7 +247,7 @@ void rideos::delaycancel(const uint64_t orderKey)
 
     withdraw(iteratorOrder->buyer, iteratorOrder->priceOrder + iteratorOrder->priceDeliver);
 
-    _orders.modify(iteratorOrder, iteratorOrder->buyer, [&](auto &order) {
+    _orders.modify(iteratorOrder, sender, [&](auto &order) {
         order.state = ORDER_CANCEL;
     });
 }

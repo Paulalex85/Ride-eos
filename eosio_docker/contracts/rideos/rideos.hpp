@@ -42,7 +42,7 @@ public:
 
     ACTION initcancel(const uint64_t orderKey, const name account);
 
-    ACTION delaycancel(const uint64_t orderKey);
+    ACTION delaycancel(const uint64_t orderKey, const name sender);
 
     ACTION deleteorder(const uint64_t orderKey);
 

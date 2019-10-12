@@ -195,7 +195,7 @@ async function initializeCancel(orderKey, account) {
 }
 
 async function delayCancel(orderKey, account) {
-    await rideosContract.delaycancel(orderKey, { from: account });
+    await rideosContract.delaycancel(orderKey, account.name, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 98, "The state should be 98");
     return order;
@@ -289,7 +289,7 @@ describe('Rideos contract', function () {
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
 
-        order = await delayCancel(order.orderKey, buyer);
+        order = await delayCancel(order.orderKey, deliver);
         await deleteOrder(order.orderKey)
     });
 
@@ -313,7 +313,7 @@ describe('Rideos contract', function () {
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
 
-        order = await delayCancel(order.orderKey, buyer);
+        order = await delayCancel(order.orderKey, seller);
         await deleteOrder(order.orderKey)
     });
 

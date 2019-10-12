@@ -33,10 +33,10 @@ class DelayCancel extends Component {
 
         let isPrint = false;
 
-        const { order: { state, currentActor, date } } = this.props;
+        const { order: { state, date } } = this.props;
 
         if (state === "2" || state === "3" || state === "4") {
-            if (currentActor === "buyer" && new Date(date).getTime() < Date.now()) {
+            if (new Date(date).getTime() < Date.now()) {
                 isPrint = true;
             }
         }
