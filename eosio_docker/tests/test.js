@@ -90,6 +90,11 @@ async function getOrder(key) {
     return result.rows[0]
 }
 
+async function getBalanceOfAccount(account) {
+    let balanceAccount = await account.getBalance(CURRENCY_SYMBOL, tokenContract.name);
+    return assetToAmount(balanceAccount[0])
+}
+
 async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", priceDeliver = "2.0000 SYS", orderDetail = "order", dateDelay = 555) {
     await rideosContract.initialize(
         buyer.name,
@@ -134,8 +139,13 @@ async function validateDeliver(order) {
 }
 
 async function validateBuyer(order, keyBuyer) {
+    let balanceBuyer = await getBalanceOfAccount(buyer)
+
     await rideosContract.validatebuy(order.orderKey, keyBuyer.hash, { from: buyer });
     order = await getOrder(order.orderKey);
+
+    let balanceBuyerAfter = await getBalanceOfAccount(buyer)
+    assert.strictEqual(balanceBuyerAfter, balanceBuyer - (assetToAmount(order.priceOrder) + assetToAmount(order.priceDeliver)), "The balance of the buyer account is not ok");
     assert.strictEqual(order.validateBuyer, 1, "Validate buyer should be 1");
     return order;
 }
@@ -162,26 +172,22 @@ async function orderTaken(orderKey, key, account) {
 }
 
 async function orderDelive(orderKey, key, account) {
-    let balanceSeller = await seller.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    let balanceDeliver = await deliver.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    let balanceDev = await devAccount.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    balanceSeller = assetToAmount(balanceSeller[0])
-    balanceDeliver = assetToAmount(balanceDeliver[0])
-    balanceDev = assetToAmount(balanceDev[0])
+    let balanceSeller = await getBalanceOfAccount(seller)
+    let balanceDeliver = await getBalanceOfAccount(deliver)
+    let balanceDev = await getBalanceOfAccount(devAccount)
 
     await rideosContract.orderdelive(orderKey, key, { from: account });
     let order = await getOrder(orderKey)
 
-    let balanceDevAfter = await devAccount.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    balanceDevAfter = assetToAmount(balanceDevAfter[0])
+    let balanceDevAfter = await getBalanceOfAccount(devAccount)
     let devAmount = (assetToAmount(order.priceOrder) + assetToAmount(order.priceDeliver)) * DEV_RATE
     assert.strictEqual((balanceDevAfter - balanceDev).toString(), devAmount.toFixed(2).toString(), "The balance of the dev account is not ok");
 
-    let balanceSellerAfter = await seller.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    assert.strictEqual(balanceSeller + (assetToAmount(order.priceOrder) * (1 - DEV_RATE)), assetToAmount(balanceSellerAfter[0]), "The balance of the seller account is not ok");
+    let balanceSellerAfter = await getBalanceOfAccount(seller)
+    assert.strictEqual(balanceSeller + (assetToAmount(order.priceOrder) * (1 - DEV_RATE)), balanceSellerAfter, "The balance of the seller account is not ok");
 
-    let balanceDeliverAfter = await deliver.getBalance(CURRENCY_SYMBOL, tokenContract.name);
-    assert.strictEqual(balanceDeliver + (assetToAmount(order.priceDeliver) * (1 - DEV_RATE)), assetToAmount(balanceDeliverAfter[0]), "The balance of the deliver account is not ok");
+    let balanceDeliverAfter = await getBalanceOfAccount(deliver)
+    assert.strictEqual(balanceDeliver + (assetToAmount(order.priceDeliver) * (1 - DEV_RATE)), balanceDeliverAfter, "The balance of the deliver account is not ok");
 
     assert.strictEqual(order.state, 5, "The state should be 5");
     return order;
@@ -235,6 +241,25 @@ describe('Rideos contract', function () {
         await tokenContract.transfer(tokenContract.executor.name, deliver.name, "10.0000 SYS", "memo", { from: tokenContract.executor });
 
         await buyer.addPermission('active', rideosContract.executor.name);
+    });
+
+    it('Withdraw method is not possible ', async () => {
+        await tokenContract.transfer(buyer.name, rideosContract.executor.name, "100.0000 SYS", "memo", { from: buyer });
+        try {
+            await rideosContract.withdraw(buyer.name, "10.0000 SYS", { from: buyer })
+        } catch (error) {
+            assert.ok(error instanceof TypeError)
+            assert.equal(error.message, 'rideosContract.withdraw is not a function');
+        }
+    });
+
+    it('Deposit method is not possible ', async () => {
+        try {
+            await rideosContract.deposit(buyer.name, "10.0000 SYS", { from: buyer })
+        } catch (error) {
+            assert.ok(error instanceof TypeError)
+            assert.equal(error.message, 'rideosContract.deposit is not a function');
+        }
     });
 
     it('Create a new order, cancel and delete', async () => {

@@ -201,7 +201,6 @@ void rideos::orderdelive(const uint64_t orderKey, const string &source)
 
     asset sellerTax = asset{(int64_t)(iteratorOrder->priceOrder.amount * DEV_RATE), iteratorOrder->priceOrder.symbol};
     asset deliverTax = asset{(int64_t)(iteratorOrder->priceDeliver.amount * DEV_RATE), iteratorOrder->priceDeliver.symbol};
-    eosio::print(sellerTax);
 
     withdraw(iteratorOrder->seller, iteratorOrder->priceOrder - sellerTax);
     withdraw(iteratorOrder->deliver, iteratorOrder->priceDeliver - deliverTax);
