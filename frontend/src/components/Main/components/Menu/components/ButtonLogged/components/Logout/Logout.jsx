@@ -1,38 +1,29 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router";
-import { connect } from 'react-redux';
-import { LinkContainer } from "react-router-bootstrap";
+import React, {Component} from "react";
+import {withRouter} from "react-router";
+import {connect} from 'react-redux';
+import {LinkContainer} from "react-router-bootstrap";
 // Components
-import { UserAction } from 'actions';
+import {UserAction} from 'actions';
 
-import { Nav } from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
+import {UALContext} from "ual-reactjs-renderer";
 
 class Logout extends Component {
-    constructor(props) {
-        super(props);
-
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        const { history, setScatter, user: { scatter } } = this.props;
-
-        scatter.forgetIdentity();
-        setScatter({ scatter: undefined });
-
-        history.push("/");
-    }
-
+    static contextType = UALContext;
     render() {
+        const { logout } = this.context;
         return (
             <LinkContainer to="/">
-                <Nav.Link onClick={this.handleClick}>
+                <Button
+                    variant="outline-primary"
+                    onClick={logout}>
                     Logout
-                </Nav.Link>
+                </Button>
             </LinkContainer>
         )
     }
 }
+
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {

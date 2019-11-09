@@ -1,68 +1,63 @@
-import React, { Component } from "react";
-import { connect } from 'react-redux';
-import {
-    Route,
-    BrowserRouter
-} from "react-router-dom";
-
-import ScatterJS from 'scatterjs-core';
-import ScatterEOS from 'scatterjs-plugin-eosjs2';
-
-import { UserAction } from 'actions';
-
-import OrderDashboard from '../OrderDashboard';
+import React, {Component} from "react";
+import {BrowserRouter, Route} from "react-router-dom";
+import {UALContext, withUAL} from 'ual-reactjs-renderer'
 import KeyGenerator from '../KeyGenerator';
-import CreateOrder from '../CreateOrder'
-import { Menu } from './components';
+import OrderDashboard from "../OrderDashboard";
+import CreateOrder from "../CreateOrder/CreateOrder";
+import {Menu} from './components';
+import {connect} from "react-redux";
+import {UserAction} from "actions";
 
 
 class Main extends Component {
-    constructor(props) {
-        super(props);
+    static contextType = UALContext;
 
-        this.getCurrentUser();
+    async componentDidUpdate(prevProps) {
+        // Via withUAL() below, access to the error object is now available
+        // This error object will be set in the event of an error during any UAL execution
+        const {ual: {error}} = this.props
+        const {ual: {error: prevError}} = prevProps
+        if (error && (prevError ? error.message !== prevError.message : true)) {
+            // UAL modal will display the error message to the user, so no need to render this error in the app
+            console.error('UAL Error', JSON.parse(JSON.stringify(error)))
+        }
     }
 
-    getCurrentUser() {
-        const { setScatter, user: { scatter } } = this.props;
+    // async componentDidMount() {
+    //     const {activeUser, logout} = this.context;
+    //     if (activeUser) {
+    //         let name = activeUser.getAccountName();
+    //         if (name === null || name === undefined || name === "") {
+    //             logout()
+    //         }
+    //     }
+    // }
 
-        const network = ScatterJS.Network.fromJson({
-            blockchain: 'eos',
-            host: '127.0.0.1',
-            port: 8888,
-            protocol: 'http',
-            chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
-        });
-
-        ScatterJS.plugins(new ScatterEOS());
-
-        if (scatter !== undefined) {
-            console.log("scatter ok")
-        }
-        else {
-            ScatterJS.connect('Rideos', { network }).then(connected => {
-                if (connected) {
-                    console.log("connected")
-                    setScatter({ scatter: ScatterJS.scatter });
-                }
-            });
+    displayLoginModal = (display) => {
+        // Via withUAL() below, access to the showModal & hideModal functions are now available
+        const {ual: {showModal, hideModal}} = this.props;
+        if (display) {
+            showModal()
+        } else {
+            hideModal()
         }
     }
 
     render() {
-        const { user: { scatter } } = this.props;
+        const login = () => this.displayLoginModal(true);
+        const {activeUser} = this.context;
 
         return (
             <BrowserRouter>
                 <div>
-                    <Menu />
-                    <div >
-                        <Route exact path="/" component={KeyGenerator} />
-                        {scatter &&
-                            <div>
-                                <Route path="/orders" component={OrderDashboard} />
-                                <Route path="/create" component={CreateOrder} />
-                            </div>
+                    <Menu login={login}/>
+                    <div>
+                        <Route exact path="/" component={KeyGenerator}/>
+                        {activeUser &&
+                        <div>
+                            <Route path="/orders" component={OrderDashboard}/>
+                            <Route path="/create" component={CreateOrder}/>
+                        </div>
                         }
                     </div>
                 </div>
@@ -74,7 +69,7 @@ class Main extends Component {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = {
-    setScatter: UserAction.setScatter,
+    setName: UserAction.setName
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default withUAL(connect(mapStateToProps, mapDispatchToProps)(Main));

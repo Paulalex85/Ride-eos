@@ -1,108 +1,120 @@
-import ScatterJS from 'scatterjs-core';
-import { Api, JsonRpc, RpcError } from 'eosjs';
-
-
-function getRPC() {
-    return new JsonRpc('http://127.0.0.1:8888');
-}
-
-function eosAPI(scatter) {
-    const rpc = getRPC();
-    const network = getNetwork();
-
-    return scatter.eos(network, Api, { rpc, beta3: true });
-}
-
-function getNetwork() {
-    return ScatterJS.Network.fromJson({
-        blockchain: 'eos',
-        host: '127.0.0.1',
-        port: 8888,
-        protocol: 'http',
-        chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
-    });
-}
-
-function getAccountFromScatter(scatter) {
-    return scatter.identity.accounts.find(x => x.blockchain === 'eos');
-}
-
-async function send(actionName, actionData, contractDestination, scatter) {
-
-    const eos = eosAPI(scatter);
-    const account = getAccountFromScatter(scatter);
-    try {
-        const result = await eos.transact({
-            actions: [{
-                account: contractDestination,
-                name: actionName,
-                authorization: [{
-                    actor: account.name,
-                    permission: 'active',
-                }],
-                data: actionData,
+function generateTransaction(contractDestination, actionName, actionData, accountName) {
+    return {
+        actions: [{
+            account: contractDestination,
+            name: actionName,
+            authorization: [{
+                actor: accountName,
+                permission: 'active',
             }],
-        }, {
-            blocksBehind: 3,
-            expireSeconds: 30,
-        });
-        return result;
+            data: actionData,
+        }],
+    }
+}
+
+async function send(actionName, actionData, contractDestination, activeUser) {
+
+    try {
+        const accountName = await activeUser.getAccountName();
+        const transaction = generateTransaction(contractDestination, actionName, actionData, accountName);
+        return await activeUser.signTransaction(transaction, {broadcast: true, expireSeconds: 300});
     } catch (e) {
-        console.log(actionName)
-        console.log('\nCaught exception: ' + e);
-        if (e instanceof RpcError)
-            console.log(JSON.stringify(e.json, null, 2));
+        let text = JSON.stringify(e);
+        console.error('UAL Error', JSON.parse(text));
     }
 }
 
 class ApiServiceScatter {
 
-    static updatePermission(actor, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("updateauth", { "account": account.name, "permission": "active", "parent": "owner", "auth": { "threshold": 1, "keys": [{ "key": account.publicKey, "weight": 1 }], "waits": [], "accounts": [{ "weight": 1, "permission": { "actor": actor, "permission": "active" } }] } }, "eosio", scatter);
+    static async updatePermission(actor, activeUser) {
+        const accountName = await activeUser.getAccountName();
+        const keysAccount = await activeUser.getKeys();
+        console.log(keysAccount);
+        if (!keysAccount.isEmpty) {
+            return send("updateauth", {
+                "account": accountName,
+                "permission": "active",
+                "parent": "owner",
+                "auth": {
+                    "threshold": 1,
+                    "keys": [{"key": keysAccount[0], "weight": 1}],
+                    "waits": [],
+                    "accounts": [{"weight": 1, "permission": {"actor": actor, "permission": "active"}}]
+                }
+            }, "eosio", activeUser);
+        } else {
+            return "";
+        }
     }
 
     //ORDERS
-    static initializeOrder({ sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay }, scatter) {
-        return send("initialize", { sender: sender, buyer: buyer, deliver: deliver, seller: seller, priceOrder: priceOrder, priceDeliver: priceDeliver, details: details, delay: delay }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
+        return send("initialize", {
+            sender: sender,
+            buyer: buyer,
+            deliver: deliver,
+            seller: seller,
+            priceOrder: priceOrder,
+            priceDeliver: priceDeliver,
+            details: details,
+            delay: delay
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateBuyer(orderKey, hash, scatter) {
-        return send("validatebuy", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static validateBuyer(orderKey, hash, activeUser) {
+        return send("validatebuy", {
+            orderKey: orderKey,
+            hash: hash
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateSeller(orderKey, hash, scatter) {
-        return send("validatesell", { orderKey: orderKey, hash: hash }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static validateSeller(orderKey, hash, activeUser) {
+        return send("validatesell", {
+            orderKey: orderKey,
+            hash: hash
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateDeliver(orderKey, scatter) {
-        return send("validatedeli", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static validateDeliver(orderKey, activeUser) {
+        return send("validatedeli", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderReady(orderKey, scatter) {
-        return send("orderready", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static orderReady(orderKey, activeUser) {
+        return send("orderready", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderTaken(orderKey, source, scatter) {
-        return send("ordertaken", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static orderTaken(orderKey, source, activeUser) {
+        return send("ordertaken", {
+            orderKey: orderKey,
+            source: source
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderDelivered(orderKey, source, scatter) {
-        return send("orderdelive", { orderKey: orderKey, source: source }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static orderDelivered(orderKey, source, activeUser) {
+        return send("orderdelive", {
+            orderKey: orderKey,
+            source: source
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static initCancel(orderKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("initcancel", { orderKey: orderKey, account: account.name }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static async initCancel(orderKey, activeUser) {
+        const accountName = await activeUser.getAccountName();
+        return send("initcancel", {
+            orderKey: orderKey,
+            account: accountName
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static delayCancel(orderKey, scatter) {
-        const account = getAccountFromScatter(scatter);
-        return send("delaycancel", { orderKey: orderKey, sender: account.name }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static async delayCancel(orderKey, activeUser) {
+        const accountName = await activeUser.getAccountName();
+        return send("delaycancel", {
+            orderKey: orderKey,
+            sender: accountName
+        }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static deleteOrder(orderKey, scatter) {
-        return send("deleteorder", { orderKey: orderKey }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter);
+    static deleteOrder(orderKey, activeUser) {
+        return send("deleteorder", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 }
 

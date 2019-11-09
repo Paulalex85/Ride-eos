@@ -1,19 +1,23 @@
-import React, { Component } from 'react';
-import { withRouter } from "react-router";
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {withRouter} from "react-router";
+import {connect} from 'react-redux';
 // Components
-import { Row, Col, Card, Button } from 'react-bootstrap';
+import {Button, Card, Col, Row} from 'react-bootstrap';
 
-import { ApiServiceScatter } from 'services';
+import {ApiServiceScatter} from 'services';
 
-import { AccountInfo, OrderDetails, CurrencyInput } from './components'
+import {AccountInfo, CurrencyInput, OrderDetails} from './components'
 import DelayInput from './components/DelayInput/DelayInput';
+import {UALContext} from "ual-reactjs-renderer";
 
 class CreateOrder extends Component {
+    static contextType = UALContext;
+
     constructor(props) {
         super(props);
 
         this.state = {
+            name: "",
             buyer: "",
             seller: "",
             deliver: "",
@@ -24,19 +28,28 @@ class CreateOrder extends Component {
         }
     }
 
+    async componentDidMount() {
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
+        this.setState({
+            ...this.state,
+            name: name
+        })
+    }
+
     handleChange = (value, name) => {
         this.setState({
             ...this.state,
             [name]: value
         })
-    }
+    };
 
     handleSubmit = () => {
-        const { history, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+        const {activeUser} = this.context;
+        const {history} = this.props;
 
         ApiServiceScatter.initializeOrder({
-            sender: accountScatter.name,
+            sender: this.state.name,
             buyer: this.state.buyer,
             seller: this.state.seller,
             deliver: this.state.deliver,
@@ -44,18 +57,17 @@ class CreateOrder extends Component {
             priceOrder: this.state.amountSeller,
             priceDeliver: this.state.amountDeliver,
             delay: Math.floor(this.state.delay.getTime() / 1000)
-        }, scatter).then(() => {
+        }, activeUser).then(() => {
             history.push("/orders");
         });
-
-    }
+    };
 
     render() {
 
         return (
             <Row className="justify-content-md-center mt-5">
                 <Col className="col-sm-5">
-                    <Card className="text-center" >
+                    <Card className="text-center">
                         <Card.Header>
                             Create Order
                         </Card.Header>
@@ -110,7 +122,7 @@ class CreateOrder extends Component {
                         </Card.Body>
                     </Card>
                 </Col>
-            </Row >
+            </Row>
         )
     }
 }

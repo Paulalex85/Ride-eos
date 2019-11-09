@@ -1,41 +1,39 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 // Components
-import { ListGroup } from 'react-bootstrap';
+import {ListGroup} from 'react-bootstrap';
 
-import { ApiService } from 'services'
-import { OrderAction } from 'actions'
+import {ApiService} from 'services'
+import {OrderAction} from 'actions'
 
-import { OrderElement } from './components'
+import {OrderElement} from './components'
+import {UALContext} from "ual-reactjs-renderer";
 
 class ListOrder extends Component {
-    constructor(props) {
-        // Inherit constructor
-        super(props);
-        this.loadOrders();
-    }
+    static contextType = UALContext;
 
-    loadOrders() {
-        const { setListOrders, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
-        return ApiService.getOrderByBuyer(accountScatter).then(listBuyer => {
-            ApiService.getOrderBySeller(accountScatter).then(listSeller => {
-                ApiService.getOrderByDeliver(accountScatter).then(listDeliver => {
-                    let rows = listBuyer.rows.concat(listSeller.rows)
-                    rows = rows.concat(listDeliver.rows)
+    async componentDidMount() {
+        const {activeUser} = this.context;
+        const {setListOrders} = this.props;
+        const name = await activeUser.getAccountName();
+        return ApiService.getOrderByBuyer(name).then(listBuyer => {
+            ApiService.getOrderBySeller(name).then(listSeller => {
+                ApiService.getOrderByDeliver(name).then(listDeliver => {
+                    let rows = listBuyer.rows.concat(listSeller.rows);
+                    rows = rows.concat(listDeliver.rows);
                     let list = {
                         rows: rows
-                    }
-                    setListOrders({ listOrders: list, account: accountScatter.name });
+                    };
+                    setListOrders({listOrders: list, account: name});
                 })
             })
-        }).catch((err) => { console.error(err) });
+        }).catch((err) => {
+            console.error(err)
+        });
     }
 
     render() {
-        const { orders: { listOrders } } = this.props;
+        const {orders: {listOrders}} = this.props;
 
         const Orders = listOrders.map(order => (
             <OrderElement
@@ -45,7 +43,7 @@ class ListOrder extends Component {
         ))
 
         return (
-            <ListGroup className="align-items-center" >
+            <ListGroup className="align-items-center">
                 {Orders}
             </ListGroup>
         )

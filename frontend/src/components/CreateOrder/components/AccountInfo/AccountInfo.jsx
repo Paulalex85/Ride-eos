@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 // Components
-import { Form, Col, Row } from 'react-bootstrap';
+import {Form, Col, Row} from 'react-bootstrap';
 
-import { AccountInput } from './components'
+import {AccountInput} from './components'
+import {UALContext} from "ual-reactjs-renderer";
 
 class AccountInfo extends Component {
+    static contextType = UALContext;
 
     constructor(props) {
         super(props);
@@ -16,17 +18,16 @@ class AccountInfo extends Component {
         }
     }
 
-    handleCheckBox = (event) => {
+    handleCheckBox = async (event) => {
         if (event.target.checked === true) {
-            const { user: { scatter } } = this.props;
-            const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+            const {activeUser} = this.context;
+            const name = await activeUser.getAccountName();
             this.setState({
-                account: accountScatter.name,
+                account: name,
                 disabled: true
             })
-            this.props.handleChange(accountScatter.name, this.props.actor)
-        }
-        else {
+            this.props.handleChange(name, this.props.actor)
+        } else {
             this.setState({
                 ...this.state,
                 disabled: false

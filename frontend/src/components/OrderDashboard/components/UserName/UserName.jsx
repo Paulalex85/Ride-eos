@@ -1,18 +1,29 @@
-import React, { Component } from "react";
-import { connect } from 'react-redux';
-
-import { Col, Row } from 'react-bootstrap'
+import React, {Component} from "react";
+import {connect} from 'react-redux';
+import {UserAction} from "actions";
+import {Col, Row} from 'react-bootstrap'
+import {UALContext} from 'ual-reactjs-renderer'
 
 class UserName extends Component {
+    static contextType = UALContext;
+    state = {
+        accountName: ""
+    };
+
+    async componentDidMount() {
+        const {activeUser} = this.context;
+        if (activeUser) {
+            activeUser.getAccountName().then(name => {
+                this.setState({accountName: name});
+            });
+        }
+    }
 
     render() {
-
-        const { user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
         return (
             <Row className="justify-content-md-center mt-4">
                 <Col className="col-md-auto">
-                    <h5>EOS Username : {accountScatter.name}</h5>
+                    <h5>EOS Username : {this.state.accountName}</h5>
                 </Col>
             </Row>
         )
@@ -21,4 +32,8 @@ class UserName extends Component {
 
 const mapStateToProps = state => state;
 
-export default connect(mapStateToProps)(UserName);
+const mapDispatchToProps = {
+    setName: UserAction.setName
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserName);

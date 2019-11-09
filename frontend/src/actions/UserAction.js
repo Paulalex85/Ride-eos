@@ -8,6 +8,12 @@ class UserAction {
             scatter
         }
     }
+    static setName({ name }) {
+        return {
+            type: ActionTypes.SET_NAME,
+            name
+        }
+    }
     static setBalance({ balance }) {
         return {
             type: ActionTypes.SET_BALANCE,

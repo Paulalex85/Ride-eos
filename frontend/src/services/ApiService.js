@@ -34,8 +34,8 @@ async function getTableRows({
 class ApiService {
 
   static async getBalanceAccountEOS(account) {
-    let code = "eosio.token"
-    let symbol = "SYS"
+    let code = "eosio.token";
+    let symbol = "SYS";
     const rpc = getRPC();
     const result = await rpc.fetch(
       "/v1/chain/get_currency_balance", {

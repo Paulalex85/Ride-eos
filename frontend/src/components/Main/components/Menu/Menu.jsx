@@ -1,14 +1,15 @@
-import React, { Component } from "react";
-import { connect } from 'react-redux';
-import { LinkContainer } from "react-router-bootstrap";
-import { ButtonLogged, Scatter } from './components'
-import { Navbar } from 'react-bootstrap'
+import React, {Component} from "react";
+import {UALContext} from 'ual-reactjs-renderer'
+import {LinkContainer} from "react-router-bootstrap";
+import {ButtonLogged, Login} from './components'
+import {Navbar} from 'react-bootstrap'
 
 class Menu extends Component {
+    static contextType = UALContext;
 
     render() {
-        const { user: { scatter } } = this.props;
-
+        const {login} = this.props;
+        const {activeUser} = this.context;
         return (
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
                 <LinkContainer to="/">
@@ -16,13 +17,12 @@ class Menu extends Component {
                         Rideos
                     </Navbar.Brand>
                 </LinkContainer>
-                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
                 <Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
                     {
-                        scatter ?
-                            (<ButtonLogged />)
-                            :
-                            (<Scatter />)
+                        activeUser
+                            ? (<ButtonLogged/>)
+                            : (<Login login={login}/>)
                     }
                 </Navbar.Collapse>
             </Navbar>
@@ -30,6 +30,4 @@ class Menu extends Component {
     }
 }
 
-const mapStateToProps = state => state;
-
-export default connect(mapStateToProps)(Menu);
+export default Menu;

@@ -1,31 +1,31 @@
-import React, { Component } from "react";
-import { connect } from 'react-redux';
+import React, {Component} from "react";
+import {connect} from 'react-redux';
 
-import { UserAction } from 'actions';
-import { Col, Row } from 'react-bootstrap'
-import { ApiService } from 'services';
+import {UserAction} from 'actions';
+import {Col, Row} from 'react-bootstrap'
+import {ApiService} from 'services';
+import {UALContext} from "ual-reactjs-renderer";
 
 class Balance extends Component {
-    constructor(props) {
-        super(props);
+    static contextType = UALContext;
 
-        this.setBalanceValue();
-    }
-
-    setBalanceValue = () => {
-        const { setBalance, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
-        ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
-            setBalance({ balance: balance });
-        }).catch(error => {
-            console.error(error);
-        });
+    async componentDidMount() {
+        const {setBalance} = this.props;
+        const {activeUser} = this.context;
+        if (activeUser) {
+            activeUser.getAccountName().then(name => {
+                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                    setBalance({balance: balance});
+                })
+            }).catch(error => {
+                console.error(error);
+            });
+        }
     }
 
     render() {
 
-        const { user: { balance } } = this.props;
+        const {user: {balance}} = this.props;
         return (
             <Row className="justify-content-md-center mt-1 mb-5">
                 <Col className="col-md-auto">
