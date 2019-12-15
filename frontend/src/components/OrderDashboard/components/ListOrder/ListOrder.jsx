@@ -12,17 +12,26 @@ import {UALContext} from "ual-reactjs-renderer";
 class ListOrder extends Component {
     static contextType = UALContext;
 
-    async componentDidMount() {
+    setListOrdersToMap = (list, map) => {
+        for (let entry of list.rows) {
+            map.set(entry.orderKey.toString(), entry)
+        }
+        return map;
+    };
+
+    componentDidMount = async () => {
         const {activeUser} = this.context;
         const {setListOrders} = this.props;
         const name = await activeUser.getAccountName();
+        let mapOrders = new Map();
         return ApiService.getOrderByBuyer(name).then(listBuyer => {
+            mapOrders = this.setListOrdersToMap(listBuyer, mapOrders);
             ApiService.getOrderBySeller(name).then(listSeller => {
+                mapOrders = this.setListOrdersToMap(listSeller, mapOrders);
                 ApiService.getOrderByDeliver(name).then(listDeliver => {
-                    let rows = listBuyer.rows.concat(listSeller.rows);
-                    rows = rows.concat(listDeliver.rows);
+                    mapOrders = this.setListOrdersToMap(listDeliver, mapOrders);
                     let list = {
-                        rows: rows
+                        rows: Array.from(mapOrders.values())
                     };
                     setListOrders({listOrders: list, account: name});
                 })
@@ -30,7 +39,7 @@ class ListOrder extends Component {
         }).catch((err) => {
             console.error(err)
         });
-    }
+    };
 
     render() {
         const {orders: {listOrders}} = this.props;
@@ -40,7 +49,7 @@ class ListOrder extends Component {
                 order={order}
                 key={order.orderKey}
             />
-        ))
+        ));
 
         return (
             <ListGroup className="align-items-center">
