@@ -44,11 +44,11 @@ class CreateOrder extends Component {
         })
     };
 
-    handleSubmit = () => {
+    handleSubmit = async () => {
         const {activeUser} = this.context;
         const {history} = this.props;
 
-        ApiServiceScatter.initializeOrder({
+        await ApiServiceScatter.initializeOrder({
             sender: this.state.name,
             buyer: this.state.buyer,
             seller: this.state.seller,
