@@ -6,8 +6,7 @@ import {Button, Card, Col, Row} from 'react-bootstrap';
 
 import {ApiServiceScatter} from 'services';
 
-import {AccountInfo, CurrencyInput, OrderDetails} from './components'
-import DelayInput from './components/DelayInput/DelayInput';
+import {AccountInfo, CurrencyInput, DelayInput, DisplayError, OrderDetails} from './components'
 import {UALContext} from "ual-reactjs-renderer";
 
 class CreateOrder extends Component {
@@ -24,18 +23,19 @@ class CreateOrder extends Component {
             details: "",
             amountSeller: "0.0000",
             amountDeliver: "0.0000",
-            delay: new Date()
+            delay: new Date(),
+            showError: false
         }
     }
 
-    async componentDidMount() {
+    componentDidMount = async () => {
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
         this.setState({
             ...this.state,
             name: name
         })
-    }
+    };
 
     handleChange = (value, name) => {
         this.setState({
@@ -57,8 +57,15 @@ class CreateOrder extends Component {
             priceOrder: this.state.amountSeller,
             priceDeliver: this.state.amountDeliver,
             delay: Math.floor(this.state.delay.getTime() / 1000)
-        }, activeUser).then(() => {
-            history.push("/orders");
+        }, activeUser).then((data) => {
+            if (data === undefined || data === null || data.status !== "executed") {
+                this.setState({
+                    ...this.state,
+                    showError: true
+                });
+            } else {
+                history.push("/orders");
+            }
         });
     };
 
@@ -67,6 +74,10 @@ class CreateOrder extends Component {
         return (
             <Row className="justify-content-md-center mt-5">
                 <Col className="col-sm-5">
+                    <DisplayError
+                        showError={this.state.showError}
+                        hide={() => this.setState({...this.state, showError: false})}
+                    />
                     <Card className="text-center">
                         <Card.Header>
                             Create Order

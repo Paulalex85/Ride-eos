@@ -16,10 +16,7 @@ async function send(actionName, actionData, contractDestination, activeUser) {
     try {
         const accountName = await activeUser.getAccountName();
         const transaction = generateTransaction(contractDestination, actionName, actionData, accountName);
-        console.log("Active User before send :");
-        console.log(activeUser);
-        let jambon = await activeUser.signTransaction(transaction, {broadcast: true, expireSeconds: 300});
-        console.log(jambon)
+        return await activeUser.signTransaction(transaction, {broadcast: true, expireSeconds: 300});
     } catch (e) {
         let text = JSON.stringify(e);
         console.error('UAL Error', JSON.parse(text));
@@ -51,7 +48,7 @@ class ApiServiceScatter {
 
     //ORDERS
     static async initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
-        await send("initialize", {
+        return await send("initialize", {
             sender: sender,
             buyer: buyer,
             deliver: deliver,
