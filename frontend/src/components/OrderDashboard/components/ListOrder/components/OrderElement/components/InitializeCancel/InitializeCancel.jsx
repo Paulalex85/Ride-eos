@@ -1,39 +1,37 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 
-import { Button } from 'react-bootstrap'
+import {Button} from 'react-bootstrap'
 
-import { OrderAction, UserAction } from 'actions';
-import { ApiService, ApiServiceScatter } from 'services';
+import {OrderAction, UserAction} from 'actions';
+import {ApiService, ApiServiceScatter} from 'services';
+import {UALContext} from "ual-reactjs-renderer";
 
 class InitializeCancel extends Component {
-    constructor(props) {
-        super(props);
+    static contextType = UALContext;
 
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick(event) {
+    handleClick = async event => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, setBalance, orders: { listOrders }, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
-        ApiServiceScatter.initCancel(orderKey, scatter).then(() => {
+        const {order: {orderKey}, setOrder, setBalance, orders: {listOrders}} = this.props;
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
+        ApiServiceScatter.initCancel(orderKey, activeUser).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name })
-                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
-                    setBalance({ balance: balance });
+                setOrder({listOrders: listOrders, order: order, account: name});
+                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                    setBalance({balance: balance});
                 })
             })
-        }).catch((err) => { console.error(err) });
-    }
+        }).catch((err) => {
+            console.error(err)
+        });
+    };
 
     render() {
-
         let isPrint = false;
 
-        const { order: { state, currentActor } } = this.props;
+        const {order: {state, currentActor}} = this.props;
 
         if (state === "1" && currentActor !== "") {
             isPrint = true;
@@ -42,12 +40,12 @@ class InitializeCancel extends Component {
         return (
             <div>
                 {isPrint &&
-                    <Button
-                        onClick={this.handleClick}
-                        variant="danger"
-                        className="float-right"
-                    >
-                        INITIALIZATION CANCEL
+                <Button
+                    onClick={this.handleClick}
+                    variant="danger"
+                    className="float-right"
+                >
+                    INITIALIZATION CANCEL
                 </Button>
                 }
             </div>

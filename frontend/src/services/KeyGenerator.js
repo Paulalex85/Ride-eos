@@ -1,9 +1,5 @@
 import ecc from 'eosjs-ecc';
 
-const initial = {
-    listKeys: []
-};
-
 class KeyGenerator {
 
     static generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, priceOrder, priceDeliver, details) {
@@ -23,9 +19,9 @@ class KeyGenerator {
     }
 
     static chunk(str, n) {
-        var ret = [];
-        var i;
-        var len;
+        let ret = [];
+        let i;
+        let len;
 
         for (i = 0, len = str.length; i < len; i += n) {
             ret.push(str.substr(i, n))
@@ -38,14 +34,9 @@ class KeyGenerator {
         return ecc.verify(signature, data, pubkey)
     }
 
-    static async signData(scatter, publicKey, data) {
+    static async signData(activeUser, publicKey, data) {
         try {
-            return await scatter.getArbitrarySignature(
-                publicKey,
-                data,
-                'Order key creation',
-                true
-            );
+            return await activeUser.signArbitrary(publicKey, data, "Generate order validation key");
         } catch (e) {
             console.log(e)
         }
@@ -55,14 +46,13 @@ class KeyGenerator {
         return ecc.sha256(key);
     }
 
-    static async createKeyForDelivery(order, scatter) {
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
+    static generateSlicedData(order) {
         let data = KeyGenerator.generateDataToSign(order.orderKey, order.buyer, order.seller, order.deliver, new Date(order.date).getTime(), new Date(order.dateDelay).getTime(), order.priceOrder, order.priceDeliver, order.details);
         let hashData = KeyGenerator.generateHash(data);
-        let slicedData = KeyGenerator.sliceData(hashData);
-        let signature = await KeyGenerator.signData(scatter, accountScatter.publicKey, slicedData);
+        return KeyGenerator.sliceData(hashData);
+    }
 
+    static generateKeyFromSignature(signature) {
         let key = KeyGenerator.generateHash(signature);
         let hash = KeyGenerator.generateHash(key);
 
@@ -70,67 +60,6 @@ class KeyGenerator {
             key: key,
             hash: hash
         }
-    }
-
-    static purgeStore(orderKey, type) {
-        let list = initial;
-        if (localStorage.getItem("listKeys") !== "") {
-            list = JSON.parse(localStorage.getItem("listKeys"))
-        }
-
-        for (let i = list.listKeys.length - 1; i >= 0; i--) {
-            const element = list.listKeys[i];
-            if (element.orderKey === orderKey.toString() && element.type === type) {
-                list.listKeys.splice(i, 1);
-            }
-        }
-        localStorage.setItem("listKeys", JSON.stringify(list));
-    }
-
-    static storeKey(orderKey, key, hash, type) {
-        var o = {
-            order: orderKey,
-            key: key,
-            hash: hash,
-            type: type
-        }
-        let list = initial;
-        if (localStorage.getItem("listKeys") !== "") {
-            list = JSON.parse(localStorage.getItem("listKeys"))
-        }
-
-        let index = this.getIndexKey(list, orderKey, type)
-
-        if (index === -1) {
-            list.listKeys.push(o);
-        } else {
-            list.listKeys[index] = o;
-        }
-
-        localStorage.setItem("listKeys", JSON.stringify(list));
-    }
-
-    static getKey(orderKey, type) {
-        let list = initial;
-        if (localStorage.getItem("listKeys") !== "") {
-            list = JSON.parse(localStorage.getItem("listKeys"))
-        }
-
-        let index = this.getIndexKey(list, orderKey, type)
-        if (index === -1) {
-            return undefined
-        }
-        return list.listKeys[index]
-    }
-
-    static getIndexKey(list, orderKey, type) {
-        for (let i = 0; i < list.listKeys.length; i++) {
-            const element = list.listKeys[i];
-            if (element.order === orderKey.toString() && element.type === type) {
-                return i
-            }
-        }
-        return -1
     }
 }
 

@@ -1,34 +1,34 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 // Components
-import { Button } from 'react-bootstrap'
+import {Button} from 'react-bootstrap'
 // Services and redux action
-import { OrderAction } from 'actions';
-import { ApiService, ApiServiceScatter } from 'services';
+import {OrderAction} from 'actions';
+import {ApiService, ApiServiceScatter} from 'services';
+import {UALContext} from "ual-reactjs-renderer";
 
 class OrderReady extends Component {
-    constructor(props) {
-        super(props);
+    static contextType = UALContext;
 
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick(event) {
+    handleClick = async (event) => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, orders: { listOrders }, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+        const {order: {orderKey}, setOrder, orders: {listOrders}} = this.props;
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.orderReady(orderKey, scatter).then(() => {
+        ApiServiceScatter.orderReady(orderKey, activeUser).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
+                setOrder({listOrders: listOrders, order: order, account: name});
             })
-        }).catch((err) => { console.error(err) });
-    }
+        }).catch((err) => {
+            console.error(err)
+        });
+    };
 
     render() {
 
-        const { order } = this.props;
+        const {order} = this.props;
 
         let isPrint = false;
 
@@ -39,11 +39,11 @@ class OrderReady extends Component {
         return (
             <div>
                 {isPrint &&
-                    <Button
-                        onClick={this.handleClick}
-                        variant='primary'
-                    >
-                        ORDER READY
+                <Button
+                    onClick={this.handleClick}
+                    variant='primary'
+                >
+                    ORDER READY
                 </Button>
                 }
             </div>

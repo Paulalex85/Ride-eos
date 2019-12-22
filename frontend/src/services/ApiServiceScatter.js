@@ -24,28 +24,6 @@ async function send(actionName, actionData, contractDestination, activeUser) {
 }
 
 class ApiServiceScatter {
-
-    static async updatePermission(actor, activeUser) {
-        const accountName = await activeUser.getAccountName();
-        const keysAccount = await activeUser.getKeys();
-        console.log(keysAccount);
-        if (!keysAccount.isEmpty) {
-            return send("updateauth", {
-                "account": accountName,
-                "permission": "active",
-                "parent": "owner",
-                "auth": {
-                    "threshold": 1,
-                    "keys": [{"key": keysAccount[0], "weight": 1}],
-                    "waits": [],
-                    "accounts": [{"weight": 1, "permission": {"actor": actor, "permission": "active"}}]
-                }
-            }, "eosio", activeUser);
-        } else {
-            return "";
-        }
-    }
-
     //ORDERS
     static async initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
         return await send("initialize", {
@@ -60,36 +38,36 @@ class ApiServiceScatter {
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateBuyer(orderKey, hash, activeUser) {
+    static async validateBuyer(orderKey, hash, activeUser) {
         return send("validatebuy", {
             orderKey: orderKey,
             hash: hash
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateSeller(orderKey, hash, activeUser) {
+    static async validateSeller(orderKey, hash, activeUser) {
         return send("validatesell", {
             orderKey: orderKey,
             hash: hash
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static validateDeliver(orderKey, activeUser) {
+    static async validateDeliver(orderKey, activeUser) {
         return send("validatedeli", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderReady(orderKey, activeUser) {
+    static async orderReady(orderKey, activeUser) {
         return send("orderready", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderTaken(orderKey, source, activeUser) {
+    static async orderTaken(orderKey, source, activeUser) {
         return send("ordertaken", {
             orderKey: orderKey,
             source: source
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static orderDelivered(orderKey, source, activeUser) {
+    static async orderDelivered(orderKey, source, activeUser) {
         return send("orderdelive", {
             orderKey: orderKey,
             source: source
@@ -112,7 +90,7 @@ class ApiServiceScatter {
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static deleteOrder(orderKey, activeUser) {
+    static async deleteOrder(orderKey, activeUser) {
         return send("deleteorder", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 }

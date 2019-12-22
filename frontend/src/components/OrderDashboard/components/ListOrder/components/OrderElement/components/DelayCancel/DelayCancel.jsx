@@ -5,29 +5,26 @@ import { Button } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction, UserAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
+import {UALContext} from "ual-reactjs-renderer";
 
 class DelayCancel extends Component {
-    constructor(props) {
-        super(props);
-
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick(event) {
+    static contextType = UALContext;
+    handleClick = async event => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, setBalance, orders: { listOrders }, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+        const { order: { orderKey }, setOrder, setBalance, orders: { listOrders } } = this.props;
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.delayCancel(orderKey, scatter).then(() => {
+        ApiServiceScatter.delayCancel(orderKey, activeUser).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
-                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
+                setOrder({ listOrders: listOrders, order: order, account: name });
+                ApiService.getBalanceAccountEOS(name).then((balance) => {
                     setBalance({ balance: balance });
                 })
             })
         }).catch((err) => { console.error(err) });
-    }
+    };
 
     render() {
 

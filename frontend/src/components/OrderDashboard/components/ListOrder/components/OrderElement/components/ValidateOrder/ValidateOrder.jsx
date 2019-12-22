@@ -1,75 +1,73 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 // Components
-import { Button } from 'react-bootstrap'
+import {Button} from 'react-bootstrap'
 // Services and redux action
-import { OrderAction, UserAction } from 'actions';
-import { ApiService, ApiServiceScatter, KeyGenerator } from 'services';
+import {OrderAction, UserAction} from 'actions';
+import {ApiService, ApiServiceScatter} from 'services';
+import {UALContext} from "ual-reactjs-renderer";
+import {createKeyOrder} from '../../../../../../../../utils/OrderTools'
 
 class ValidateOrder extends Component {
+    static contextType = UALContext;
 
-    handleClick = (event) => {
+    handleClick = async (event) => {
         event.preventDefault();
 
-        const { order: { orderKey }, setOrder, orders: { listOrders }, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+        const {order: {orderKey}, setOrder, orders: {listOrders}} = this.props;
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
 
         this.validateAPI().then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
+                setOrder({listOrders: listOrders, order: order, account: name});
             })
-        }).catch((err) => { console.error(err) });
-    }
+        }).catch((err) => {
+            console.error(err)
+        });
+    };
 
     validateAPI = async () => {
-        const { order, order: { currentActor, orderKey }, user: { scatter }, setBalance } = this.props;
+        const {order, order: {currentActor, orderKey}, setBalance} = this.props;
+        const {activeUser} = this.context;
 
         if (currentActor === "deliver") {
-            await ApiServiceScatter.validateDeliver(orderKey, scatter)
-                .catch((err) => { console.error(err) });
+            await ApiServiceScatter.validateDeliver(orderKey, activeUser)
+                .catch((err) => {
+                    console.error(err)
+                });
 
         } else if (currentActor === "seller") {
-
-            let keyObject = await KeyGenerator.createKeyForDelivery(order, scatter)
-            KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, "seller");
-            await ApiServiceScatter.validateSeller(orderKey, keyObject.hash, scatter).catch((err) => { console.error(err) });
+            createKeyOrder(activeUser, order).then((keyset) => {
+                ApiServiceScatter.validateSeller(orderKey, keyset.hash, activeUser)
+            }).catch((err) => {
+                console.error(err)
+            });
 
         } else if (currentActor === "buyer") {
-            let keyObject = await KeyGenerator.createKeyForDelivery(order, scatter)
-            const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
-
-            KeyGenerator.storeKey(orderKey, keyObject.key, keyObject.hash, "buyer");
-            await ApiServiceScatter.updatePermission(process.env.REACT_APP_EOSIO_CONTRACT_USERS, scatter).catch((err) => { console.error(err) });
-            await ApiServiceScatter.validateBuyer(orderKey, keyObject.hash, scatter).then(() => {
-                ApiService.getBalanceAccountEOS(accountScatter.name).then((balance) => {
-                    setBalance({ balance: balance });
+            const name = await activeUser.getAccountName();
+            createKeyOrder(activeUser, order).then((keyset) => {
+                ApiServiceScatter.validateBuyer(orderKey, keyset.hash, activeUser).then(() => {
+                    ApiService.getBalanceAccountEOS(name).then((balance) => {
+                        setBalance({balance: balance});
+                    })
                 })
-            }).catch((err) => { console.error(err) });
+            }).catch((err) => {
+                console.error(err)
+            });
         }
-    }
+    };
 
     setCanValidate() {
-        const { order } = this.props;
+        const {order} = this.props;
 
         if (order.state === "1") {
             if (order.currentActor === "seller") {
-                if (order.validateSeller === "0") {
-                    return true;
-                } else {
-                    return false;
-                }
+                return order.validateSeller === "0";
             } else if (order.currentActor === "deliver") {
-                if (order.validateDeliver === "0") {
-                    return true;
-                } else {
-                    return false;
-                }
+                return order.validateDeliver === "0";
             } else if (order.currentActor === "buyer") {
-                if (order.validateBuyer === "0") {
-                    return true;
-                } else {
-                    return false;
-                }
+                return order.validateBuyer === "0";
             }
         }
         return false
@@ -82,11 +80,11 @@ class ValidateOrder extends Component {
         return (
             <div>
                 {canValidate &&
-                    <Button
-                        onClick={this.handleClick}
-                        variant='primary'
-                    >
-                        VALIDATE
+                <Button
+                    onClick={this.handleClick}
+                    variant='primary'
+                >
+                    VALIDATE
                 </Button>
                 }
             </div>

@@ -6,6 +6,7 @@
     "@babel/runtime": "^7.6.0",
     "@githubprimer/octicons-react": "^8.5.0",
     "eosjs": "20.0.0",
+    "eosjs-ecc": "^4.0.7",
     "qrcode.react": "^0.9.3",
     "react": "16.9.0",
     "react-bootstrap": "1.0.0-beta.12",

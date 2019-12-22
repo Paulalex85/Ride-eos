@@ -6,8 +6,10 @@ import { Button, InputGroup, FormControl } from 'react-bootstrap'
 import { OrderAction } from 'actions';
 import { ApiService, ApiServiceScatter } from 'services';
 import ReadQRCode from '../ReadQRCode';
+import {UALContext} from "ual-reactjs-renderer";
 
 class OrderTaken extends Component {
+    static contextType = UALContext;
     constructor(props) {
         super(props);
 
@@ -22,27 +24,28 @@ class OrderTaken extends Component {
         this.setState({
             key: value,
         });
-    }
+    };
 
     handleReadQRCode = key => {
         this.setState({
             key: key
         })
-    }
+    };
 
-    handleClick = event => {
+    handleClick = async event => {
         event.preventDefault();
 
         const { key } = this.state;
-        const { setOrder, order: { orderKey }, orders: { listOrders }, user: { scatter } } = this.props;
-        const accountScatter = scatter.identity.accounts.find(x => x.blockchain === 'eos');
+        const { setOrder, order: { orderKey }, orders: { listOrders } } = this.props;
+        const {activeUser} = this.context;
+        const name = await activeUser.getAccountName();
 
-        return ApiServiceScatter.orderTaken(orderKey, key, scatter).then(() => {
+        return ApiServiceScatter.orderTaken(orderKey, key, activeUser).then(() => {
             ApiService.getOrderByKey(orderKey).then((order) => {
-                setOrder({ listOrders: listOrders, order: order, account: accountScatter.name });
+                setOrder({ listOrders: listOrders, order: order, account: name });
             })
         }).catch((err) => { console.error(err) });
-    }
+    };
 
     render() {
 
