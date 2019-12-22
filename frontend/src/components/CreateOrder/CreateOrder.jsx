@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 // Components
 import {Button, Card, Col, Row} from 'react-bootstrap';
 
-import {ApiServiceScatter} from 'services';
+import {ApiServiceSender} from 'services';
 
 import {AccountInfo, CurrencyInput, DelayInput, DisplayError, OrderDetails} from './components'
 import {UALContext} from "ual-reactjs-renderer";
@@ -48,7 +48,7 @@ class CreateOrder extends Component {
         const {activeUser} = this.context;
         const {history} = this.props;
 
-        await ApiServiceScatter.initializeOrder({
+        await ApiServiceSender.initializeOrder({
             sender: this.state.name,
             buyer: this.state.buyer,
             seller: this.state.seller,

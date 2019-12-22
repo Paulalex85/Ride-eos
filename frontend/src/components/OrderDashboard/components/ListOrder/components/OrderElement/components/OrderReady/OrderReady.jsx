@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Button} from 'react-bootstrap'
 // Services and redux action
 import {OrderAction} from 'actions';
-import {ApiService, ApiServiceScatter} from 'services';
+import {ApiServiceReader, ApiServiceSender} from 'services';
 import {UALContext} from "ual-reactjs-renderer";
 
 class OrderReady extends Component {
@@ -17,8 +17,8 @@ class OrderReady extends Component {
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.orderReady(orderKey, activeUser).then(() => {
-            ApiService.getOrderByKey(orderKey).then((order) => {
+        ApiServiceSender.orderReady(orderKey, activeUser).then(() => {
+            ApiServiceReader.getOrderByKey(orderKey).then((order) => {
                 setOrder({listOrders: listOrders, order: order, account: name});
             })
         }).catch((err) => {

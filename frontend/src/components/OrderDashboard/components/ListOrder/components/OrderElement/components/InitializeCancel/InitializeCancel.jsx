@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Button} from 'react-bootstrap'
 
 import {OrderAction, UserAction} from 'actions';
-import {ApiService, ApiServiceScatter} from 'services';
+import {ApiServiceReader, ApiServiceSender} from 'services';
 import {UALContext} from "ual-reactjs-renderer";
 
 class InitializeCancel extends Component {
@@ -16,10 +16,10 @@ class InitializeCancel extends Component {
         const {order: {orderKey}, setOrder, setBalance, orders: {listOrders}} = this.props;
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
-        ApiServiceScatter.initCancel(orderKey, activeUser).then(() => {
-            ApiService.getOrderByKey(orderKey).then((order) => {
+        ApiServiceSender.initCancel(orderKey, activeUser).then(() => {
+            ApiServiceReader.getOrderByKey(orderKey).then((order) => {
                 setOrder({listOrders: listOrders, order: order, account: name});
-                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
                     setBalance({balance: balance});
                 })
             })

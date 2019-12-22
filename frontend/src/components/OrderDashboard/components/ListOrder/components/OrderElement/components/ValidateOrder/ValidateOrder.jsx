@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Button} from 'react-bootstrap'
 // Services and redux action
 import {OrderAction, UserAction} from 'actions';
-import {ApiService, ApiServiceScatter} from 'services';
+import {ApiServiceReader, ApiServiceSender} from 'services';
 import {UALContext} from "ual-reactjs-renderer";
 import {createKeyOrder} from '../../../../../../../../utils/OrderTools'
 
@@ -19,7 +19,7 @@ class ValidateOrder extends Component {
         const name = await activeUser.getAccountName();
 
         this.validateAPI().then(() => {
-            ApiService.getOrderByKey(orderKey).then((order) => {
+            ApiServiceReader.getOrderByKey(orderKey).then((order) => {
                 setOrder({listOrders: listOrders, order: order, account: name});
             })
         }).catch((err) => {
@@ -32,14 +32,14 @@ class ValidateOrder extends Component {
         const {activeUser} = this.context;
 
         if (currentActor === "deliver") {
-            await ApiServiceScatter.validateDeliver(orderKey, activeUser)
+            await ApiServiceSender.validateDeliver(orderKey, activeUser)
                 .catch((err) => {
                     console.error(err)
                 });
 
         } else if (currentActor === "seller") {
             createKeyOrder(activeUser, order).then((keyset) => {
-                ApiServiceScatter.validateSeller(orderKey, keyset.hash, activeUser)
+                ApiServiceSender.validateSeller(orderKey, keyset.hash, activeUser)
             }).catch((err) => {
                 console.error(err)
             });
@@ -47,8 +47,8 @@ class ValidateOrder extends Component {
         } else if (currentActor === "buyer") {
             const name = await activeUser.getAccountName();
             createKeyOrder(activeUser, order).then((keyset) => {
-                ApiServiceScatter.validateBuyer(orderKey, keyset.hash, activeUser).then(() => {
-                    ApiService.getBalanceAccountEOS(name).then((balance) => {
+                ApiServiceSender.validateBuyer(orderKey, keyset.hash, activeUser).then(() => {
+                    ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
                         setBalance({balance: balance});
                     })
                 })

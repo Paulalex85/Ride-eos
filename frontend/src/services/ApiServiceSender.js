@@ -23,7 +23,7 @@ async function send(actionName, actionData, contractDestination, activeUser) {
     }
 }
 
-class ApiServiceScatter {
+class ApiServiceSender {
     //ORDERS
     static async initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
         return await send("initialize", {
@@ -95,4 +95,4 @@ class ApiServiceScatter {
     }
 }
 
-export default ApiServiceScatter;
+export default ApiServiceSender;

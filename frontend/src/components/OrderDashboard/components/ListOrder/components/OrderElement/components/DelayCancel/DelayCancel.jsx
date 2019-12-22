@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap'
 // Services and redux action
 import { OrderAction, UserAction } from 'actions';
-import { ApiService, ApiServiceScatter } from 'services';
+import { ApiServiceReader, ApiServiceSender } from 'services';
 import {UALContext} from "ual-reactjs-renderer";
 
 class DelayCancel extends Component {
@@ -16,10 +16,10 @@ class DelayCancel extends Component {
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.delayCancel(orderKey, activeUser).then(() => {
-            ApiService.getOrderByKey(orderKey).then((order) => {
+        ApiServiceSender.delayCancel(orderKey, activeUser).then(() => {
+            ApiServiceReader.getOrderByKey(orderKey).then((order) => {
                 setOrder({ listOrders: listOrders, order: order, account: name });
-                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
                     setBalance({ balance: balance });
                 })
             })

@@ -6,7 +6,7 @@ import {Button} from 'react-bootstrap'
 import {OrderAction} from '../../../../../../../../actions';
 import {UALContext} from "ual-reactjs-renderer";
 import {getOrdersOfUser} from "../../../../../../../../utils/OrderTools"
-import {ApiServiceScatter} from "../../../../../../../../services";
+import {ApiServiceSender} from "../../../../../../../../services";
 
 class DeleteOrder extends Component {
     static contextType = UALContext;
@@ -18,7 +18,7 @@ class DeleteOrder extends Component {
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.deleteOrder(orderKey, activeUser).then(() => {
+        ApiServiceSender.deleteOrder(orderKey, activeUser).then(() => {
             getOrdersOfUser(name, setListOrders);
         }).catch((err) => {
             console.error(err)

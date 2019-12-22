@@ -1,4 +1,4 @@
-import {ApiService, KeyGenerator} from "services";
+import {ApiServiceReader, KeyGenerator} from "services";
 
 export const createKeyOrder = async (activeUser, order) => {
     let publicKey = await activeUser.getKeys();
@@ -23,11 +23,11 @@ export const getOrdersOfUser = async (name,setListOrders) => {
         rows: []
     };
     let mapOrders = new Map();
-    ApiService.getOrderByBuyer(name).then(listBuyer => {
+    ApiServiceReader.getOrderByBuyer(name).then(listBuyer => {
         mapOrders = setListOrdersToMap(listBuyer, mapOrders);
-        ApiService.getOrderBySeller(name).then(listSeller => {
+        ApiServiceReader.getOrderBySeller(name).then(listSeller => {
             mapOrders = setListOrdersToMap(listSeller, mapOrders);
-            ApiService.getOrderByDeliver(name).then(listDeliver => {
+            ApiServiceReader.getOrderByDeliver(name).then(listDeliver => {
                 mapOrders = setListOrdersToMap(listDeliver, mapOrders);
                 if (mapOrders.size) {
                     listRows = {

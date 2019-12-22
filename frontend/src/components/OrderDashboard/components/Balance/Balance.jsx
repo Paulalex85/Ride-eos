@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 
 import {UserAction} from 'actions';
 import {Col, Row} from 'react-bootstrap'
-import {ApiService} from 'services';
+import {ApiServiceReader} from 'services';
 import {UALContext} from "ual-reactjs-renderer";
 
 class Balance extends Component {
@@ -14,7 +14,7 @@ class Balance extends Component {
         const {activeUser} = this.context;
         if (activeUser) {
             activeUser.getAccountName().then(name => {
-                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
                     setBalance({balance: balance});
                 })
             }).catch(error => {

@@ -1,9 +1,9 @@
-import ApiService from './ApiService';
+import ApiServiceReader from './ApiServiceReader';
 import KeyGenerator from './KeyGenerator';
-import ApiServiceScatter from './ApiServiceScatter'
+import ApiServiceSender from './ApiServiceSender'
 
 export {
-  ApiService,
+  ApiServiceReader,
   KeyGenerator,
-  ApiServiceScatter
+  ApiServiceSender
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Button, InputGroup, FormControl } from 'react-bootstrap'
 
 import { OrderAction, UserAction } from 'actions';
-import { ApiService, ApiServiceScatter } from 'services';
+import { ApiServiceReader, ApiServiceSender } from 'services';
 import ReadQRCode from '../ReadQRCode';
 import {UALContext} from "ual-reactjs-renderer";
 
@@ -41,10 +41,10 @@ class OrderDelivered extends Component {
         const {activeUser} = this.context;
         const name = await activeUser.getAccountName();
 
-        ApiServiceScatter.orderDelivered(orderKey, key, activeUser).then(() => {
-            ApiService.getOrderByKey(orderKey).then((order) => {
+        ApiServiceSender.orderDelivered(orderKey, key, activeUser).then(() => {
+            ApiServiceReader.getOrderByKey(orderKey).then((order) => {
                 setOrder({ listOrders: listOrders, order: order, account: name });
-                ApiService.getBalanceAccountEOS(name).then((balance) => {
+                ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
                     setBalance({ balance: balance });
                 })
             })

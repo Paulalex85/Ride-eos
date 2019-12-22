@@ -32,7 +32,7 @@ async function getTableRows({
         });
 }
 
-class ApiService {
+class ApiServiceReader {
 
     static async getBalanceAccountEOS(account) {
         let code = "eosio.token";
@@ -99,4 +99,4 @@ class ApiService {
     }
 }
 
-export default ApiService;
+export default ApiServiceReader;

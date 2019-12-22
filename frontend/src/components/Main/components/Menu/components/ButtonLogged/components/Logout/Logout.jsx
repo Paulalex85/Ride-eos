@@ -3,15 +3,15 @@ import {withRouter} from "react-router";
 import {connect} from 'react-redux';
 import {LinkContainer} from "react-router-bootstrap";
 // Components
-import {UserAction} from 'actions';
 
 import {Button} from 'react-bootstrap';
 import {UALContext} from "ual-reactjs-renderer";
 
 class Logout extends Component {
     static contextType = UALContext;
+
     render() {
-        const { logout } = this.context;
+        const {logout} = this.context;
         return (
             <LinkContainer to="/">
                 <Button
@@ -26,8 +26,4 @@ class Logout extends Component {
 
 const mapStateToProps = state => state;
 
-const mapDispatchToProps = {
-    setScatter: UserAction.setScatter,
-};
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Logout));
+export default withRouter(connect(mapStateToProps)(Logout));
