@@ -25,8 +25,8 @@ async function send(actionName, actionData, contractDestination, activeUser) {
 
 class ApiServiceSender {
     //ORDERS
-    static async initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
-        return await send("initialize", {
+    static initializeOrder({sender, buyer, seller, deliver, priceOrder, priceDeliver, details, delay}, activeUser) {
+        return send("initialize", {
             sender: sender,
             buyer: buyer,
             deliver: deliver,
@@ -38,36 +38,36 @@ class ApiServiceSender {
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async validateBuyer(orderKey, hash, activeUser) {
+    static validateBuyer(orderKey, hash, activeUser) {
         return send("validatebuy", {
             orderKey: orderKey,
             hash: hash
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async validateSeller(orderKey, hash, activeUser) {
+    static validateSeller(orderKey, hash, activeUser) {
         return send("validatesell", {
             orderKey: orderKey,
             hash: hash
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async validateDeliver(orderKey, activeUser) {
+    static validateDeliver(orderKey, activeUser) {
         return send("validatedeli", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async orderReady(orderKey, activeUser) {
+    static orderReady(orderKey, activeUser) {
         return send("orderready", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async orderTaken(orderKey, source, activeUser) {
+    static orderTaken(orderKey, source, activeUser) {
         return send("ordertaken", {
             orderKey: orderKey,
             source: source
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async orderDelivered(orderKey, source, activeUser) {
+    static orderDelivered(orderKey, source, activeUser) {
         return send("orderdelive", {
             orderKey: orderKey,
             source: source
@@ -90,7 +90,7 @@ class ApiServiceSender {
         }, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 
-    static async deleteOrder(orderKey, activeUser) {
+    static deleteOrder(orderKey, activeUser) {
         return send("deleteorder", {orderKey: orderKey}, process.env.REACT_APP_EOSIO_CONTRACT_USERS, activeUser);
     }
 }

@@ -32,29 +32,16 @@ class ValidateOrder extends Component {
         const {activeUser} = this.context;
 
         if (currentActor === "deliver") {
-            await ApiServiceSender.validateDeliver(orderKey, activeUser)
-                .catch((err) => {
-                    console.error(err)
-                });
-
+            await ApiServiceSender.validateDeliver(orderKey, activeUser);
         } else if (currentActor === "seller") {
-            createKeyOrder(activeUser, order).then((keyset) => {
-                ApiServiceSender.validateSeller(orderKey, keyset.hash, activeUser)
-            }).catch((err) => {
-                console.error(err)
-            });
-
+            let keyset = await createKeyOrder(activeUser, order);
+            await ApiServiceSender.validateSeller(orderKey, keyset.hash, activeUser);
         } else if (currentActor === "buyer") {
             const name = await activeUser.getAccountName();
-            createKeyOrder(activeUser, order).then((keyset) => {
-                ApiServiceSender.validateBuyer(orderKey, keyset.hash, activeUser).then(() => {
-                    ApiServiceReader.getBalanceAccountEOS(name).then((balance) => {
-                        setBalance({balance: balance});
-                    })
-                })
-            }).catch((err) => {
-                console.error(err)
-            });
+            let keyset = await createKeyOrder(activeUser, order);
+            await ApiServiceSender.validateBuyer(orderKey, keyset.hash, activeUser);
+            let balance = await ApiServiceReader.getBalanceAccountEOS(name);
+            await setBalance({balance: balance});
         }
     };
 
