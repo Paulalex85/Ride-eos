@@ -1,18 +1,18 @@
 import React, {Component} from "react";
 import {BrowserRouter, Route} from "react-router-dom";
 import {UALContext, withUAL} from 'ual-reactjs-renderer'
-import KeyGenerator from '../KeyGenerator';
 import OrderDashboard from "../OrderDashboard";
-import CreateOrder from "../CreateOrder/CreateOrder";
+import CreateOrder from "../CreateOrder";
 import {Menu} from './components';
 import {connect} from "react-redux";
 import {UserAction} from "actions";
+import LandingPage from "../LandingPage";
 
 
 class Main extends Component {
     static contextType = UALContext;
 
-    async componentDidUpdate(prevProps) {
+    componentDidUpdate = async prevProps => {
         // Via withUAL() below, access to the error object is now available
         // This error object will be set in the event of an error during any UAL execution
         const {ual: {error}} = this.props
@@ -21,17 +21,7 @@ class Main extends Component {
             // UAL modal will display the error message to the user, so no need to render this error in the app
             console.error('UAL Error', JSON.parse(JSON.stringify(error)))
         }
-    }
-
-    // async componentDidMount() {
-    //     const {activeUser, logout} = this.context;
-    //     if (activeUser) {
-    //         let name = activeUser.getAccountName();
-    //         if (name === null || name === undefined || name === "") {
-    //             logout()
-    //         }
-    //     }
-    // }
+    };
 
     displayLoginModal = (display) => {
         // Via withUAL() below, access to the showModal & hideModal functions are now available
@@ -41,7 +31,7 @@ class Main extends Component {
         } else {
             hideModal()
         }
-    }
+    };
 
     render() {
         const login = () => this.displayLoginModal(true);
@@ -52,7 +42,7 @@ class Main extends Component {
                 <div>
                     <Menu login={login}/>
                     <div>
-                        <Route exact path="/" component={KeyGenerator}/>
+                        <Route exact path="/" component={LandingPage}/>
                         {activeUser &&
                         <div>
                             <Route path="/orders" component={OrderDashboard}/>

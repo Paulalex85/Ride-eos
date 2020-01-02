@@ -1,11 +1,11 @@
 import OrderDashboard from './OrderDashboard';
 import Main from './Main';
-import KeyGenerator from './KeyGenerator';
+import LandingPage from './LandingPage';
 import CreateOrder from './CreateOrder';
 
 export {
   OrderDashboard,
   Main,
-  KeyGenerator,
+  LandingPage,
   CreateOrder,
 }
