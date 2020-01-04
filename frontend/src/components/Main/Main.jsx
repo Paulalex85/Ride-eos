@@ -15,8 +15,8 @@ class Main extends Component {
     componentDidUpdate = async prevProps => {
         // Via withUAL() below, access to the error object is now available
         // This error object will be set in the event of an error during any UAL execution
-        const {ual: {error}} = this.props
-        const {ual: {error: prevError}} = prevProps
+        const {ual: {error}} = this.props;
+        const {ual: {error: prevError}} = prevProps;
         if (error && (prevError ? error.message !== prevError.message : true)) {
             // UAL modal will display the error message to the user, so no need to render this error in the app
             console.error('UAL Error', JSON.parse(JSON.stringify(error)))
@@ -42,7 +42,7 @@ class Main extends Component {
                 <div>
                     <Menu login={login}/>
                     <div>
-                        <Route exact path="/" component={LandingPage}/>
+                        <Route exact path="/" render={(props) => <LandingPage login={login} {...props} />}/>
                         {activeUser &&
                         <div>
                             <Route path="/orders" component={OrderDashboard}/>

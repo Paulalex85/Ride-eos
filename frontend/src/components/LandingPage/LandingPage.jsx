@@ -1,12 +1,15 @@
 import React, {Component} from "react";
 import "./css/landing-page.css"
-import {Button, Col, Container, Form, Row} from 'react-bootstrap'
+import {Col, Container, Form, Row} from 'react-bootstrap'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faLock, faFileInvoiceDollar} from '@fortawesome/free-solid-svg-icons'
+import {faFileInvoiceDollar, faLock} from '@fortawesome/free-solid-svg-icons'
 import {faGithub} from '@fortawesome/free-brands-svg-icons'
+import {LoginButtonLandingPage} from "./components";
 
 class LandingPage extends Component {
+
     render() {
+        const {login} = this.props;
         return (
             <div>
                 <header className="masthead text-white text-center">
@@ -21,13 +24,7 @@ class LandingPage extends Component {
                             <Col md={10} lg={8} xl={7} className="mx-auto">
                                 <Form>
                                     <Form.Row>
-                                        <Col >
-                                            <Button
-                                                type="submit"
-                                                className="btn btn-lg btn-primary">
-                                                Start now without register !
-                                            </Button>
-                                        </Col>
+                                        <LoginButtonLandingPage login={login}/>
                                     </Form.Row>
                                 </Form>
                             </Col>
@@ -67,7 +64,8 @@ class LandingPage extends Component {
                                                          className="m-auto text-primary"/>
                                     </div>
                                     <h3>Transparency</h3>
-                                    <p className="lead mb-0">Check the code on our <a href={"https://github.com/Paulalex85/Rideos"}>Github</a> !</p>
+                                    <p className="lead mb-0">Check the code on our <a
+                                        href={"https://github.com/Paulalex85/Rideos"}>Github</a> !</p>
                                 </div>
                             </Col>
                         </Row>
@@ -120,10 +118,7 @@ class LandingPage extends Component {
                             <Col md={10} lg={8} xl={7} className="mx-auto">
                                 <Form>
                                     <Form.Row>
-                                        <Col>
-                                            <Button type="submit" className="btn btn-lg btn-primary">Sign up!
-                                            </Button>
-                                        </Col>
+                                        <LoginButtonLandingPage login={login}/>
                                     </Form.Row>
                                 </Form>
                             </Col>
@@ -137,19 +132,19 @@ class LandingPage extends Component {
                             <Col lg={6} className="h-100 text-center text-lg-left my-auto">
                                 <ul className="list-inline mb-2">
                                     <li className="list-inline-item">
-                                        <a href="#" className="text-dark">About</a>
+                                        <a href="/" className="text-dark">About</a>
                                     </li>
                                     <li className="list-inline-item">&sdot;</li>
                                     <li className="list-inline-item">
-                                        <a href="#" className="text-dark">Contact</a>
+                                        <a href="/" className="text-dark">Contact</a>
                                     </li>
                                     <li className="list-inline-item">&sdot;</li>
                                     <li className="list-inline-item">
-                                        <a href="#" className="text-dark">Terms of Use</a>
+                                        <a href="/" className="text-dark">Terms of Use</a>
                                     </li>
                                     <li className="list-inline-item">&sdot;</li>
                                     <li className="list-inline-item">
-                                        <a href="#" className="text-dark">Privacy Policy</a>
+                                        <a href="/" className="text-dark">Privacy Policy</a>
                                     </li>
                                 </ul>
                                 <p className="text-muted small mb-4 mb-lg-0">&copy; Your Website 2019. All Rights
