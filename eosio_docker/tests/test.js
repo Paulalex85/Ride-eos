@@ -74,7 +74,7 @@ async function orderTableIsEmpty() {
         json: true
     });
 
-    return result.rows.length == 0;
+    return result.rows.length === 0;
 }
 
 async function getOrder(key) {
@@ -172,21 +172,21 @@ async function orderTaken(orderKey, key, account) {
 }
 
 async function orderDelive(orderKey, key, account) {
-    let balanceSeller = await getBalanceOfAccount(seller)
-    let balanceDeliver = await getBalanceOfAccount(deliver)
-    let balanceDev = await getBalanceOfAccount(devAccount)
+    let balanceSeller = await getBalanceOfAccount(seller);
+    let balanceDeliver = await getBalanceOfAccount(deliver);
+    let balanceDev = await getBalanceOfAccount(devAccount);
 
     await blockDeliveryContract.orderdelive(orderKey, key, { from: account });
-    let order = await getOrder(orderKey)
+    let order = await getOrder(orderKey);
 
-    let balanceDevAfter = await getBalanceOfAccount(devAccount)
-    let devAmount = (assetToAmount(order.priceOrder) + assetToAmount(order.priceDeliver)) * DEV_RATE
-    assert.strictEqual((balanceDevAfter - balanceDev).toString(), devAmount.toFixed(2).toString(), "The balance of the dev account is not ok");
+    let balanceDevAfter = await getBalanceOfAccount(devAccount);
+    let devAmount = assetToAmount(order.priceDeliver) * DEV_RATE;
+    assert.strictEqual((balanceDevAfter - balanceDev).toString(), devAmount.toString(), "The balance of the dev account is not ok");
 
-    let balanceSellerAfter = await getBalanceOfAccount(seller)
-    assert.strictEqual(balanceSeller + (assetToAmount(order.priceOrder) * (1 - DEV_RATE)), balanceSellerAfter, "The balance of the seller account is not ok");
+    let balanceSellerAfter = await getBalanceOfAccount(seller);
+    assert.strictEqual(balanceSeller , balanceSellerAfter, "The balance of the seller account is not ok");
 
-    let balanceDeliverAfter = await getBalanceOfAccount(deliver)
+    let balanceDeliverAfter = await getBalanceOfAccount(deliver);
     assert.strictEqual(balanceDeliver + (assetToAmount(order.priceDeliver) * (1 - DEV_RATE)), balanceDeliverAfter, "The balance of the deliver account is not ok");
 
     assert.strictEqual(order.state, 5, "The state should be 5");
@@ -410,16 +410,16 @@ describe('Block Delivery contract', function () {
         order = await validateBuyer(order, keyBuyer);
         assert.strictEqual(order.state, 2, "The state should move at 2");
 
-        order = await orderReady(order.orderKey, seller)
+        order = await orderReady(order.orderKey, seller);
 
-        order = await orderTaken(order.orderKey, keySeller.key, deliver)
+        order = await orderTaken(order.orderKey, keySeller.key, deliver);
 
-        order = await orderDelive(order.orderKey, keyBuyer.key, deliver)
+        order = await orderDelive(order.orderKey, keyBuyer.key, deliver);
 
         await eoslime.utils.test.expectAssert(
             blockDeliveryContract.initcancel(order.orderKey, buyer.name, { from: buyer })
         );
-        order = await getOrder(order.orderKey)
+        order = await getOrder(order.orderKey);
         assert.strictEqual(order.state, 5, "The state should stay at 5");
 
         await deleteOrder(order.orderKey)

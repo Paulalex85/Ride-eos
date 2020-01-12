@@ -6,6 +6,7 @@ using namespace eosio;
 // Only for testing
 int DELAY_END_ASSIGN = 5;
 int DELAY_POWER_NEEDED = 5;
+
 double DEV_RATE = 0.05;
 
 bool is_equal(const checksum256 &a, const checksum256 &b)
@@ -199,12 +200,10 @@ void blockdeliver::orderdelive(const uint64_t orderKey, const string &source)
         order.state = ORDER_DELIVERED;
     });
 
-    asset sellerTax = asset{(int64_t)(iteratorOrder->priceOrder.amount * DEV_RATE), iteratorOrder->priceOrder.symbol};
     asset deliverTax = asset{(int64_t)(iteratorOrder->priceDeliver.amount * DEV_RATE), iteratorOrder->priceDeliver.symbol};
 
-    withdraw(iteratorOrder->seller, iteratorOrder->priceOrder - sellerTax);
     withdraw(iteratorOrder->deliver, iteratorOrder->priceDeliver - deliverTax);
-    withdraw(name("sarabrown"), sellerTax + deliverTax);
+    withdraw(name("sarabrown"), deliverTax);
 }
 
 void blockdeliver::initcancel(const uint64_t orderKey, const name account)
