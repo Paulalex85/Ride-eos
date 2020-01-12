@@ -8,13 +8,13 @@ using namespace eosio;
 
 using std::string;
 
-CONTRACT rideos : public eosio::contract
+CONTRACT blockdeliver : public eosio::contract
 {
     using contract::contract;
 
 public:
     // constructor
-    rideos(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
+    blockdeliver(name receiver, name code, datastream<const char *> ds) : contract(receiver, code, ds),
                                                                     _orders(receiver, receiver.value) {}
 
     uint32_t now()

@@ -39,23 +39,23 @@ echo "=== setup wallet: eosiomain ==="
 cleos wallet create -n eosiomain --to-console | tail -1 | sed -e 's/^"//' -e 's/"$//' > eosiomain_wallet_password.txt
 cleos wallet import -n eosiomain --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
 
-echo "=== setup wallet: rideoswallet ==="
+echo "=== setup wallet: blockdeliverywallet ==="
 # key for eosio account and export the generated password to a file for unlocking wallet later
-cleos wallet create -n rideoswallet --to-console | tail -1 | sed -e 's/^"//' -e 's/"$//' > rideos_wallet_password.txt
-# Import key for rideoswallet wallet
-#rideos
-cleos wallet import -n rideoswallet --private-key 5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr
+cleos wallet create -n blockdeliverywallet --to-console | tail -1 | sed -e 's/^"//' -e 's/"$//' > blockdelivery_wallet_password.txt
+# Import key for blockdeliverywallet wallet
+#blockdelivery
+cleos wallet import -n blockdeliverywallet --private-key 5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr
 #eosio.code
-cleos wallet import -n rideoswallet --private-key 5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw
+cleos wallet import -n blockdeliverywallet --private-key 5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw
 
-# create account for rideos with above wallet's public keys
-cleos create account eosio rideos EOS7e4xQuxLZFBDeAqeSC5qHaUYKcMmEdyxjPFbe9Yjjx9z36nm7J
+# create account for blockdelivery with above wallet's public keys
+cleos create account eosio blockdeliver EOS7e4xQuxLZFBDeAqeSC5qHaUYKcMmEdyxjPFbe9Yjjx9z36nm7J
 cleos create account eosio eosio.token EOS82WxL7ZkBbZPEPArmaeNv3dfchMo82A5hzdx3A7vCPyGDzDwCf
 cleos create account eosio eosio.assert EOS82WxL7ZkBbZPEPArmaeNv3dfchMo82A5hzdx3A7vCPyGDzDwCf
 
 echo "=== create user accounts ==="
 # script for creating data into blockchain
-create_accounts.sh rideoswallet
+create_accounts.sh blockdeliverywallet
 
 
 echo "=== deploy smart contract ==="
@@ -63,7 +63,7 @@ echo "=== deploy smart contract ==="
 # $2 account holder name of the smart contract
 # $3 wallet that holds the keys for the account
 # $4 password for unlocking the wallet
-deploy_contract.sh rideos rideos rideoswallet $(cat rideos_wallet_password.txt)
+deploy_contract.sh blockdeliver blockdeliver blockdeliverywallet $(cat blockdelivery_wallet_password.txt)
 deploy_system_contract.sh eosio.contracts/contracts eosio.token
 deploy_system_contract.sh eosio.assert eosio.assert
 

@@ -15,7 +15,7 @@ class Menu extends Component {
                 <Container>
                     <LinkContainer to="/">
                         <Navbar.Brand>
-                            Rideos
+                            Block Delivery
                         </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav"/>

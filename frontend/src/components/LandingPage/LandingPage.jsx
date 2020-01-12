@@ -65,7 +65,7 @@ class LandingPage extends Component {
                                     </div>
                                     <h3>Transparency</h3>
                                     <p className="lead mb-0">Check the code on our <a
-                                        href={"https://github.com/Paulalex85/Rideos"}>Github</a> !</p>
+                                        href={"https://github.com/Paulalex85/Block-Delivery"}>Github</a> !</p>
                                 </div>
                             </Col>
                         </Row>
@@ -153,7 +153,7 @@ class LandingPage extends Component {
                             <Col lg={6} className="h-100 text-center text-lg-right my-auto">
                                 <ul className="list-inline mb-0">
                                     <li className="list-inline-item mr-3">
-                                        <a href="https://github.com/Paulalex85/Rideos">
+                                        <a href="https://github.com/Paulalex85/Block-Delivery">
                                             <FontAwesomeIcon icon={faGithub}
                                                              className="fab fa-2x fa-fw m-auto text-dark"/>
                                         </a>

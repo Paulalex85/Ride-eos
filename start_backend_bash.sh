@@ -1,1 +1,1 @@
-docker exec -it eosio_rideos_container bash
+docker exec -it eosio_blockdelivery_container bash

@@ -1,4 +1,4 @@
-#include "rideos.hpp"
+#include "blockdeliver.hpp"
 using namespace eosio;
 
 // int DELAY_END_ASSIGN = 86400;
@@ -28,7 +28,7 @@ bool is_actor(const name sender, const name buyer, const name seller, const name
     return false;
 }
 
-void rideos::deposit(const name account, const asset &quantity)
+void blockdeliver::deposit(const name account, const asset &quantity)
 {
     check(quantity.is_valid(), "invalid quantity");
     check(quantity.amount > 0, "must withdraw positive quantity");
@@ -42,7 +42,7 @@ void rideos::deposit(const name account, const asset &quantity)
         .send();
 }
 
-void rideos::withdraw(const name account, const asset &quantity)
+void blockdeliver::withdraw(const name account, const asset &quantity)
 {
     check(quantity.is_valid(), "invalid quantity");
     check(quantity.amount > 0, "must withdraw positive quantity");
@@ -55,7 +55,7 @@ void rideos::withdraw(const name account, const asset &quantity)
         .send();
 }
 
-void rideos::initialize(const name sender, const name buyer, const name seller, const name deliver, const asset &priceOrder,
+void blockdeliver::initialize(const name sender, const name buyer, const name seller, const name deliver, const asset &priceOrder,
                         const asset &priceDeliver, const string &details, const uint64_t delay)
 {
     require_auth(sender);
@@ -87,7 +87,7 @@ void rideos::initialize(const name sender, const name buyer, const name seller, 
     });
 }
 
-void rideos::validatebuy(const uint64_t orderKey, const checksum256 &hash)
+void blockdeliver::validatebuy(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -111,7 +111,7 @@ void rideos::validatebuy(const uint64_t orderKey, const checksum256 &hash)
     });
 }
 
-void rideos::validatedeli(const uint64_t orderKey)
+void blockdeliver::validatedeli(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -132,7 +132,7 @@ void rideos::validatedeli(const uint64_t orderKey)
     });
 }
 
-void rideos::validatesell(const uint64_t orderKey, const checksum256 &hash)
+void blockdeliver::validatesell(const uint64_t orderKey, const checksum256 &hash)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -154,7 +154,7 @@ void rideos::validatesell(const uint64_t orderKey, const checksum256 &hash)
     });
 }
 
-void rideos::orderready(const uint64_t orderKey)
+void blockdeliver::orderready(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -168,7 +168,7 @@ void rideos::orderready(const uint64_t orderKey)
     });
 }
 
-void rideos::ordertaken(const uint64_t orderKey, const string &source)
+void blockdeliver::ordertaken(const uint64_t orderKey, const string &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -184,7 +184,7 @@ void rideos::ordertaken(const uint64_t orderKey, const string &source)
     });
 }
 
-void rideos::orderdelive(const uint64_t orderKey, const string &source)
+void blockdeliver::orderdelive(const uint64_t orderKey, const string &source)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -207,7 +207,7 @@ void rideos::orderdelive(const uint64_t orderKey, const string &source)
     withdraw(name("sarabrown"), sellerTax + deliverTax);
 }
 
-void rideos::initcancel(const uint64_t orderKey, const name account)
+void blockdeliver::initcancel(const uint64_t orderKey, const name account)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -230,7 +230,7 @@ void rideos::initcancel(const uint64_t orderKey, const name account)
     });
 }
 
-void rideos::delaycancel(const uint64_t orderKey, const name sender)
+void blockdeliver::delaycancel(const uint64_t orderKey, const name sender)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -251,7 +251,7 @@ void rideos::delaycancel(const uint64_t orderKey, const name sender)
     });
 }
 
-void rideos::deleteorder(const uint64_t orderKey)
+void blockdeliver::deleteorder(const uint64_t orderKey)
 {
     auto iteratorOrder = _orders.find(orderKey);
     check(iteratorOrder != _orders.end(), "Address for order not found");
@@ -262,4 +262,4 @@ void rideos::deleteorder(const uint64_t orderKey)
     }
 }
 
-EOSIO_DISPATCH(rideos, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder))
+EOSIO_DISPATCH(blockdeliver, (initialize)(validatebuy)(validatedeli)(validatesell)(orderready)(ordertaken)(orderdelive)(initcancel)(delaycancel)(deleteorder))

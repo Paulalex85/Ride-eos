@@ -9,7 +9,7 @@ import {TokenPocket} from 'ual-token-pocket'
 import {Ledger} from 'ual-ledger'
 import {UALProvider} from 'ual-reactjs-renderer'
 
-const appName = 'Rideos';
+const appName = 'BlockDelivery';
 
 // Chains
 const chain = {

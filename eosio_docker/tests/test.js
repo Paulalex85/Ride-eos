@@ -2,7 +2,7 @@ const ecc = require('eosjs-ecc');
 const assert = require('assert');
 const eoslime = require('eoslime').init('local');
 
-const RIDEOS_PATH = '/opt/eosio/bin/compiled_contracts/rideos/rideos';
+const BLOCK_DELIVERY_PATH = '/opt/eosio/bin/compiled_contracts/blockdeliver/blockdeliver';
 const TOKEN_PATH = "/opt/eosio/bin/contracts/eosio.contracts/contracts/eosio.token/src/eosio.token"
 
 const TOTAL_SUPPLY = '1000000000.0000 SYS';
@@ -10,10 +10,10 @@ const DEV_RATE = 0.05;
 const CURRENCY_SYMBOL = 'SYS'
 const DEV_ACCOUNT_NAME = "sarabrown"
 
-let rideosContract;
+let blockDeliveryContract;
 let tokenContract;
 let buyer, seller, deliver, devAccount;
-let rideosAccount, eosiotokenAccount;
+let blockDeliveryAccount, eosiotokenAccount;
 
 function generateDataToSign(orderKey, buyer, seller, deliver, date, dateDelay, priceOrder, priceDeliver, details) {
     return "orderKey:" + orderKey
@@ -66,9 +66,9 @@ function createKey(account, order) {
 }
 
 async function orderTableIsEmpty() {
-    let result = await rideosContract.provider.eos.getTableRows({
-        code: rideosContract.name,
-        scope: rideosContract.name,
+    let result = await blockDeliveryContract.provider.eos.getTableRows({
+        code: blockDeliveryContract.name,
+        scope: blockDeliveryContract.name,
         table: "order",
         limit: 10,
         json: true
@@ -78,10 +78,10 @@ async function orderTableIsEmpty() {
 }
 
 async function getOrder(key) {
-    let result = await rideosContract.provider.eos.getTableRows({
+    let result = await blockDeliveryContract.provider.eos.getTableRows({
         json: true,
-        code: rideosContract.name,    // contract who owns the table
-        scope: rideosContract.name,   // scope of the table
+        code: blockDeliveryContract.name,    // contract who owns the table
+        scope: blockDeliveryContract.name,   // scope of the table
         table: "order",    // name of the table as specified by the contract abi
         limit: 1,
         lower_bound: key,
@@ -96,7 +96,7 @@ async function getBalanceOfAccount(account) {
 }
 
 async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", priceDeliver = "2.0000 SYS", orderDetail = "order", dateDelay = 555) {
-    await rideosContract.initialize(
+    await blockDeliveryContract.initialize(
         buyer.name,
         buyer.name,
         seller.name,
@@ -108,9 +108,9 @@ async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", pr
         { from: buyer }
     );
 
-    let result = await rideosContract.provider.eos.getTableRows({
-        code: rideosContract.name,
-        scope: rideosContract.name,
+    let result = await blockDeliveryContract.provider.eos.getTableRows({
+        code: blockDeliveryContract.name,
+        scope: blockDeliveryContract.name,
         table: "order",
         limit: 10,
         json: true
@@ -132,7 +132,7 @@ async function createOrder(buyer, seller, deliver, priceOrder = "5.0000 SYS", pr
 }
 
 async function validateDeliver(order) {
-    await rideosContract.validatedeli(order.orderKey, { from: deliver });
+    await blockDeliveryContract.validatedeli(order.orderKey, { from: deliver });
     order = await getOrder(order.orderKey);
     assert.strictEqual(order.validateDeliver, 1, "Validate deliver should be 1");
     return order;
@@ -141,7 +141,7 @@ async function validateDeliver(order) {
 async function validateBuyer(order, keyBuyer) {
     let balanceBuyer = await getBalanceOfAccount(buyer)
 
-    await rideosContract.validatebuy(order.orderKey, keyBuyer.hash, { from: buyer });
+    await blockDeliveryContract.validatebuy(order.orderKey, keyBuyer.hash, { from: buyer });
     order = await getOrder(order.orderKey);
 
     let balanceBuyerAfter = await getBalanceOfAccount(buyer)
@@ -151,21 +151,21 @@ async function validateBuyer(order, keyBuyer) {
 }
 
 async function validateSeller(order, keySeller) {
-    await rideosContract.validatesell(order.orderKey, keySeller.hash, { from: seller });
+    await blockDeliveryContract.validatesell(order.orderKey, keySeller.hash, { from: seller });
     order = await getOrder(order.orderKey);
     assert.strictEqual(order.validateSeller, 1, "Validate seller should be 1");
     return order;
 }
 
 async function orderReady(orderKey, account) {
-    await rideosContract.orderready(orderKey, { from: account });
+    await blockDeliveryContract.orderready(orderKey, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 3, "The state should be 3");
     return order;
 }
 
 async function orderTaken(orderKey, key, account) {
-    await rideosContract.ordertaken(orderKey, key, { from: account });
+    await blockDeliveryContract.ordertaken(orderKey, key, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 4, "The state should be 4");
     return order;
@@ -176,7 +176,7 @@ async function orderDelive(orderKey, key, account) {
     let balanceDeliver = await getBalanceOfAccount(deliver)
     let balanceDev = await getBalanceOfAccount(devAccount)
 
-    await rideosContract.orderdelive(orderKey, key, { from: account });
+    await blockDeliveryContract.orderdelive(orderKey, key, { from: account });
     let order = await getOrder(orderKey)
 
     let balanceDevAfter = await getBalanceOfAccount(devAccount)
@@ -194,37 +194,37 @@ async function orderDelive(orderKey, key, account) {
 }
 
 async function initializeCancel(orderKey, account) {
-    await rideosContract.initcancel(orderKey, account.name, { from: account });
+    await blockDeliveryContract.initcancel(orderKey, account.name, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 99, "The state should be 99");
     return order;
 }
 
 async function delayCancel(orderKey, account) {
-    await rideosContract.delaycancel(orderKey, account.name, { from: account });
+    await blockDeliveryContract.delaycancel(orderKey, account.name, { from: account });
     let order = await getOrder(orderKey)
     assert.strictEqual(order.state, 98, "The state should be 98");
     return order;
 }
 
 async function deleteOrder(orderKey) {
-    await rideosContract.deleteorder(orderKey);
+    await blockDeliveryContract.deleteorder(orderKey);
     let tableIsEmpty = await orderTableIsEmpty()
     assert.strictEqual(tableIsEmpty, true, "The table should be empty");
 }
 
-describe('Rideos contract', function () {
+describe('Block Delivery contract', function () {
 
     this.timeout(25000);
 
     before(async () => {
-        rideosAccount = eoslime.Account.load('rideos', '5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr');
+        blockDeliveryAccount = eoslime.Account.load('blockdeliver', '5Ka8DotT5vXv8tgjCoJzNrKGvv8Go7xVfycd3XvzjYMQn6bDStr');
         eosiotokenAccount = eoslime.Account.load('eosio.token', '5Jaq9Z6VNLvKBzoeiT29FjoxX5jqU4bYyvYp47RBNfu75iLhkHw');
         devAccount = eoslime.Account.load(DEV_ACCOUNT_NAME, '5KE2UNPCZX5QepKcLpLXVCLdAw7dBfJFJnuCHhXUf61hPRMtUZg');
 
         tokenContract = eoslime.Contract(TOKEN_PATH + ".abi", "eosio.token", eosiotokenAccount);
-        rideosContract = eoslime.Contract(RIDEOS_PATH + ".abi", "rideos", rideosAccount);
-        await rideosContract.makeInline();
+        blockDeliveryContract = eoslime.Contract(BLOCK_DELIVERY_PATH + ".abi", "blockdeliver", blockDeliveryAccount);
+        await blockDeliveryContract.makeInline();
 
         await tokenContract.create(eosiotokenAccount.name, TOTAL_SUPPLY, { from: eosiotokenAccount });
         await tokenContract.issue(eosiotokenAccount.name, "50000000.0000 SYS", 'memo', { from: eosiotokenAccount });
@@ -240,25 +240,25 @@ describe('Rideos contract', function () {
         await tokenContract.transfer(tokenContract.executor.name, seller.name, "10.0000 SYS", "memo", { from: tokenContract.executor });
         await tokenContract.transfer(tokenContract.executor.name, deliver.name, "10.0000 SYS", "memo", { from: tokenContract.executor });
 
-        await buyer.addPermission('active', rideosContract.executor.name);
+        await buyer.addPermission('active', blockDeliveryContract.executor.name);
     });
 
     it('Withdraw method is not possible ', async () => {
-        await tokenContract.transfer(buyer.name, rideosContract.executor.name, "100.0000 SYS", "memo", { from: buyer });
+        await tokenContract.transfer(buyer.name, blockDeliveryContract.executor.name, "100.0000 SYS", "memo", { from: buyer });
         try {
-            await rideosContract.withdraw(buyer.name, "10.0000 SYS", { from: buyer })
+            await blockDeliveryContract.withdraw(buyer.name, "10.0000 SYS", { from: buyer })
         } catch (error) {
             assert.ok(error instanceof TypeError)
-            assert.equal(error.message, 'rideosContract.withdraw is not a function');
+            assert.equal(error.message, 'blockDeliveryContract.withdraw is not a function');
         }
     });
 
     it('Deposit method is not possible ', async () => {
         try {
-            await rideosContract.deposit(buyer.name, "10.0000 SYS", { from: buyer })
+            await blockDeliveryContract.deposit(buyer.name, "10.0000 SYS", { from: buyer })
         } catch (error) {
             assert.ok(error instanceof TypeError)
-            assert.equal(error.message, 'rideosContract.deposit is not a function');
+            assert.equal(error.message, 'blockDeliveryContract.deposit is not a function');
         }
     });
 
@@ -285,7 +285,7 @@ describe('Rideos contract', function () {
         assert.strictEqual(order.state, 2, "The state should move at 2");
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+            blockDeliveryContract.initcancel(order.orderKey, buyer.name, { from: buyer })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
@@ -309,7 +309,7 @@ describe('Rideos contract', function () {
         assert.strictEqual(order.state, 2, "The state should move to 2");
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, deliver.name, { from: deliver })
+            blockDeliveryContract.initcancel(order.orderKey, deliver.name, { from: deliver })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
@@ -333,7 +333,7 @@ describe('Rideos contract', function () {
         assert.strictEqual(order.state, 2, "The state should move to 2");
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, seller.name, { from: seller })
+            blockDeliveryContract.initcancel(order.orderKey, seller.name, { from: seller })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 2, "The state should stay at 2");
@@ -359,7 +359,7 @@ describe('Rideos contract', function () {
         order = await orderReady(order.orderKey, seller)
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+            blockDeliveryContract.initcancel(order.orderKey, buyer.name, { from: buyer })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 3, "The state should stay at 3");
@@ -387,7 +387,7 @@ describe('Rideos contract', function () {
         order = await orderTaken(order.orderKey, keySeller.key, deliver)
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+            blockDeliveryContract.initcancel(order.orderKey, buyer.name, { from: buyer })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 4, "The state should stay at 4");
@@ -417,7 +417,7 @@ describe('Rideos contract', function () {
         order = await orderDelive(order.orderKey, keyBuyer.key, deliver)
 
         await eoslime.utils.test.expectAssert(
-            rideosContract.initcancel(order.orderKey, buyer.name, { from: buyer })
+            blockDeliveryContract.initcancel(order.orderKey, buyer.name, { from: buyer })
         );
         order = await getOrder(order.orderKey)
         assert.strictEqual(order.state, 5, "The state should stay at 5");
